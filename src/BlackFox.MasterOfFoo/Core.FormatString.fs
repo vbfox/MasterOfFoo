@@ -1,7 +1,8 @@
 ﻿/// Set of helpers to parse format string
 module MasterOfFoo.Core.FormatString
 
-open MasterOfFoo.Core.FormatSpecification
+open MasterOfFoo
+open MasterOfFoo.FormatSpecifierConstants
 open System
 
 let inline isDigit c = c >= '0' && c <= '9'

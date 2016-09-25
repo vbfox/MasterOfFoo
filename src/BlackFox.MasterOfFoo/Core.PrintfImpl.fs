@@ -4,7 +4,4 @@ module MasterOfFoo.Core.PrintfImpl
 
     open MasterOfFoo.Core.PrintfCache
    
-    let inline doPrintf fmt f = 
-        let formatter, n = Cache<_, _, _, _>.Get fmt
-        let env() = f(n)
-        formatter env
+

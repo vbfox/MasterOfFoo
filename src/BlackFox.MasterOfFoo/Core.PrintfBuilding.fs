@@ -22,7 +22,7 @@
 
 module MasterOfFoo.Core.PrintfBuilding
 
-open MasterOfFoo.Core.FormatSpecification
+open MasterOfFoo
 open MasterOfFoo.Core.FormatToString
 open System
 open System.Collections.Generic

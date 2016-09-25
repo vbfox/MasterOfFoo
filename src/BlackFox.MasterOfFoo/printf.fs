@@ -1,8 +1,14 @@
 ﻿[<CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
-module MasterOfFoo.Core.Printf 
+module MasterOfFoo.Printf 
 
 open System
-open PrintfImpl
+open MasterOfFoo
+open MasterOfFoo.Core
+
+let doPrintf fmt f = 
+    let formatter, n = PrintfCache.Cache<_, _, _, _>.Get fmt
+    let env() = f(n)
+    formatter env
 
 type StringPrintfEnv<'Result>(k, n) = 
     inherit PrintfEnv<unit, string, 'Result>(())

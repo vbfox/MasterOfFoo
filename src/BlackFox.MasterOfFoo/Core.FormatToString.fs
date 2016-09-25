@@ -1,11 +1,17 @@
 ﻿module MasterOfFoo.Core.FormatToString
 
-open MasterOfFoo.Core.FormatSpecification
+open MasterOfFoo
 open System
 open System.Reflection
 
 let inline boolToString v = if v then "true" else "false"
 let inline stringToSafeString v = if v = null then "" else v
+
+let inline hasFlag flags (expected : FormatFlags) = (flags &&& expected) = expected
+let inline isLeftJustify flags = hasFlag flags FormatFlags.LeftJustify
+let inline isPadWithZeros flags = hasFlag flags FormatFlags.PadWithZeros
+let inline isPlusForPositives flags = hasFlag flags FormatFlags.PlusForPositives
+let inline isSpaceForPositives flags = hasFlag flags FormatFlags.SpaceForPositives
 
 [<Literal>]
 let DefaultPrecision = 6
@@ -455,8 +461,11 @@ type Foo =
                 let printer = fun () -> real x
                 PrintableElement.MakeFromFormatSpecifier(printer, box x, ty, spec))
 
-let getValueConverter (ty : Type) (spec : FormatSpecifier) : obj =
+let private getValueConverterForMethod =
     let mi = typeof<Foo>.GetMethod("getValueConverterFor", NonPublicStatics)
     verifyMethodInfoWasTaken mi
-    let mi' = mi.MakeGenericMethod(ty)
+    mi
+
+let getValueConverter (ty : Type) (spec : FormatSpecifier) : obj =
+    let mi' = getValueConverterForMethod.MakeGenericMethod(ty)
     mi'.Invoke(null, [| ty; box spec |])

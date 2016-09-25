@@ -2,7 +2,7 @@
 // See the 'F# Tutorial' project for more help.
 
 open System.Text
-open MasterOfFoo.Core
+open MasterOfFoo
 
 type internal MyEnv<'Result>(k, state) = 
     inherit PrintfEnv<StringBuilder, unit, 'Result>(state)
@@ -19,7 +19,7 @@ type MyFormat<'T, 'Result>  = Format<'T, StringBuilder, unit, 'Result>
 type MyFormat<'T>  = MyFormat<'T, unit>
 
 let testprintf (sb: StringBuilder) (format : MyFormat<'T>) =
-    PrintfImpl.doPrintf format (fun n -> 
+    Printf.doPrintf format (fun n -> 
         MyEnv(ignore, sb) :> PrintfEnv<_, _, _>
     )
 

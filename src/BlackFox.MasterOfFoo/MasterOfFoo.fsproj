@@ -42,16 +42,16 @@
     <Reference Include="System.Numerics" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Script.fsx" />
-    <Compile Include="Helpers.fs" />
-    <Compile Include="FormatOptions.fs" />
     <Compile Include="FormatSpecification.fs" />
+    <Compile Include="PrintableElement.fs" />
     <Compile Include="PrintfEnv.fs" />
-    <Compile Include="FormatString.fs" />
-    <Compile Include="FormatToString.fs" />
-    <Compile Include="PrintfBuilding.fs" />
-    <Compile Include="PrintfCache.fs" />
-    <Compile Include="PrintfImpl.fs" />
+    <Compile Include="Core.Helpers.fs" />
+    <Compile Include="Core.FormatOptions.fs" />
+    <Compile Include="Core.FormatString.fs" />
+    <Compile Include="Core.FormatToString.fs" />
+    <Compile Include="Core.PrintfBuilding.fs" />
+    <Compile Include="Core.PrintfCache.fs" />
+    <Compile Include="Core.PrintfImpl.fs" />
     <Compile Include="Printf.fs" />
   </ItemGroup>
   <PropertyGroup>

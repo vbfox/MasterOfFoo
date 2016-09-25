@@ -1,4 +1,4 @@
-﻿module MasterOfFoo.Core.FormatSpecification
+﻿namespace MasterOfFoo
 
 open System
 
@@ -10,18 +10,16 @@ type FormatFlags =
     | PlusForPositives = 4
     | SpaceForPositives = 8
 
-let inline hasFlag flags (expected : FormatFlags) = (flags &&& expected) = expected
-let inline isLeftJustify flags = hasFlag flags FormatFlags.LeftJustify
-let inline isPadWithZeros flags = hasFlag flags FormatFlags.PadWithZeros
-let inline isPlusForPositives flags = hasFlag flags FormatFlags.PlusForPositives
-let inline isSpaceForPositives flags = hasFlag flags FormatFlags.SpaceForPositives
+module internal FormatSpecifierConstants =
+    /// Used for width and precision to denote that user has specified '*' flag
+    [<Literal>]
+    let StarValue = -1
 
-/// Used for width and precision to denote that user has specified '*' flag
-[<Literal>]
-let StarValue = -1
-/// Used for width and precision to denote that corresponding value was omitted in format string
-[<Literal>]
-let NotSpecifiedValue = -2
+    /// Used for width and precision to denote that corresponding value was omitted in format string
+    [<Literal>]
+    let NotSpecifiedValue = -2
+
+open FormatSpecifierConstants
 
 [<System.Diagnostics.DebuggerDisplayAttribute("{ToString()}")>]
 [<NoComparison; NoEquality>]
