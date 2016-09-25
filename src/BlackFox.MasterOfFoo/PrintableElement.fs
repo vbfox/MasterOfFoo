@@ -7,30 +7,55 @@ type PrintableElementType =
     | Direct = 1
     | FromFormatSpecifier = 2
 
-[<Struct>]
-type PrintableElement(printer: unit -> string, value: obj, type': PrintableElementType, valueType: Type, spec: FormatSpecifier option) =
-    override x.ToString () = 
-        sprintf
-            "value: %A, type: %A, valueType: %s, spec: %s, AsPrintF: %s"
-            value
-            type'
-            (valueType.FullName)
-            (match spec with Some x -> string x.TypeChar | None -> "")
-            (x.FormatAsPrintF())
+type PrintableElement =
+    struct
+        val private printer: unit -> string
+        member x.Printer with get() = x.printer
 
-    /// Get the string representation that printf would have normally generated
-    member x.FormatAsPrintF() =
-        printer ()
+        val private value: obj
+        member x.Value with get() = x.value
 
-    static member inline MakeFromString(s: string, type': PrintableElementType) =
-        let printer = fun () -> s
-        PrintableElement(printer, s, type', typeof<string>, None)
+        val private type': PrintableElementType
+        member x.Type with get() = x.type'
 
-    static member inline MadeByEngine(s: string) =
-        PrintableElement.MakeFromString(s , PrintableElementType.MadeByEngine)
+        val private valueType: Type
+        member x.ValueType with get() = x.valueType
 
-    static member MakeDirect(s: string) =
-        PrintableElement.MakeFromString(s , PrintableElementType.Direct)
+        val private spec: FormatSpecifier option
+        member x.Spec with get() = x.spec
 
-    static member MakeFromFormatSpecifier(printer: unit -> string, value: obj, valueType: Type, spec: FormatSpecifier) =
-        PrintableElement(printer, value, PrintableElementType.FromFormatSpecifier, valueType, Some(spec))
+        new (printer, value: obj, type', valueType, spec) =
+            {
+                printer = printer
+                value = value
+                type' = type'
+                valueType = valueType
+                spec = spec
+            }
+
+        override x.ToString () = 
+            sprintf
+                "value: %A, type: %A, valueType: %s, spec: %s, AsPrintF: %s"
+                x.value
+                x.type'
+                (x.valueType.FullName)
+                (match x.spec with Some x -> x.ToString() | None -> "")
+                (x.FormatAsPrintF())
+
+        /// Get the string representation that printf would have normally generated
+        member x.FormatAsPrintF() =
+            x.printer ()
+
+        static member inline MakeFromString(s: string, type': PrintableElementType) =
+            let printer = fun () -> s
+            PrintableElement(printer, s, type', typeof<string>, None)
+
+        static member inline MadeByEngine(s: string) =
+            PrintableElement.MakeFromString(s , PrintableElementType.MadeByEngine)
+
+        static member MakeDirect(s: string) =
+            PrintableElement.MakeFromString(s , PrintableElementType.Direct)
+
+        static member MakeFromFormatSpecifier(printer: unit -> string, value: obj, valueType: Type, spec: FormatSpecifier) =
+            PrintableElement(printer, value, PrintableElementType.FromFormatSpecifier, valueType, Some(spec))
+    end

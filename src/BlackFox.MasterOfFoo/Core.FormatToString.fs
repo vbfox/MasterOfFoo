@@ -442,7 +442,7 @@ let getValueConverter_Real (ty : Type) (spec : FormatSpecifier) =
     | _ -> 
         raise (ArgumentException("Bad format specifier"))
 
-type Foo =
+type ValueConverterHolder =
     static member getValueConverterFor<'t> (ty : Type, spec : FormatSpecifier) =
         let realUntyped = getValueConverter_Real ty spec
         if spec.IsStarWidth && spec.IsStarPrecision then
@@ -462,7 +462,7 @@ type Foo =
                 PrintableElement.MakeFromFormatSpecifier(printer, box x, ty, spec))
 
 let private getValueConverterForMethod =
-    let mi = typeof<Foo>.GetMethod("getValueConverterFor", NonPublicStatics)
+    let mi = typeof<ValueConverterHolder>.GetMethod("getValueConverterFor", NonPublicStatics)
     verifyMethodInfoWasTaken mi
     mi
 
