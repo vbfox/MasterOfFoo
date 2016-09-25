@@ -11,21 +11,23 @@ type StringPrintfEnv<'Result>(k, n) =
     let mutable ptr = 0
 
     override this.Finalize() : 'Result = k (String.Concat(buf))
-    override this.Write(s : string) = 
+    override this.Write(s : PrintableElement) = 
+        buf.[ptr] <- s.ToString()
+        ptr <- ptr + 1
+    override this.WriteT(s) = 
         buf.[ptr] <- s
         ptr <- ptr + 1
-    override this.WriteT(s) = this.Write s
 
 type StringBuilderPrintfEnv<'Result>(k, buf) = 
     inherit PrintfEnv<Text.StringBuilder, unit, 'Result>(buf)
     override this.Finalize() : 'Result = k ()
-    override this.Write(s : string) = ignore(buf.Append(s))
+    override this.Write(s : PrintableElement) = ignore(buf.Append(s.ToString()))
     override this.WriteT(()) = ()
 
 type TextWriterPrintfEnv<'Result>(k, tw : IO.TextWriter) =
     inherit PrintfEnv<IO.TextWriter, unit, 'Result>(tw)
     override this.Finalize() : 'Result = k()
-    override this.Write(s : string) = tw.Write s
+    override this.Write(s : PrintableElement) = tw.Write (s.ToString())
     override this.WriteT(()) = ()
 
 type BuilderFormat<'T,'Result>    = Format<'T, System.Text.StringBuilder, unit, 'Result>

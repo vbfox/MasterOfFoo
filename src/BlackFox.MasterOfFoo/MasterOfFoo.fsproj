@@ -46,9 +46,9 @@
     <Compile Include="Helpers.fs" />
     <Compile Include="FormatOptions.fs" />
     <Compile Include="FormatSpecification.fs" />
+    <Compile Include="PrintfEnv.fs" />
     <Compile Include="FormatString.fs" />
     <Compile Include="FormatToString.fs" />
-    <Compile Include="PrintfEnv.fs" />
     <Compile Include="PrintfBuilding.fs" />
     <Compile Include="PrintfCache.fs" />
     <Compile Include="PrintfImpl.fs" />

@@ -31,7 +31,7 @@ type Cache<'T, 'State, 'Residue, 'Result>() =
             if map.TryGetValue(key, &res) then res
             else
             let v = 
-#if DEBUG
+#if DEBUG_
                 try 
                     generate(key)
                 with

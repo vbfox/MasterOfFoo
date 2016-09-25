@@ -208,7 +208,7 @@ type Specializations<'State, 'Residue, 'Result> private ()=
             )
         )
 
-    static member TFinal(s1 : string, s2 : string) = 
+    static member TFinal(s1 : PrintableElement, s2 : PrintableElement) = 
         (fun (env : unit -> PrintfEnv<'State, 'Residue, 'Result>) ->
             (fun (f : 'State -> 'Residue) -> 
                 let env = env()
@@ -218,7 +218,7 @@ type Specializations<'State, 'Residue, 'Result> private ()=
                 env.Finalize()
             )
         )
-    static member TChained<'Tail>(s1 : string, next : PrintfFactory<'State, 'Residue, 'Result,'Tail>) = 
+    static member TChained<'Tail>(s1 : PrintableElement, next : PrintfFactory<'State, 'Residue, 'Result,'Tail>) = 
         (fun (env : unit -> PrintfEnv<'State, 'Residue, 'Result>) ->
             (fun (f : 'State -> 'Residue) -> 
                 let env() = 
@@ -230,7 +230,7 @@ type Specializations<'State, 'Residue, 'Result> private ()=
             )
         )
 
-    static member LittleAFinal<'A>(s1 : string, s2 : string) = 
+    static member LittleAFinal<'A>(s1 : PrintableElement, s2 : PrintableElement) = 
         (fun (env : unit -> PrintfEnv<'State, 'Residue, 'Result>) ->
             (fun (f : 'State -> 'A ->'Residue) (a : 'A) -> 
                 let env = env()
@@ -240,7 +240,7 @@ type Specializations<'State, 'Residue, 'Result> private ()=
                 env.Finalize()
             )
         )
-    static member LittleAChained<'A, 'Tail>(s1 : string, next : PrintfFactory<'State, 'Residue, 'Result,'Tail>) = 
+    static member LittleAChained<'A, 'Tail>(s1 : PrintableElement, next : PrintfFactory<'State, 'Residue, 'Result,'Tail>) = 
         (fun (env : unit -> PrintfEnv<'State, 'Residue, 'Result>) ->
             (fun (f : 'State -> 'A ->'Residue) (a : 'A) -> 
                 let env() = 
@@ -252,96 +252,96 @@ type Specializations<'State, 'Residue, 'Result> private ()=
             )
         )
 
-    static member StarFinal1<'A>(s1 : string, conv, s2 : string) = 
+    static member StarFinal1<'A>(s1 : PrintableElement, conv, s2 : PrintableElement) = 
         (fun (env : unit -> PrintfEnv<'State, 'Residue, 'Result>) ->
             (fun (star1 : int) (a : 'A) -> 
                 let env = env()
                 env.Write s1
-                env.Write (conv a star1 : string)
+                env.Write (conv a star1 : PrintableElement)
                 env.Write s2
                 env.Finalize()
             )
         )
         
-    static member PercentStarFinal1(s1 : string, s2 : string) = 
+    static member PercentStarFinal1(s1 : PrintableElement, s2 : PrintableElement) = 
         (fun (env : unit -> PrintfEnv<'State, 'Residue, 'Result>) ->
             (fun (_star1 : int) -> 
                 let env = env()
                 env.Write s1
-                env.Write("%")
+                env.Write(PrintableElement.MadeByEngine("%"))
                 env.Write s2
                 env.Finalize()
             )
         )
 
-    static member StarFinal2<'A>(s1 : string, conv, s2 : string) = 
+    static member StarFinal2<'A>(s1 : PrintableElement, conv, s2 : PrintableElement) = 
         (fun (env : unit -> PrintfEnv<'State, 'Residue, 'Result>) ->
             (fun (star1 : int) (star2 : int) (a : 'A) -> 
                 let env = env()
                 env.Write s1
-                env.Write (conv a star1 star2: string)
+                env.Write (conv a star1 star2: PrintableElement)
                 env.Write s2
                 env.Finalize()
             )
         )
 
     /// Handles case when '%*.*%' is used at the end of string
-    static member PercentStarFinal2(s1 : string, s2 : string) = 
+    static member PercentStarFinal2(s1 : PrintableElement, s2 : PrintableElement) = 
         (fun (env : unit -> PrintfEnv<'State, 'Residue, 'Result>) ->
             (fun (_star1 : int) (_star2 : int) -> 
                 let env = env()
                 env.Write s1
-                env.Write("%")
+                env.Write(PrintableElement.MadeByEngine("%"))
                 env.Write s2
                 env.Finalize()
             )
         )
 
-    static member StarChained1<'A, 'Tail>(s1 : string, conv, next : PrintfFactory<'State, 'Residue, 'Result,'Tail>) = 
+    static member StarChained1<'A, 'Tail>(s1 : PrintableElement, conv, next : PrintfFactory<'State, 'Residue, 'Result,'Tail>) = 
         (fun (env : unit -> PrintfEnv<'State, 'Residue, 'Result>) ->
             (fun (star1 : int) (a : 'A) -> 
                 let env() =
                     let env = env()
                     env.Write s1
-                    env.Write(conv a star1 : string)
+                    env.Write(conv a star1 : PrintableElement)
                     env
                 next env : 'Tail
             )
         )
         
     /// Handles case when '%*%' is used in the middle of the string so it needs to be chained to another printing block
-    static member PercentStarChained1<'Tail>(s1 : string, next : PrintfFactory<'State, 'Residue, 'Result,'Tail>) = 
+    static member PercentStarChained1<'Tail>(s1 : PrintableElement, next : PrintfFactory<'State, 'Residue, 'Result,'Tail>) = 
         (fun (env : unit -> PrintfEnv<'State, 'Residue, 'Result>) ->
             (fun (_star1 : int) -> 
                 let env() =
                     let env = env()
                     env.Write s1
-                    env.Write("%")
+                    env.Write(PrintableElement.MadeByEngine("%"))
                     env
                 next env : 'Tail
             )
         )
 
-    static member StarChained2<'A, 'Tail>(s1 : string, conv, next : PrintfFactory<'State, 'Residue, 'Result,'Tail>) = 
+    static member StarChained2<'A, 'Tail>(s1 : PrintableElement, conv, next : PrintfFactory<'State, 'Residue, 'Result,'Tail>) = 
         (fun (env : unit -> PrintfEnv<'State, 'Residue, 'Result>) ->
             (fun (star1 : int) (star2 : int) (a : 'A) -> 
                 let env() =
                     let env = env()
                     env.Write s1
-                    env.Write(conv a star1 star2 : string)
+                    env.Write(conv a star1 star2 : PrintableElement)
                     env
                 next env : 'Tail
             )
         )
         
     /// Handles case when '%*.*%' is used in the middle of the string so it needs to be chained to another printing block
-    static member PercentStarChained2<'Tail>(s1 : string, next : PrintfFactory<'State, 'Residue, 'Result,'Tail>) = 
+    static member PercentStarChained2<'Tail>(s1 : PrintableElement, next : PrintfFactory<'State, 'Residue, 'Result,'Tail>) = 
         (fun (env : unit -> PrintfEnv<'State, 'Residue, 'Result>) ->
             (fun (_star1 : int) (_star2 : int) -> 
                 let env() =
                     let env = env()
                     env.Write s1
-                    env.Write("%")
+                    env.Write(PrintableElement.MadeByEngine("%"))
                     env
                 next env : 'Tail
             )
@@ -425,14 +425,6 @@ type private PrintfBuilderStack() =
         System.Diagnostics.Debug.Assert(args.Count = types.Count, "args.Count = types.Count")
         args.Count = 0
 
-let inline private verifyMethodInfoWasTaken (_mi : System.Reflection.MemberInfo) =
-#if DEBUG
-    if _mi = null then 
-        ignore (System.Diagnostics.Debugger.Break())
-#else
-    ()
-#endif
-
 /// Parses format string and creates result printer function.
 /// First it recursively consumes format string up to the end, then during unwinding builds printer using PrintfBuilderStack as storage for arguments.
 /// idea of implementation is very simple: every step can either push argument to the stack (if current block of 5 format specifiers is not yet filled) 
@@ -441,7 +433,7 @@ type PrintfBuilder<'S, 'Re, 'Res>() =
     
     let mutable count = 0
            
-    let buildSpecialChained(spec : FormatSpecifier, argTys : Type[], prefix : string, tail : obj, retTy) = 
+    let buildSpecialChained(spec : FormatSpecifier, argTys : Type[], prefix : PrintableElement, tail : obj, retTy) = 
         if spec.TypeChar = 'a' then
             let mi = typeof<Specializations<'S, 'Re, 'Res>>.GetMethod("LittleAChained", NonPublicStatics)
             verifyMethodInfoWasTaken mi
@@ -476,7 +468,7 @@ type PrintfBuilder<'S, 'Re, 'Res>() =
             let mi = mi.MakeGenericMethod argTypes
             mi.Invoke(null, args)
             
-    let buildSpecialFinal(spec : FormatSpecifier, argTys : Type[], prefix : string, suffix : string) =
+    let buildSpecialFinal(spec : FormatSpecifier, argTys : Type[], prefix : PrintableElement, suffix : PrintableElement) =
         if spec.TypeChar = 'a' then
             let mi = typeof<Specializations<'S, 'Re, 'Res>>.GetMethod("LittleAFinal", NonPublicStatics)
             verifyMethodInfoWasTaken mi
@@ -520,8 +512,8 @@ type PrintfBuilder<'S, 'Re, 'Res>() =
     let buildPlainChained(args : obj[], argTypes : Type[]) = 
         let mi = typeof<Specializations<'S, 'Re, 'Res>>.GetMethod("Chained" + ((argTypes.Length - 1).ToString()), NonPublicStatics)
         verifyMethodInfoWasTaken mi
-        let mi = mi.MakeGenericMethod(argTypes)
-        mi.Invoke(null, args)   
+        let mi' = mi.MakeGenericMethod(argTypes)
+        mi'.Invoke(null, args)   
 
     let builderStack = PrintfBuilderStack()
 
@@ -546,7 +538,7 @@ type PrintfBuilder<'S, 'Re, 'Res>() =
         else
             buildPlainFinal(plainArgs, plainTypes)
 
-    let rec parseFromFormatSpecifier (prefix : string) (s : string) (funcTy : Type) i : int = 
+    let rec parseFromFormatSpecifier (prefix : PrintableElement) (s : string) (funcTy : Type) i : int = 
             
         if i >= s.Length then 0
         else

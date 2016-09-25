@@ -403,7 +403,7 @@ let basicFloatToString ty spec =
     | TypeCode.Decimal  -> decimalWithPadding spec (getFormatForFloat spec.TypeChar) defaultFormat (fun fmt (v : decimal) -> toFormattedString fmt v)
     | _ -> raise (ArgumentException(ty.Name + " not a basic floating point type"))
 
-let getValueConverter (ty : Type) (spec : FormatSpecifier) : obj = 
+let getValueConverter_Real (ty : Type) (spec : FormatSpecifier) = 
     match spec.TypeChar with
     | 'b' ->  
         System.Diagnostics.Debug.Assert(ty === typeof<bool>, "ty === typeof<bool>")
@@ -425,11 +425,26 @@ let getValueConverter (ty : Type) (spec : FormatSpecifier) : obj =
         basicFloatToString ty spec
     | 'A' ->
         let mi = typeof<ObjectPrinter>.GetMethod("GenericToString", NonPublicStatics)
-        let mi = mi.MakeGenericMethod(ty)
-        mi.Invoke(null, [| box spec |])
+        verifyMethodInfoWasTaken mi
+        let mi' = mi.MakeGenericMethod(ty)
+        mi'.Invoke(null, [| box spec |])
     | 'O' -> 
         let mi = typeof<ObjectPrinter>.GetMethod("ObjectToString", NonPublicStatics)
-        let mi = mi.MakeGenericMethod(ty)
-        mi.Invoke(null, [| box spec |])
+        verifyMethodInfoWasTaken mi
+        let mi' = mi.MakeGenericMethod(ty)
+        mi'.Invoke(null, [| box spec |])
     | _ -> 
         raise (ArgumentException("Bad format specifier"))
+
+type Foo =
+    static member getValueConverterFor<'t> (ty : Type, spec : FormatSpecifier) =
+        fun (x: 't) ->
+            let untypedReal = getValueConverter_Real ty spec
+            let real = untypedReal :?> ('t -> string)
+            PrintableElement.TempGenerated(real x)
+
+let getValueConverter (ty : Type) (spec : FormatSpecifier) : obj =
+    let mi = typeof<Foo>.GetMethod("getValueConverterFor", NonPublicStatics)
+    verifyMethodInfoWasTaken mi
+    let mi' = mi.MakeGenericMethod(ty)
+    mi'.Invoke(null, [| ty; box spec |])

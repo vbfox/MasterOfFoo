@@ -41,7 +41,7 @@ let parseTypeChar (s : string) i : char * int =
 let findNextFormatSpecifier (s : string) i = 
     let rec go i (buf : Text.StringBuilder) =
         if i >= s.Length then 
-            s.Length, buf.ToString()
+            s.Length, PrintableElement.DirectFromFormatString (buf.ToString())
         else
             let c = s.[i]
             if c = '%' then
@@ -56,7 +56,7 @@ let findNextFormatSpecifier (s : string) i =
                         buf.Append('%') |> ignore
                         go i4 buf
                     else 
-                        i, buf.ToString()
+                        i, PrintableElement.DirectFromFormatString (buf.ToString())
                 else
                     raise (ArgumentException("Missing format specifier"))
             else 
