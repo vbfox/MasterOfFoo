@@ -438,10 +438,22 @@ let getValueConverter_Real (ty : Type) (spec : FormatSpecifier) =
 
 type Foo =
     static member getValueConverterFor<'t> (ty : Type, spec : FormatSpecifier) =
-        fun (x: 't) ->
-            let untypedReal = getValueConverter_Real ty spec
-            let real = untypedReal :?> ('t -> string)
-            PrintableElement.MakeFromFormatSpecifier(real x, box x, ty, spec)
+        let realUntyped = getValueConverter_Real ty spec
+        if spec.IsStarWidth && spec.IsStarPrecision then
+            let real = realUntyped :?> ('t -> int -> int -> string)
+            box(fun (x: 't) width prec ->
+                let printer = fun () -> real x width prec
+                PrintableElement.MakeFromFormatSpecifier(printer, box x, ty, spec))
+        else if spec.IsStarWidth || spec.IsStarPrecision then
+            let real = realUntyped :?> ('t -> int -> string)
+            box(fun (x: 't) widthOrPrec ->
+                let printer = fun () -> real x widthOrPrec
+                PrintableElement.MakeFromFormatSpecifier(printer, box x, ty, spec))
+        else
+            let real = realUntyped :?> ('t -> string)
+            box(fun (x: 't) ->
+                let printer = fun () -> real x
+                PrintableElement.MakeFromFormatSpecifier(printer, box x, ty, spec))
 
 let getValueConverter (ty : Type) (spec : FormatSpecifier) : obj =
     let mi = typeof<Foo>.GetMethod("getValueConverterFor", NonPublicStatics)
