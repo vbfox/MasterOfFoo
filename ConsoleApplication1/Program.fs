@@ -26,7 +26,13 @@ let testprintf (sb: StringBuilder) (format : MyFormat<'T>) =
 let simple () =
     printfn "------------------------------------------------"
     let sb = StringBuilder ()
-    testprintf sb "Hello %s" "World"
+    testprintf sb "Hello %i hello %s" 1000 "World"
+    System.Console.WriteLine("RESULT: {0}", sb.ToString())
+
+let percentStar () =
+    printfn "------------------------------------------------"
+    let sb = StringBuilder ()
+    testprintf sb "Hello '%*i'" 5 42
     System.Console.WriteLine("RESULT: {0}", sb.ToString())
 
 let chained () =
@@ -44,6 +50,7 @@ let complex () =
 [<EntryPoint>]
 let main argv = 
     simple ()
+    percentStar ()
     //chained ()
     //complex ()
     ignore(System.Console.ReadLine ())

@@ -441,7 +441,7 @@ type Foo =
         fun (x: 't) ->
             let untypedReal = getValueConverter_Real ty spec
             let real = untypedReal :?> ('t -> string)
-            PrintableElement.TempGenerated(real x)
+            PrintableElement.MakeFromFormatSpecifier(real x, box x, ty, spec)
 
 let getValueConverter (ty : Type) (spec : FormatSpecifier) : obj =
     let mi = typeof<Foo>.GetMethod("getValueConverterFor", NonPublicStatics)

@@ -491,7 +491,7 @@ type PrintfBuilder<'S, 'Re, 'Res>() =
                
             verifyMethodInfoWasTaken mi
 
-            let mi, args = 
+            let mi', args = 
                 if spec.TypeChar = '%' then 
                     mi, [| box prefix; box suffix  |]
                 else
@@ -500,7 +500,7 @@ type PrintfBuilder<'S, 'Re, 'Res>() =
                     let conv = getValueConverter argTy spec 
                     mi, [| box prefix; box conv; box suffix  |]
 
-            mi.Invoke(null, args)
+            mi'.Invoke(null, args)
 
     let buildPlainFinal(args : obj[], argTypes : Type[]) = 
         let methodName = "Final" + (argTypes.Length.ToString())
