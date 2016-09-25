@@ -4,10 +4,6 @@ open MasterOfFoo.Core.FormatSpecification
 open System
 open System.Reflection
 
-let inline internal (===) a b = Object.ReferenceEquals(a, b)
-
-let invariantCulture = System.Globalization.CultureInfo.InvariantCulture 
-
 let inline boolToString v = if v then "true" else "false"
 let inline stringToSafeString v = if v = null then "" else v
 
@@ -301,10 +297,10 @@ let inline floatWithPadding (spec : FormatSpecifier) getFormat defaultFormat f =
     let padChar, prefix = getPadAndPrefix true spec
     let isGFormat = isGFormat spec
     Padding.withPaddingFormatted spec getFormat defaultFormat (Float.noJustification f prefix) (Float.leftJustify isGFormat f prefix padChar) (Float.rightJustify f prefix padChar)
-    
+
 let inline identity v =  v
-let inline toString  v =   (^T : (member ToString : IFormatProvider -> string)(v, invariantCulture))
-let inline toFormattedString fmt = fun (v : ^T) -> (^T : (member ToString : string * IFormatProvider -> string)(v, fmt, invariantCulture))
+let inline toString  v =   (^T : (member ToString : IFormatProvider -> string)(v, System.Globalization.CultureInfo.InvariantCulture))
+let inline toFormattedString fmt = fun (v : ^T) -> (^T : (member ToString : string * IFormatProvider -> string)(v, fmt, System.Globalization.CultureInfo.InvariantCulture))
 
 let inline numberToString c spec alt unsignedConv  =
     if c = 'd' || c = 'i' then
@@ -323,7 +319,7 @@ type ObjectPrinter =
     static member ObjectToString<'T>(spec : FormatSpecifier) = 
         basicWithPadding spec (fun (v : 'T) -> match box v with null -> "<null>" | x -> x.ToString())
         
-    static member GenericToStringCore(v : 'T, opts : Microsoft.FSharp.Text.StructuredPrintfImpl.FormatOptions, bindingFlags) = 
+    static member GenericToStringCore(v : 'T, opts : FormatOptions, bindingFlags) = 
         // printfn %0A is considered to mean 'print width zero'
         match box v with 
         | null -> "<null>" 
@@ -342,7 +338,7 @@ type ObjectPrinter =
 
         let useZeroWidth = isPadWithZeros spec.Flags
         let opts = 
-            let o = Microsoft.FSharp.Text.StructuredPrintfImpl.FormatOptions.Default
+            let o = FormatOptions.Default
             let o =
                 if useZeroWidth then { o with PrintWidth = 0} 
                 elif spec.IsWidthSpecified then { o with PrintWidth = spec.Width}
@@ -406,8 +402,6 @@ let basicFloatToString ty spec =
     | TypeCode.Double   -> floatWithPadding spec (getFormatForFloat spec.TypeChar) defaultFormat (fun fmt (v : float) -> toFormattedString fmt v)
     | TypeCode.Decimal  -> decimalWithPadding spec (getFormatForFloat spec.TypeChar) defaultFormat (fun fmt (v : decimal) -> toFormattedString fmt v)
     | _ -> raise (ArgumentException(ty.Name + " not a basic floating point type"))
-
-let private NonPublicStatics = BindingFlags.NonPublic ||| BindingFlags.Static
 
 let getValueConverter (ty : Type) (spec : FormatSpecifier) : obj = 
     match spec.TypeChar with

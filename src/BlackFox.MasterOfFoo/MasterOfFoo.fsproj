@@ -43,12 +43,16 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Script.fsx" />
-    <Compile Include="File1.fs" />
+    <Compile Include="Helpers.fs" />
+    <Compile Include="FormatOptions.fs" />
     <Compile Include="FormatSpecification.fs" />
     <Compile Include="FormatString.fs" />
     <Compile Include="FormatToString.fs" />
-    <Compile Include="printf.fs" />
-    <Compile Include="MasterOfFoo.fs" />
+    <Compile Include="PrintfEnv.fs" />
+    <Compile Include="PrintfBuilding.fs" />
+    <Compile Include="PrintfCache.fs" />
+    <Compile Include="PrintfImpl.fs" />
+    <Compile Include="Printf.fs" />
   </ItemGroup>
   <PropertyGroup>
     <MinimumVisualStudioVersion Condition="'$(MinimumVisualStudioVersion)' == ''">11</MinimumVisualStudioVersion>
