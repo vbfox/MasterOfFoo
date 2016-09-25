@@ -26,7 +26,7 @@ let testprintf (sb: StringBuilder) (format : MyFormat<'T>) =
 let simple () =
     printfn "------------------------------------------------"
     let sb = StringBuilder ()
-    testprintf sb "Hello %i hello %s" 1000 "World"
+    testprintf sb "Hello %-010i hello %s" 1000 "World"
     System.Console.WriteLine("RESULT: {0}", sb.ToString())
 
 let percentStar () =

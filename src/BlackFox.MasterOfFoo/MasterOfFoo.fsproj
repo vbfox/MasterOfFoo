@@ -51,7 +51,6 @@
     <Compile Include="Core.FormatToString.fs" />
     <Compile Include="Core.PrintfBuilding.fs" />
     <Compile Include="Core.PrintfCache.fs" />
-    <Compile Include="Core.PrintfImpl.fs" />
     <Compile Include="Printf.fs" />
   </ItemGroup>
   <PropertyGroup>
