@@ -268,7 +268,7 @@ type Specializations<'State, 'Residue, 'Result> private ()=
             (fun (_star1 : int) -> 
                 let env = env()
                 env.Write s1
-                env.Write(PrintableElement.MadeByEngine("%"))
+                env.Write(PrintableElement("%", PrintableElementType.MadeByEngine))
                 env.Write s2
                 env.Finalize()
             )
@@ -291,7 +291,7 @@ type Specializations<'State, 'Residue, 'Result> private ()=
             (fun (_star1 : int) (_star2 : int) -> 
                 let env = env()
                 env.Write s1
-                env.Write(PrintableElement.MadeByEngine("%"))
+                env.Write(PrintableElement("%", PrintableElementType.MadeByEngine))
                 env.Write s2
                 env.Finalize()
             )
@@ -316,7 +316,7 @@ type Specializations<'State, 'Residue, 'Result> private ()=
                 let env() =
                     let env = env()
                     env.Write s1
-                    env.Write(PrintableElement.MadeByEngine("%"))
+                    env.Write(PrintableElement("%", PrintableElementType.MadeByEngine))
                     env
                 next env : 'Tail
             )
@@ -341,7 +341,7 @@ type Specializations<'State, 'Residue, 'Result> private ()=
                 let env() =
                     let env = env()
                     env.Write s1
-                    env.Write(PrintableElement.MadeByEngine("%"))
+                    env.Write(PrintableElement("%", PrintableElementType.MadeByEngine))
                     env
                 next env : 'Tail
             )

@@ -446,27 +446,28 @@ open FormatSpecifierConstants
 
 type ValueConverterHolder =
     static member getValueConverterFor<'t> (ty : Type, spec : FormatSpecifier) =
+        let et = PrintableElementType.FromFormatSpecifier
         let realUntyped = getValueConverter_Real ty spec
         if spec.IsStarWidth && spec.IsStarPrecision then
             let real = realUntyped :?> ('t -> int -> int -> string)
             box(fun (x: 't) width prec ->
                 let printer = fun () -> real x width prec
-                PrintableElement.MakeFromFormatSpecifier(printer, box x, ty, spec, width, prec))
+                PrintableElement(printer, box x, et, ty, spec, width, prec))
         else if spec.IsStarWidth || spec.IsStarPrecision then
             let real = realUntyped :?> ('t -> int -> string)
             if spec.IsStarWidth then
                 box(fun (x: 't) width ->
                     let printer = fun () -> real x width
-                    PrintableElement.MakeFromFormatSpecifier(printer, box x, ty, spec, width, NotSpecifiedValue))
+                    PrintableElement(printer, box x, et, ty, spec, width, NotSpecifiedValue))
             else
                 box(fun (x: 't) prec ->
                     let printer = fun () -> real x prec
-                    PrintableElement.MakeFromFormatSpecifier(printer, box x, ty, spec, NotSpecifiedValue, prec))
+                    PrintableElement(printer, box x, et, ty, spec, NotSpecifiedValue, prec))
         else
             let real = realUntyped :?> ('t -> string)
             box(fun (x: 't) ->
                 let printer = fun () -> real x
-                PrintableElement.MakeFromFormatSpecifier(printer, box x, ty, spec, NotSpecifiedValue, NotSpecifiedValue))
+                PrintableElement(printer, box x, et, ty, spec, NotSpecifiedValue, NotSpecifiedValue))
 
 let private getValueConverterForMethod =
     let mi = typeof<ValueConverterHolder>.GetMethod("getValueConverterFor", NonPublicStatics)
