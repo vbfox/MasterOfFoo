@@ -82,7 +82,7 @@ let testprintf (sb: StringBuilder) (format : Format<'T, StringBuilder, unit, uni
 let simple () =
     printfn "------------------------------------------------"
     let sb = StringBuilder ()
-    testprintf sb "Hello %0-10i hello %s" 1000 "World"
+    testprintf sb "Hello %0-10i hello %s %A" 1000 "World" "World"
     sb.Clear() |> ignore
     testprintf sb "Hello %-010i hello %s" 1000 "World"
     System.Console.WriteLine("RESULT: {0}", sb.ToString())
@@ -120,8 +120,8 @@ let main argv =
             "Test"
             System.DateTimeOffset.Now
 
-    //simple ()
-    percentStar ()
+    simple ()
+    //percentStar ()
     //chained ()
     //complex ()
     ignore(System.Console.ReadLine ())

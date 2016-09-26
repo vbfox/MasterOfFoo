@@ -1,63 +1,60 @@
 ﻿namespace MasterOfFoo
 
 open System
+open FormatSpecifierConstants
 
 type PrintableElementType =
-    | MadeByEngine = 0
-    | Direct = 1
-    | FromFormatSpecifier = 2
+    | MadeByEngine = 0uy
+    | Direct = 1uy
+    | FromFormatSpecifier = 2uy
 
-type PrintableElement =
-    val private printer: unit -> string
-    member x.Printer with get() = x.printer
+type PrintableElement
+    (
+        printer: unit -> string,
+        value: obj,
+        type': PrintableElementType,
+        valueType: Type,
+        spec: FormatSpecifier,
+        starWidth: int,
+        starPrecision: int
+    ) =
 
-    val private value: obj
-    member x.Value with get() = x.value
-
-    val private type': PrintableElementType
-    member x.Type with get() = x.type'
-
-    val private valueType: Type
-    member x.ValueType with get() = x.valueType
-
-    val private spec: FormatSpecifier option
-    member x.Spec with get() = x.spec
-
-    val private starWidth: int option
-    member x.StarWidth with get() = x.starWidth
-
-    val private starPrecision: int option
-    member x.StarPrecision with get() = x.starPrecision
-
-    new (printer, value: obj, type', valueType, spec, starWidth, starPrecision) =
-        {
-            printer = printer
-            value = value
-            type' = type'
-            valueType = valueType
-            spec = spec
-            starWidth = starWidth
-            starPrecision = starPrecision
-        }
+    /// The type of element (From a format specifier or directly from the string string)
+    member x.Type with get() = type'
+    
+    /// The value passed as parameter, of type ValueType
+    member x.Value with get() = value
+    
+    /// The type of the value
+    member x.ValueType with get() = valueType
+    
+    /// The format specification for format specifiers
+    member x.Spec with get() = if Object.ReferenceEquals(spec, null) then None else Some(spec)
+    
+    /// The width if specified via another parameter as in "%*i"
+    member x.StarWidth with get() = match starWidth with NotSpecifiedValue -> None | x -> Some(x)
+    
+    /// The precision if specified via another parameter as in "%.*f"
+    member x.StarPrecision with get() = match starPrecision with NotSpecifiedValue -> None | x -> Some(x)
 
     override x.ToString () = 
         sprintf
-            "value: %A, type: %A, valueType: %s, spec: %s, starWidth: %A, starPrecision: %A, AsPrintF: %s"
-            x.value
-            x.type'
-            (x.valueType.FullName)
-            (match x.spec with Some x -> x.ToString() | None -> "")
-            x.starWidth
-            x.starPrecision
+            "value: %A, type: %A, valueType: %s, spec: %s, starWidth: %s, starPrecision: %s, AsPrintF: %s"
+            value
+            type'
+            (valueType.FullName)
+            (match x.Spec with Some x -> x.ToString() | None -> "")
+            (match x.StarWidth with Some x -> x.ToString() | None -> "")
+            (match x.StarPrecision with Some x -> x.ToString() | None -> "")
             (x.FormatAsPrintF())
 
     /// Get the string representation that printf would have normally generated
     member x.FormatAsPrintF() =
-        x.printer ()
+        printer ()
 
     static member inline MakeFromString(s: string, type': PrintableElementType) =
         let printer = fun () -> s
-        PrintableElement(printer, s, type', typeof<string>, None, None, None)
+        PrintableElement(printer, s, type', typeof<string>, Unchecked.defaultof<FormatSpecifier>, NotSpecifiedValue, NotSpecifiedValue)
 
     static member inline MadeByEngine(s: string) =
         PrintableElement.MakeFromString(s , PrintableElementType.MadeByEngine)
@@ -65,5 +62,5 @@ type PrintableElement =
     static member MakeDirect(s: string) =
         PrintableElement.MakeFromString(s , PrintableElementType.Direct)
 
-    static member MakeFromFormatSpecifier(printer: unit -> string, value: obj, valueType: Type, spec: FormatSpecifier, starWidth: int option, starPrecision: int option) =
-        PrintableElement(printer, value, PrintableElementType.FromFormatSpecifier, valueType, Some(spec), starWidth, starPrecision)
+    static member MakeFromFormatSpecifier(printer: unit -> string, value: obj, valueType: Type, spec: FormatSpecifier, starWidth: int, starPrecision: int) =
+        PrintableElement(printer, value, PrintableElementType.FromFormatSpecifier, valueType, spec, starWidth, starPrecision)

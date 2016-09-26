@@ -330,7 +330,7 @@ type ObjectPrinter =
         match box v with 
         | null -> "<null>" 
         | _ ->
-            failwith "%A not supported"
+            sprintf "%A" v
             //Microsoft.FSharp.Text.StructuredPrintfImpl.Display.anyToStringForPrintf opts bindingFlags v
 
     static member GenericToString<'T>(spec : FormatSpecifier) = 
@@ -442,6 +442,8 @@ let getValueConverter_Real (ty : Type) (spec : FormatSpecifier) =
     | _ -> 
         raise (ArgumentException("Bad format specifier"))
 
+open FormatSpecifierConstants
+
 type ValueConverterHolder =
     static member getValueConverterFor<'t> (ty : Type, spec : FormatSpecifier) =
         let realUntyped = getValueConverter_Real ty spec
@@ -449,22 +451,22 @@ type ValueConverterHolder =
             let real = realUntyped :?> ('t -> int -> int -> string)
             box(fun (x: 't) width prec ->
                 let printer = fun () -> real x width prec
-                PrintableElement.MakeFromFormatSpecifier(printer, box x, ty, spec, Some(width), Some(prec)))
+                PrintableElement.MakeFromFormatSpecifier(printer, box x, ty, spec, width, prec))
         else if spec.IsStarWidth || spec.IsStarPrecision then
             let real = realUntyped :?> ('t -> int -> string)
             if spec.IsStarWidth then
                 box(fun (x: 't) width ->
                     let printer = fun () -> real x width
-                    PrintableElement.MakeFromFormatSpecifier(printer, box x, ty, spec, Some(width), None))
+                    PrintableElement.MakeFromFormatSpecifier(printer, box x, ty, spec, width, NotSpecifiedValue))
             else
                 box(fun (x: 't) prec ->
                     let printer = fun () -> real x prec
-                    PrintableElement.MakeFromFormatSpecifier(printer, box x, ty, spec, None, Some(prec)))
+                    PrintableElement.MakeFromFormatSpecifier(printer, box x, ty, spec, NotSpecifiedValue, prec))
         else
             let real = realUntyped :?> ('t -> string)
             box(fun (x: 't) ->
                 let printer = fun () -> real x
-                PrintableElement.MakeFromFormatSpecifier(printer, box x, ty, spec, None, None))
+                PrintableElement.MakeFromFormatSpecifier(printer, box x, ty, spec, NotSpecifiedValue, NotSpecifiedValue))
 
 let private getValueConverterForMethod =
     let mi = typeof<ValueConverterHolder>.GetMethod("getValueConverterFor", NonPublicStatics)
