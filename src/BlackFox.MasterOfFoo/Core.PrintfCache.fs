@@ -15,40 +15,14 @@ type CachedItem<'T, 'State, 'Residue, 'Result> = PrintfFactory<'State, 'Residue,
 /// 2nd level is global dictionary that maps format string to the corresponding PrintfFactory
 type Cache<'T, 'State, 'Residue, 'Result>() =
     static let generate(fmt) = PrintfBuilder<'State, 'Residue, 'Result>().Build<'T>(fmt)        
-#if FSHARP_CORE_4_5
     static let mutable map = System.Collections.Concurrent.ConcurrentDictionary<string, CachedItem<'T, 'State, 'Residue, 'Result>>()
     static let getOrAddFunc = Func<_, _>(generate)
-#else
-    static let mutable map = Dictionary<string, CachedItem<'T, 'State, 'Residue, 'Result>>()
-#endif
 
     static let get(key : string) = 
-#if FSHARP_CORE_4_5
         map.GetOrAdd(key, getOrAddFunc)
-#else
-        lock map (fun () ->
-            let mutable res = Unchecked.defaultof<_>
-            if map.TryGetValue(key, &res) then res
-            else
-            let v = 
-#if DEBUG_
-                try 
-                    generate(key)
-                with
-                    e -> raise (ArgumentException("PRINTF::" + key + ": " + e.Message, e))
-#else
-                    generate(key)
-#endif
-            map.Add(key, v)
-            v
-        )
-#endif
 
     [<DefaultValue>]
-#if FX_NO_THREAD_STATIC
-#else
     [<ThreadStatic>]
-#endif
     static val mutable private last : string * CachedItem<'T, 'State, 'Residue, 'Result>
     
     static member Get(key : Format<'T, 'State, 'Residue, 'Result>) =
