@@ -6,34 +6,43 @@ open MasterOfFoo
 open System.Data.SqlClient
 open System.Data.Common
 
-type internal SqlEnv(n: int) =
-    inherit PrintfEnv<unit, unit, SqlCommand>(())
+type internal SqlEnv<'cmd when 'cmd :> DbCommand>(n: int, command: 'cmd) =
+    inherit PrintfEnv<unit, unit, 'cmd>(())
     let queryString = StringBuilder()
-    let dbParameters = System.Collections.Generic.List<SqlParameter>(n)
     let mutable index = 0
 
+    let addParameter (p: DbParameter) =
+        ignore(queryString.Append p.ParameterName)
+        command.Parameters.Add p |> ignore
+
     override x.Finalize() =
-        let cmd = new SqlCommand (queryString.ToString())
-        for parameter in dbParameters do
-            cmd.Parameters.Add(parameter) |> ignore
-        cmd
+        command.CommandText <- queryString.ToString()
+        command
 
     override this.Write(s : PrintableElement) =
         let asPrintf = s.FormatAsPrintF()
         match s.Type with
-        | PrintableElementType.FromFormatSpecifier -> 
-            let paramName = sprintf "@Param%i" index
-            let param = SqlParameter(paramName, s.Value)
-            dbParameters.Add(param)
-            index <- index + 1
-            ignore(queryString.Append paramName)
+        | PrintableElementType.FromFormatSpecifier ->
+            let parameter =
+                if typeof<DbParameter>.IsAssignableFrom(s.ValueType) then
+                    s.Value :?> DbParameter
+                else
+                    let paramName = sprintf "@p%i" index
+                    index <- index + 1
+
+                    let parameter = command.CreateParameter()
+                    parameter.ParameterName <- paramName
+                    parameter.Value <- s.Value
+                    parameter
+
+            addParameter parameter
         | _ ->
             ignore(queryString.Append asPrintf)
 
     override this.WriteT(()) = ()
 
 let sqlCommandf (format : Format<'T, unit, unit, SqlCommand>) =
-    Printf.doPrintf format (fun n -> SqlEnv(n) :> PrintfEnv<_, _, _>)
+    Printf.doPrintf format (fun n -> SqlEnv(n, new SqlCommand ()) :> PrintfEnv<_, _, _>)
 
 type internal QueryStringEnv() =
     inherit PrintfEnv<StringBuilder, unit, string>(StringBuilder())
