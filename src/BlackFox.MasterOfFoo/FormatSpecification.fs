@@ -35,14 +35,24 @@ type FormatSpecifier =
     member this.IsStarWidth = this.Width = StarValue
     member this.IsWidthSpecified = this.Width <> NotSpecifiedValue
 
-    override this.ToString() = 
-        let valueOf n = match n with StarValue -> "*" | NotSpecifiedValue -> "-" | n -> n.ToString()
-        System.String.Format
-            (
-                "'{0}', Precision={1}, Width={2}, Flags={3}", 
-                this.TypeChar, 
-                (valueOf this.Precision),
-                (valueOf this.Width), 
-                this.Flags
-            )
-    
+    override this.ToString() =
+        let sb = System.Text.StringBuilder ("%")
+        
+        if this.Flags.HasFlag(FormatFlags.PadWithZeros) then sb.Append('0') |> ignore
+        if this.Flags.HasFlag(FormatFlags.LeftJustify) then sb.Append('-') |> ignore
+        if this.Flags.HasFlag(FormatFlags.PlusForPositives) then sb.Append('+') |> ignore
+        if this.Flags.HasFlag(FormatFlags.SpaceForPositives) then sb.Append(' ') |> ignore
+        
+        let printValue n =
+            match n with
+            | StarValue -> sb.Append('*')  |> ignore
+            | NotSpecifiedValue -> ()
+            | n -> sb.Append(n.ToString())  |> ignore
+
+        printValue this.Width
+        if this.Precision <> NotSpecifiedValue then
+            sb.Append('.') |> ignore
+            printValue this.Precision
+
+        sb.Append(this.TypeChar) |> ignore
+        sb.ToString()

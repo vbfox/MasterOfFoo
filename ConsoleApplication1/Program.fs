@@ -82,7 +82,7 @@ let testprintf (sb: StringBuilder) (format : Format<'T, StringBuilder, unit, uni
 let simple () =
     printfn "------------------------------------------------"
     let sb = StringBuilder ()
-    testprintf sb "Hello %-010i hello %s" 1000 "World"
+    testprintf sb "Hello %0-10i hello %s" 1000 "World"
     sb.Clear() |> ignore
     testprintf sb "Hello %-010i hello %s" 1000 "World"
     System.Console.WriteLine("RESULT: {0}", sb.ToString())
@@ -91,6 +91,10 @@ let percentStar () =
     printfn "------------------------------------------------"
     let sb = StringBuilder ()
     testprintf sb "Hello '%*i'" 5 42
+    sb.Clear() |> ignore
+    testprintf sb "Hello '%.*f'" 3 42.12345
+    sb.Clear() |> ignore
+    testprintf sb "Hello '%*.*f'" 5 3 42.12345
     System.Console.WriteLine("RESULT: {0}", sb.ToString())
 
 let chained () =
@@ -107,7 +111,7 @@ let complex () =
 
 [<EntryPoint>]
 let main argv =
-    printfn "%s" (queryStringf "hello/uri+with space/x?foo=%s&bar=%s&work=%i" "#baz" "++Hello world && problem for arg √" 1)
+    //printfn "%s" (queryStringf "hello/uri+with space/x?foo=%s&bar=%s&work=%i" "#baz" "++Hello world && problem for arg √" 1)
 
     let cmd: SqlCommand =
         sqlCommandf
@@ -117,7 +121,7 @@ let main argv =
             System.DateTimeOffset.Now
 
     //simple ()
-    //percentStar ()
+    percentStar ()
     //chained ()
     //complex ()
     ignore(System.Console.ReadLine ())

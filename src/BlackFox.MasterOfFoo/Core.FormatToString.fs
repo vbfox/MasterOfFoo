@@ -449,17 +449,22 @@ type ValueConverterHolder =
             let real = realUntyped :?> ('t -> int -> int -> string)
             box(fun (x: 't) width prec ->
                 let printer = fun () -> real x width prec
-                PrintableElement.MakeFromFormatSpecifier(printer, box x, ty, spec))
+                PrintableElement.MakeFromFormatSpecifier(printer, box x, ty, spec, Some(width), Some(prec)))
         else if spec.IsStarWidth || spec.IsStarPrecision then
             let real = realUntyped :?> ('t -> int -> string)
-            box(fun (x: 't) widthOrPrec ->
-                let printer = fun () -> real x widthOrPrec
-                PrintableElement.MakeFromFormatSpecifier(printer, box x, ty, spec))
+            if spec.IsStarWidth then
+                box(fun (x: 't) width ->
+                    let printer = fun () -> real x width
+                    PrintableElement.MakeFromFormatSpecifier(printer, box x, ty, spec, Some(width), None))
+            else
+                box(fun (x: 't) prec ->
+                    let printer = fun () -> real x prec
+                    PrintableElement.MakeFromFormatSpecifier(printer, box x, ty, spec, None, Some(prec)))
         else
             let real = realUntyped :?> ('t -> string)
             box(fun (x: 't) ->
                 let printer = fun () -> real x
-                PrintableElement.MakeFromFormatSpecifier(printer, box x, ty, spec))
+                PrintableElement.MakeFromFormatSpecifier(printer, box x, ty, spec, None, None))
 
 let private getValueConverterForMethod =
     let mi = typeof<ValueConverterHolder>.GetMethod("getValueConverterFor", NonPublicStatics)
