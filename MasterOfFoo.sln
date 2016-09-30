@@ -7,9 +7,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".paket", ".paket", "{55CDFC
 		paket.dependencies = paket.dependencies
 	EndProjectSection
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "MasterOfFoo", "src\BlackFox.MasterOfFoo\MasterOfFoo.fsproj", "{80E6D22C-3DEC-4929-B4BF-68E3A3F28039}"
+Project("{f2a71f9b-5d33-465a-a702-920d77279786}") = "MasterOfFoo", "src\BlackFox.MasterOfFoo\MasterOfFoo.fsproj", "{80E6D22C-3DEC-4929-B4BF-68E3A3F28039}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "ConsoleApplication1", "ConsoleApplication1\ConsoleApplication1.fsproj", "{4C628A7D-76EC-4673-A45D-DAE6FC060784}"
+Project("{f2a71f9b-5d33-465a-a702-920d77279786}") = "TestApp", "src\TestApp\TestApp.fsproj", "{4C628A7D-76EC-4673-A45D-DAE6FC060784}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E5E77D3C-F0EE-4EB3-B813-B181020563E0}"
 	ProjectSection(SolutionItems) = preProject

@@ -1,2 +1,5 @@
 source https://api.nuget.org/v3/index.json
 nuget FAKE
+nuget FSharp.Core
+nuget NUnit
+nuget NUnit.ConsoleRunner
