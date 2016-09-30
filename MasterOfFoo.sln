@@ -16,6 +16,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		Readme.md = Readme.md
 	EndProjectSection
 EndProject
+Project("{f2a71f9b-5d33-465a-a702-920d77279786}") = "BlackFox.MasterOfFoo.Tests", "src\BlackFox.MasterOfFoo.Tests\BlackFox.MasterOfFoo.Tests.fsproj", "{B158E4B2-AF4C-4A91-BC1E-3D4E4B080802}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,6 +32,10 @@ Global
 		{4C628A7D-76EC-4673-A45D-DAE6FC060784}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4C628A7D-76EC-4673-A45D-DAE6FC060784}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4C628A7D-76EC-4673-A45D-DAE6FC060784}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B158E4B2-AF4C-4A91-BC1E-3D4E4B080802}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B158E4B2-AF4C-4A91-BC1E-3D4E4B080802}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B158E4B2-AF4C-4A91-BC1E-3D4E4B080802}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B158E4B2-AF4C-4A91-BC1E-3D4E4B080802}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
