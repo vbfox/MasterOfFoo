@@ -1,22 +1,8 @@
 #!/bin/bash
-if test "$OS" = "Windows_NT"
-then
-  # use .Net
 
-  .paket/paket.bootstrapper.exe
-  exit_code=$?
-  if [ $exit_code -ne 0 ]; then
-  	exit $exit_code
-  fi
+PAKET_VERSION=3.20.2
 
-  .paket/paket.exe $@
-else
-  # use mono
-  mono .paket/paket.bootstrapper.exe
-  exit_code=$?
-  if [ $exit_code -ne 0 ]; then
-  	exit $exit_code
-  fi
+function dotnet { if test "$OS" = "Windows_NT"; then $@; else mono $@; fi }
 
-  mono .paket/paket.exe $@
-fi
+dotnet .paket/paket.bootstrapper.exe -s $PAKET_VERSION  || { exit $?; }
+dotnet .paket/paket.exe $@
