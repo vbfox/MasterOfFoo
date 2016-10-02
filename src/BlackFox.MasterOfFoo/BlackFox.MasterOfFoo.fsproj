@@ -52,9 +52,10 @@
     <Compile Include="Core.PrintfBuilding.fs" />
     <Compile Include="Core.PrintfCache.fs" />
     <Compile Include="Printf.fs" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="paket.references" />
+    <None Include="paket.template">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <PropertyGroup>
     <MinimumVisualStudioVersion Condition="'$(MinimumVisualStudioVersion)' == ''">11</MinimumVisualStudioVersion>

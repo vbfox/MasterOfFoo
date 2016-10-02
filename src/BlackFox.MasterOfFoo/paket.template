@@ -1,0 +1,19 @@
+type file
+id MasterOfFoo
+owners Julien Roncaglia
+authors Julien Roncaglia
+projectUrl
+    https://github.com/vbfox/MasterOfFoo
+licenseUrl
+    https://github.com/vbfox/MasterOfFoo/blob/master/LICENSE.md
+requireLicenseAcceptance
+    false
+copyright
+    Copyright 2016
+summary
+    Because printf is not enough !
+description
+    Because printf is not enough !
+files
+    *.dll ==> lib/net45
+    *.xml ==> lib/net45
