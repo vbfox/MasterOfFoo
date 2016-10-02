@@ -1,6 +1,7 @@
 branches:
   only:
     - master
+version: '{build}'
 os: Windows Server 2012
 cache:
   - "%LocalAppData%\\NuGet\\Cache"
