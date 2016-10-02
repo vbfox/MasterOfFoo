@@ -1,6 +1,8 @@
 ﻿MasterOfFoo
 ===========
 
+[![Build status](https://ci.appveyor.com/api/projects/status/qp2g8ufg75ogv0k5/branch/master?svg=true)](https://ci.appveyor.com/project/vbfox/masteroffoo/branch/master)
+
 An experiment in using `printf` style strings in more places.
 
 The code is essentially a broken up version of [`printf.fs`](https://github.com/fsharp/fsharp/blob/master/src/fsharp/FSharp.Core/printf.fs) so the license will be the same (Apache 2.0) but most of the bugs are mine.
