@@ -1,0 +1,56 @@
+// include Fake libs
+#r "../packages/FAKE/tools/FakeLib.dll"
+#load "./TaskDefinitionHelper.fsx"
+
+open Fake
+open Fake.ReleaseNotesHelper
+open BlackFox
+
+let configuration = environVarOrDefault "configuration" "Release"
+
+let from s = { BaseDirectory = s; Includes = []; Excludes = [] }
+
+let rootDir = System.IO.Path.GetFullPath(__SOURCE_DIRECTORY__ </> "..")
+let srcDir = rootDir </> "src"
+let artifactsDir = rootDir </> "artifacts"
+let binDir = artifactsDir </> "bin"
+let librarySrcDir = srcDir </> "BlackFox.MasterOfFoo"
+let libraryBinDir = binDir </> "BlackFox.MasterOfFoo" </> configuration
+let projects = from srcDir ++ "**/*.*proj"
+let release = LoadReleaseNotes (rootDir </> "Release Notes.md")
+
+Task "Init" [] <| fun _ ->
+    CreateDir artifactsDir
+
+// Targets
+Task "Clean" ["Init"] <| fun _ ->
+    CleanDirs [artifactsDir]
+
+Task "Build" ["Init"; "?Clean"] <| fun _ ->
+    MSBuild null "Build" ["Configuration", configuration] projects
+        |> ignore
+
+Task "NuGet" ["Build"] <| fun _ ->
+    Paket.Pack <| fun p ->
+        { p with
+            OutputPath = artifactsDir
+            Version = release.NugetVersion
+            ReleaseNotes = toLines release.Notes
+            WorkingDir = libraryBinDir
+            BuildConfig = configuration
+            BuildPlatform = "AnyCPU"}
+    AppVeyor.PushArtifacts (from artifactsDir ++ "*.nupkg")
+
+Task "Zip" ["Build"] <| fun _ ->
+    let zipFile = artifactsDir </> (sprintf "MasterOfFoo-%s.zip" release.NugetVersion)
+    from libraryBinDir
+        ++ "**/*.dll"
+        ++ "**/*.xml"
+        -- "**/FSharp.Core.*"
+        |> Zip libraryBinDir zipFile
+    AppVeyor.PushArtifacts [zipFile]
+
+Task "CI" ["Clean"; "Zip"; "NuGet"] DoNothing
+
+// start build
+RunTaskOrDefault "Build"
