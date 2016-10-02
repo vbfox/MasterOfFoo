@@ -29,8 +29,9 @@ let release =
     else
         fromFile
 
+AppVeyorEx.updateBuild (fun info -> { info with Version = Some release.AssemblyVersion })
+
 Task "Init" [] <| fun _ ->
-    AppVeyorEx.updateBuild (fun info -> { info with Version = Some release.AssemblyVersion })
     CreateDir artifactsDir
 
 // Targets
