@@ -21,7 +21,8 @@ let projects = from srcDir ++ "**/*.*proj"
 let release =
     let fromFile = LoadReleaseNotes (rootDir </> "Release Notes.md")
     if buildServer = AppVeyor then
-        let nugetVer = sprintf "%s-appveyor.%s" fromFile.NugetVersion appVeyorBuildVersion
+        let appVeyorBuildVersion = int appVeyorBuildVersion
+        let nugetVer = sprintf "%s-appveyor%04i" fromFile.NugetVersion appVeyorBuildVersion
         let asmVer = System.Version.Parse(fromFile.AssemblyVersion)
         let asmVer = System.Version(asmVer.Major, asmVer.Minor, asmVer.Build, (int appVeyorBuildVersion))
         ReleaseNotes.New(asmVer.ToString(), nugetVer, fromFile.Date, fromFile.Notes)
