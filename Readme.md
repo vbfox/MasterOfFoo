@@ -1,7 +1,8 @@
 ﻿MasterOfFoo
 ===========
 
-[![Build status](https://ci.appveyor.com/api/projects/status/qp2g8ufg75ogv0k5/branch/master?svg=true)](https://ci.appveyor.com/project/vbfox/masteroffoo/branch/master)
+[![AppVeyor Build status](https://ci.appveyor.com/api/projects/status/qp2g8ufg75ogv0k5/branch/master?svg=true)](https://ci.appveyor.com/project/vbfox/masteroffoo/branch/master) [![Travis-CI Build status](https://travis-ci.org/vbfox/stidgen.svg)](https://travis-ci.org/vbfox/stidgen)
+
 
 An experiment in using `printf` style strings in more places.
 
