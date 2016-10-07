@@ -3,3 +3,4 @@ nuget FAKE
 nuget FSharp.Core
 nuget NUnit
 nuget NUnit.ConsoleRunner
+github fsharp/FAKE modules/Octokit/Octokit.fsx

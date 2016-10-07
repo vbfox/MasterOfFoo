@@ -20,13 +20,24 @@ let binDir = artifactsDir </> "bin"
 let librarySrcDir = srcDir </> "BlackFox.MasterOfFoo"
 let libraryBinDir = binDir </> "BlackFox.MasterOfFoo" </> configuration
 let projects = from srcDir ++ "**/*.*proj"
+
+/// The profile where the project is posted
+let gitOwner = "vbfox"
+let gitHome = "https://github.com/" + gitOwner
+
+/// The name of the project on GitHub
+let gitName = "MasterOfFoo"
+
+/// The url for the raw files hosted
+let gitRaw = environVarOrDefault "gitRaw" ("https://raw.github.com/" + gitOwner)
+
 let release =
     let fromFile = LoadReleaseNotes (rootDir </> "Release Notes.md")
     if buildServer = AppVeyor then
         let appVeyorBuildVersion = int appVeyorBuildVersion
         let nugetVer = sprintf "%s-appveyor%04i" fromFile.NugetVersion appVeyorBuildVersion
         let asmVer = System.Version.Parse(fromFile.AssemblyVersion)
-        let asmVer = System.Version(asmVer.Major, asmVer.Minor, asmVer.Build, (int appVeyorBuildVersion))
+        let asmVer = System.Version(asmVer.Major, asmVer.Minor, asmVer.Build, appVeyorBuildVersion)
         ReleaseNotes.New(asmVer.ToString(), nugetVer, fromFile.Date, fromFile.Notes)
     else
         fromFile
@@ -70,8 +81,17 @@ Task "NuGet" ["Build"] <| fun _ ->
             BuildPlatform = "AnyCPU"}
     AppVeyor.PushArtifacts (from artifactsDir ++ "*.nupkg")
 
+Task "PublishNuget" ["NuGet"] <| fun _ ->
+    let key =
+        match environVarOrNone "nuget-key" with
+        | Some(key) -> key
+        | None -> getUserPassword "NuGet key: "
+
+    Paket.Push <| fun p ->  { p with WorkingDir = artifactsDir; ApiKey = key }
+
+let zipFile = artifactsDir </> (sprintf "MasterOfFoo-%s.zip" release.NugetVersion)
+
 Task "Zip" ["Build"] <| fun _ ->
-    let zipFile = artifactsDir </> (sprintf "MasterOfFoo-%s.zip" release.NugetVersion)
     from libraryBinDir
         ++ "**/*.dll"
         ++ "**/*.xml"
@@ -79,7 +99,37 @@ Task "Zip" ["Build"] <| fun _ ->
         |> Zip libraryBinDir zipFile
     AppVeyor.PushArtifacts [zipFile]
 
+#load "../paket-files/fsharp/FAKE/modules/Octokit/Octokit.fsx"
+
+Task "GitHubRelease" ["Zip"] <| fun _ ->
+    let user =
+        match getBuildParam "github-user" with
+        | s when not (String.IsNullOrWhiteSpace s) -> s
+        | _ -> getUserInput "GitHub Username: "
+    let pw =
+        match getBuildParam "github-pw" with
+        | s when not (String.IsNullOrWhiteSpace s) -> s
+        | _ -> getUserPassword "GitHub Password or Token: "
+
+    // release on github
+    Octokit.createClient user pw
+    |> Octokit.createDraft gitOwner gitName release.NugetVersion (release.SemVer.PreRelease <> None) release.Notes
+    |> Octokit.uploadFile zipFile
+    |> Octokit.releaseDraft
+    |> Async.RunSynchronously
+
+Task "GitRelease" [] <| fun _ ->
+    let remote =
+        Git.CommandHelper.getGitResult "" "remote -v"
+        |> Seq.filter (fun (s: string) -> s.EndsWith("(push)"))
+        |> Seq.tryFind (fun (s: string) -> s.Contains(gitOwner + "/" + gitName))
+        |> function None -> gitHome + "/" + gitName | Some (s: string) -> s.Split().[0]
+
+    Git.Branches.tag "" release.NugetVersion
+    Git.Branches.pushTag "" remote release.NugetVersion
+
+Task "Default" ["RunTests"] DoNothing
+Task "Release" ["GitHubRelease"; "PublishNuget"] DoNothing
 Task "CI" ["Clean"; "RunTests"; "Zip"; "NuGet"] DoNothing
 
-// start build
-RunTaskOrDefault "Build"
+RunTaskOrDefault "Default"
