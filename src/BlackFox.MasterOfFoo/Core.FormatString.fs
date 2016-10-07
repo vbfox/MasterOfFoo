@@ -1,5 +1,5 @@
 ﻿/// Set of helpers to parse format string
-module BlackFox.MasterOfFoo.Core.FormatString
+module internal BlackFox.MasterOfFoo.Core.FormatString
 
 open BlackFox.MasterOfFoo
 open BlackFox.MasterOfFoo.FormatSpecifierConstants

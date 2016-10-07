@@ -2,7 +2,7 @@
 
 /// These are a typical set of options used to control structured formatting.
 [<NoEquality; NoComparison>]
-type FormatOptions =
+type internal FormatOptions =
     {
         FloatingPointFormat: string;
         AttributeProcessor: (string -> (string * string) list -> bool -> unit);

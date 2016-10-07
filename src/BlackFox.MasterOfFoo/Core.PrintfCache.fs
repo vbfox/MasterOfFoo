@@ -1,4 +1,4 @@
-﻿module BlackFox.MasterOfFoo.Core.PrintfCache
+﻿module internal BlackFox.MasterOfFoo.Core.PrintfCache
 
 open BlackFox.MasterOfFoo.Core.FormatToString
 open BlackFox.MasterOfFoo.Core.PrintfBuilding

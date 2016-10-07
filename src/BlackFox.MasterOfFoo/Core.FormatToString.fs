@@ -1,4 +1,4 @@
-﻿module BlackFox.MasterOfFoo.Core.FormatToString
+﻿module internal BlackFox.MasterOfFoo.Core.FormatToString
 
 open BlackFox.MasterOfFoo
 open System
@@ -325,7 +325,7 @@ type ObjectPrinter =
     static member ObjectToString<'T>(spec : FormatSpecifier) = 
         basicWithPadding spec (fun (v : 'T) -> match box v with null -> "<null>" | x -> x.ToString())
         
-    static member GenericToStringCore(v : 'T, opts : FormatOptions, bindingFlags) = 
+    static member GenericToStringCore(v : 'T) = 
         // printfn %0A is considered to mean 'print width zero'
         match box v with 
         | null -> "<null>" 

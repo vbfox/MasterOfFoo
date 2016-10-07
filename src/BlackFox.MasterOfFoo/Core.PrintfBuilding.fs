@@ -20,7 +20,7 @@
 // 2. we can make combinable parts independent from particular printf implementation. Thus final result can be cached and shared. 
 // i.e when first call to printf "%s %s" will trigger creation of the specialization. Subsequent calls will pick existing specialization
 
-module BlackFox.MasterOfFoo.Core.PrintfBuilding
+module internal BlackFox.MasterOfFoo.Core.PrintfBuilding
 
 open BlackFox.MasterOfFoo
 open BlackFox.MasterOfFoo.Core.FormatToString

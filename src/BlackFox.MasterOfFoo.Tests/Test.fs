@@ -4,7 +4,6 @@ open System
 open System.Text
 open NUnit.Framework
 open BlackFox.MasterOfFoo
-open BlackFox.MasterOfFoo.Printf
 
 type TestEnv() = 
     inherit PrintfEnv<unit, string, string>()
@@ -14,19 +13,19 @@ type TestEnv() =
     override this.WriteT(s : string) = ignore(buf.Append(s))
 
 let testprintf (format: Format<'T, unit, string, string>) =
-    doPrintf format (fun _ -> TestEnv() :> PrintfEnv<_, _, _>)
+    doPrintf format (fun _ -> TestEnv())
 
 let coreprintf = FSharp.Core.Printf.sprintf
 
 [<Test>]
 let SimpleString () =
     Assert.AreEqual(
-        testprintf "Foo",
-        coreprintf "Foo")
+        coreprintf "Foo",
+        testprintf "Foo")
 
 
 [<Test>]
 let StringFormat () =
     Assert.AreEqual(
-        testprintf "%s" "Foo",
-        coreprintf "%s" "Foo")
+        coreprintf "%s" "Foo",
+        testprintf "%s" "Foo")
