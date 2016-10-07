@@ -1,5 +1,18 @@
 ﻿module BlackFox.MasterOfFoo.DoPrintfTests
 
+module MyModule = 
+    open System.Text
+    open BlackFox.MasterOfFoo
+    type internal MySprintfEnv() = 
+        inherit PrintfEnv<unit, string, string>()
+        let buf = StringBuilder()
+        override this.Finalize() = buf.ToString ()
+        override this.Write(s : PrintableElement) = ignore(buf.Append(s.FormatAsPrintF()))
+        override this.WriteT(s : string) = ignore(buf.Append(s))
+
+    let mysprintf (format: Format<'T, unit, string, string>) =
+        doPrintfFromEnv format (MySprintfEnv())
+
 open System
 open System.Text
 open NUnit.Framework

@@ -3,11 +3,16 @@
 open System
 open FormatSpecifierConstants
 
+/// The type of an element passed to a PrintfEnv.
 type PrintableElementType =
+    /// A string created by the engine, only used in a few edge cases and only "%" is generated
     | MadeByEngine = 0uy
+    /// A string coming directly from the format string
     | Direct = 1uy
+    /// A format specifier and his corresponding value(s)
     | FromFormatSpecifier = 2uy
 
+/// An element passed to PrintfEnv for writing.
 type PrintableElement
     (
         printer: unit -> string,
@@ -29,8 +34,8 @@ type PrintableElement
             NotSpecifiedValue,
             NotSpecifiedValue)
 
-    /// The type of element (From a format specifier or directly from the string string)
-    member x.Type with get() = type'
+    /// The type of element (From a format specifier or directly from the string)
+    member x.ElementType with get() = type'
     
     /// The value passed as parameter, of type ValueType
     member x.Value with get() = value
@@ -43,7 +48,7 @@ type PrintableElement
             | _ -> typeof<string>    
     
     /// The format specification for format specifiers
-    member x.Spec with get() = if Object.ReferenceEquals(spec, null) then None else Some(spec)
+    member x.Specifier with get() = if Object.ReferenceEquals(spec, null) then None else Some(spec)
     
     /// The width if specified via another parameter as in "%*i"
     member x.StarWidth with get() = match starWidth with NotSpecifiedValue -> None | x -> Some(x)
@@ -57,7 +62,7 @@ type PrintableElement
             value
             type'
             (x.ValueType.FullName)
-            (match x.Spec with Some x -> x.ToString() | None -> "")
+            (match x.Specifier with Some x -> x.ToString() | None -> "")
             (match x.StarWidth with Some x -> x.ToString() | None -> "")
             (match x.StarPrecision with Some x -> x.ToString() | None -> "")
             (x.FormatAsPrintF())

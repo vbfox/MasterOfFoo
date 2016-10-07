@@ -97,7 +97,7 @@ type internal SqlEnv<'cmd when 'cmd :> DbCommand>(n: int, command: 'cmd) =
 
     override this.Write(s : PrintableElement) =
         let asPrintf = s.FormatAsPrintF()
-        match s.Type with
+        match s.ElementType with
         | PrintableElementType.FromFormatSpecifier ->
             let parameter =
                 if typeof<DbParameter>.IsAssignableFrom(s.ValueType) then
@@ -127,7 +127,7 @@ type internal QueryStringEnv() =
 
     override this.Write(s : PrintableElement) =
         let asPrintf = s.FormatAsPrintF()
-        match s.Type with
+        match s.ElementType with
         | PrintableElementType.FromFormatSpecifier -> 
             let escaped = System.Uri.EscapeDataString(asPrintf)
             ignore(this.State.Append escaped)
