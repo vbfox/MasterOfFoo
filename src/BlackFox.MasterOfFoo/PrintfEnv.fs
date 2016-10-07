@@ -1,4 +1,4 @@
-﻿namespace MasterOfFoo
+﻿namespace BlackFox.MasterOfFoo
 
 open System
 

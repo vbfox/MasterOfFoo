@@ -1,4 +1,4 @@
-﻿namespace MasterOfFoo.Core
+﻿namespace BlackFox.MasterOfFoo.Core
 
 /// These are a typical set of options used to control structured formatting.
 [<NoEquality; NoComparison>]

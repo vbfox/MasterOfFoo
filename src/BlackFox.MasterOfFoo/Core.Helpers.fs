@@ -1,5 +1,5 @@
 ﻿[<AutoOpen>]
-module internal MasterOfFoo.Core.Helpers
+module internal BlackFox.MasterOfFoo.Core.Helpers
 
 open System
 open System.Reflection

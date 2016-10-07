@@ -1,8 +1,8 @@
 ﻿/// Set of helpers to parse format string
-module MasterOfFoo.Core.FormatString
+module BlackFox.MasterOfFoo.Core.FormatString
 
-open MasterOfFoo
-open MasterOfFoo.FormatSpecifierConstants
+open BlackFox.MasterOfFoo
+open BlackFox.MasterOfFoo.FormatSpecifierConstants
 open System
 
 let inline isDigit c = c >= '0' && c <= '9'

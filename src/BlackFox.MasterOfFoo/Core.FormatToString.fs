@@ -1,6 +1,6 @@
-﻿module MasterOfFoo.Core.FormatToString
+﻿module BlackFox.MasterOfFoo.Core.FormatToString
 
-open MasterOfFoo
+open BlackFox.MasterOfFoo
 open System
 open System.Reflection
 

@@ -1,7 +1,7 @@
-﻿module MasterOfFoo.Core.PrintfCache
+﻿module BlackFox.MasterOfFoo.Core.PrintfCache
 
-open MasterOfFoo.Core.FormatToString
-open MasterOfFoo.Core.PrintfBuilding
+open BlackFox.MasterOfFoo.Core.FormatToString
+open BlackFox.MasterOfFoo.Core.PrintfBuilding
 open System
 open System.Collections.Generic
 

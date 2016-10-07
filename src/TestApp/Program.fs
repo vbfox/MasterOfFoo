@@ -2,7 +2,7 @@
 // See the 'F# Tutorial' project for more help.
 
 open System.Text
-open MasterOfFoo
+open BlackFox.MasterOfFoo
 open System.Data.SqlClient
 open System.Data.Common
 

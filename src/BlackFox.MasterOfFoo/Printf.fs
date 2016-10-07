@@ -1,9 +1,8 @@
 ﻿[<CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
-module MasterOfFoo.Printf 
+module BlackFox.MasterOfFoo.Printf 
 
 open System
-open MasterOfFoo
-open MasterOfFoo.Core
+open BlackFox.MasterOfFoo.Core
 
 let doPrintf fmt f = 
     let formatter, n = PrintfCache.Cache<_, _, _, _>.Get fmt

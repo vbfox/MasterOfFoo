@@ -3,8 +3,8 @@
 open System
 open System.Text
 open NUnit.Framework
-open MasterOfFoo
-open MasterOfFoo.Printf
+open BlackFox.MasterOfFoo
+open BlackFox.MasterOfFoo.Printf
 
 type TestEnv() = 
     inherit PrintfEnv<unit, string, string>()
