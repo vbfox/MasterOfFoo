@@ -18,18 +18,17 @@ type Cache<'T, 'State, 'Residue, 'Result>() =
     static let mutable map = System.Collections.Concurrent.ConcurrentDictionary<string, CachedItem<'T, 'State, 'Residue, 'Result>>()
     static let getOrAddFunc = Func<_, _>(generate)
 
-    static let get(key : string) = 
-        map.GetOrAdd(key, getOrAddFunc)
+    static member inline Get(key : string) = map.GetOrAdd(key, getOrAddFunc)
 
     [<DefaultValue>]
     [<ThreadStatic>]
     static val mutable private last : string * CachedItem<'T, 'State, 'Residue, 'Result>
     
-    static member Get(key : Format<'T, 'State, 'Residue, 'Result>) =
+    static member inline Get(key : Format<'T, 'State, 'Residue, 'Result>) =
         if not (Cache<'T, 'State, 'Residue, 'Result>.last === null) 
             && key.Value.Equals (fst Cache<'T, 'State, 'Residue, 'Result>.last) then
                 snd Cache<'T, 'State, 'Residue, 'Result>.last
         else
-            let v = get(key.Value)
+            let v = Cache<'T, 'State, 'Residue, 'Result>.Get(key.Value)
             Cache<'T, 'State, 'Residue, 'Result>.last <- (key.Value, v)
             v
