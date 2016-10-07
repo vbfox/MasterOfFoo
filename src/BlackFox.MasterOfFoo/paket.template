@@ -7,7 +7,7 @@ tags F# FSharp printf
 projectUrl
     https://github.com/vbfox/MasterOfFoo
 licenseUrl
-    https://github.com/vbfox/MasterOfFoo/blob/master/LICENSE.md
+    https://github.com/vbfox/MasterOfFoo/blob/master/License.md
 requireLicenseAcceptance
     false
 copyright
