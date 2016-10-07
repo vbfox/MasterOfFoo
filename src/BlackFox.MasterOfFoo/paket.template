@@ -1,4 +1,4 @@
-type file
+type project
 id MasterOfFoo
 owners Julien Roncaglia
 authors Julien Roncaglia
@@ -14,6 +14,3 @@ summary
     Because printf is not enough !
 description
     Because printf is not enough !
-files
-    *.dll ==> lib/net45
-    *.xml ==> lib/net45

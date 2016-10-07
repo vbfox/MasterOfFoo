@@ -65,7 +65,7 @@ Task "NuGet" ["Build"] <| fun _ ->
             OutputPath = artifactsDir
             Version = release.NugetVersion
             ReleaseNotes = toLines release.Notes
-            WorkingDir = libraryBinDir
+            WorkingDir = librarySrcDir
             BuildConfig = configuration
             BuildPlatform = "AnyCPU"}
     AppVeyor.PushArtifacts (from artifactsDir ++ "*.nupkg")
