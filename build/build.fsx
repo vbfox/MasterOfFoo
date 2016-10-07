@@ -3,8 +3,10 @@
 #load "./TaskDefinitionHelper.fsx"
 #load "./AppVeyorEx.fsx"
 
+open System
 open Fake
 open Fake.ReleaseNotesHelper
+open Fake.Testing.NUnit3
 open BlackFox
 
 let configuration = environVarOrDefault "configuration" "Release"
@@ -42,6 +44,21 @@ Task "Build" ["Init"; "?Clean"] <| fun _ ->
     MSBuild null "Build" ["Configuration", configuration] projects
         |> ignore
 
+Task "RunTests" [ "Build"] <| fun _ ->
+    let nunitPath = rootDir </> @"packages" </> "NUnit.ConsoleRunner" </> "tools" </> "nunit3-console.exe"
+    let testAssemblies = artifactsDir </> "bin" </> "*.Tests" </> configuration </> "*.Tests.dll"
+    let testResults = artifactsDir </> "TestResults.xml"
+
+    !! testAssemblies
+      |> NUnit3 (fun p ->
+          {p with
+             ToolPath = nunitPath
+             TimeOut = TimeSpan.FromMinutes 20.
+             DisposeRunners = true
+             ResultSpecs = [testResults] })
+
+    AppVeyor.UploadTestResultsFile AppVeyor.NUnit3 testResults
+
 Task "NuGet" ["Build"] <| fun _ ->
     Paket.Pack <| fun p ->
         { p with
@@ -62,7 +79,7 @@ Task "Zip" ["Build"] <| fun _ ->
         |> Zip libraryBinDir zipFile
     AppVeyor.PushArtifacts [zipFile]
 
-Task "CI" ["Clean"; "Zip"; "NuGet"] DoNothing
+Task "CI" ["Clean"; "RunTests"; "Zip"; "NuGet"] DoNothing
 
 // start build
 RunTaskOrDefault "Build"
