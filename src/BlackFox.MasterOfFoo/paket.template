@@ -1,7 +1,9 @@
 type project
-id MasterOfFoo
+id BlackFox.MasterOfFoo
+title Master Of Foo
 owners Julien Roncaglia
 authors Julien Roncaglia
+tags F# FSharp printf
 projectUrl
     https://github.com/vbfox/MasterOfFoo
 licenseUrl

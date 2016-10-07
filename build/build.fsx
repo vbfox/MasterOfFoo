@@ -89,7 +89,7 @@ Task "PublishNuget" ["NuGet"] <| fun _ ->
 
     Paket.Push <| fun p ->  { p with WorkingDir = artifactsDir; ApiKey = key }
 
-let zipFile = artifactsDir </> (sprintf "MasterOfFoo-%s.zip" release.NugetVersion)
+let zipFile = artifactsDir </> (sprintf "BlackFox.MasterOfFoo-%s.zip" release.NugetVersion)
 
 Task "Zip" ["Build"] <| fun _ ->
     from libraryBinDir
@@ -129,7 +129,7 @@ Task "GitRelease" [] <| fun _ ->
     Git.Branches.pushTag "" remote release.NugetVersion
 
 Task "Default" ["RunTests"] DoNothing
-Task "Release" ["GitRelease"; "GitHubRelease"; "PublishNuget"] DoNothing
+Task "Release" ["Clean"; "GitRelease"; "GitHubRelease"; "PublishNuget"] DoNothing
 Task "CI" ["Clean"; "RunTests"; "Zip"; "NuGet"] DoNothing
 
 RunTaskOrDefault "Default"
