@@ -13,6 +13,6 @@ requireLicenseAcceptance
 copyright
     Copyright 2016
 summary
-    Because printf is not enough !
+    An F# library to allow using printf style strings in more places.
 description
-    Because printf is not enough !
+    An F# library to allow using printf style strings in more places.
