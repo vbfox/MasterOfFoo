@@ -55,8 +55,9 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\BlackFox.MasterOfFoo\BlackFox.MasterOfFoo.fsproj">
-      <Project>{80E6D22C-3DEC-4929-B4BF-68E3A3F28039}</Project>
       <Name>BlackFox.MasterOfFoo</Name>
+      <Project>{80e6d22c-3dec-4929-b4bf-68e3a3f28039}</Project>
+      <Private>True</Private>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
@@ -66,9 +67,8 @@
     <FSharpTargetsPath>$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\FSharp\Microsoft.FSharp.Targets</FSharpTargetsPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(VisualStudioVersion)' == '11.0' Or $(OS) != 'Windows_NT'">
-     <FSharpTargetsPath>$(MSBuildExtensionsPath32)\..\Microsoft SDKs\F#\3.0\Framework\v4.0\Microsoft.FSharp.Targets</FSharpTargetsPath>
+    <FSharpTargetsPath>$(MSBuildExtensionsPath32)\..\Microsoft SDKs\F#\3.0\Framework\v4.0\Microsoft.FSharp.Targets</FSharpTargetsPath>
   </PropertyGroup>
-
   <Import Project="$(FSharpTargetsPath)" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.
