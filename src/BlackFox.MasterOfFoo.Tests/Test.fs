@@ -9,7 +9,7 @@ type TestEnv() =
     inherit PrintfEnv<unit, string, string>()
     let buf = StringBuilder()
     override this.Finalize() = buf.ToString ()
-    override this.Write(s : PrintableElement) = ignore(buf.Append(s.ToString()))
+    override this.Write(s : PrintableElement) = ignore(buf.Append(s.FormatAsPrintF()))
     override this.WriteT(s : string) = ignore(buf.Append(s))
 
 let testprintf (format: Format<'T, unit, string, string>) =
