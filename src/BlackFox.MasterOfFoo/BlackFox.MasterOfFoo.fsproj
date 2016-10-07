@@ -22,7 +22,7 @@
     <OutputPath>$(MSBuildThisFileDirectory)/../../artifacts/bin/$(MSBuildProjectName)/$(Configuration)</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <WarningLevel>3</WarningLevel>
-    <DocumentationFile>$(OutputPath)/MasterOfFoo.XML</DocumentationFile>
+    <DocumentationFile>$(OutputPath)/$(AssemblyName).xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -31,7 +31,7 @@
     <OutputPath>$(MSBuildThisFileDirectory)/../../artifacts/bin/$(MSBuildProjectName)/$(Configuration)</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <WarningLevel>3</WarningLevel>
-    <DocumentationFile>$(OutputPath)/MasterOfFoo.XML</DocumentationFile>
+    <DocumentationFile>$(OutputPath)/$(AssemblyName).xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup>
     <BaseIntermediateOutputPath>$(MSBuildThisFileDirectory)/../../artifacts/obj/$(MSBuildProjectName)/</BaseIntermediateOutputPath>
