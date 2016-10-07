@@ -18,7 +18,7 @@ Sample usage
 module MyModule =
     open System.Text
     open BlackFox.MasterOfFoo
-    type internal MySprintfEnv() =
+    type private MySprintfEnv() =
         inherit PrintfEnv<unit, string, string>()
         let buf = StringBuilder()
         override this.Finalize() = buf.ToString ()
@@ -99,5 +99,37 @@ value.
 > sprintf "%*.*f";;
 val it : (int -> int -> float -> string) = <fun:it@1>
 ````
+
+More fun ?
+----------
+
+```fsharp
+module ColorPrintf =
+    open System
+    open System.Text
+    open BlackFox.MasterOfFoo
+
+    type private Colorize<'Result>(k) =
+        inherit PrintfEnv<unit, string, 'Result>()
+        override this.Finalize() : 'Result = k()
+        override this.Write(s : PrintableElement) =
+            match s.ElementType with
+            | PrintableElementType.FromFormatSpecifier ->
+                let color = Console.ForegroundColor
+                Console.ForegroundColor <- ConsoleColor.Blue
+                Console.Write(s.FormatAsPrintF())
+                Console.ForegroundColor <- color
+            | _ -> Console.Write(s.FormatAsPrintF())
+        override this.WriteT(s : string) =
+            let color = Console.ForegroundColor
+            Console.ForegroundColor <- ConsoleColor.Red
+            Console.Write(s)
+            Console.ForegroundColor <- color
+
+    let colorprintf (format: Format<'T, unit, string, unit>) =
+        doPrintfFromEnv format (Colorize id)
+
+ColorPrintf.colorprintf "%s est %t" "La vie" (fun _ -> "belle !")
+```
 
 [printf_fs]: https://github.com/fsharp/fsharp/blob/master/src/fsharp/FSharp.Core/printf.fs

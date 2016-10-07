@@ -120,6 +120,33 @@ type internal SqlEnv<'cmd when 'cmd :> DbCommand>(n: int, command: 'cmd) =
 let sqlCommandf (format : Format<'T, unit, unit, SqlCommand>) =
     MasterOfFoo.doPrintf format (fun n -> SqlEnv(n, new SqlCommand ()) :> PrintfEnv<_, _, _>)
 
+module ColorPrintf =
+    open System
+    open System.Text
+    open BlackFox.MasterOfFoo
+
+    type private Colorize<'Result>(k) =
+        inherit PrintfEnv<unit, string, 'Result>()
+        override this.Finalize() : 'Result = k()
+        override this.Write(s : PrintableElement) =
+            match s.ElementType with
+            | PrintableElementType.FromFormatSpecifier -> 
+                let color = Console.ForegroundColor
+                Console.ForegroundColor <- ConsoleColor.Blue
+                Console.Write(s.FormatAsPrintF())
+                Console.ForegroundColor <- color
+            | _ -> Console.Write(s.FormatAsPrintF())
+        override this.WriteT(s : string) =
+            let color = Console.ForegroundColor
+            Console.ForegroundColor <- ConsoleColor.Red
+            Console.Write(s)
+            Console.ForegroundColor <- color
+
+    let colorprintf (format: Format<'T, unit, string, unit>) =
+        doPrintfFromEnv format (Colorize id)
+
+//MyModule.mysprintf "Hello %s.\n" "World"
+
 type internal QueryStringEnv() =
     inherit PrintfEnv<StringBuilder, unit, string>(StringBuilder())
 
@@ -195,8 +222,8 @@ let main argv =
             5
             "Test"
             System.DateTimeOffset.Now
-
-    simple ()
+    ColorPrintf.colorprintf "%s est %t" "La vie" (fun _ -> "belle !")
+    // simple ()
     //percentStar ()
     //chained ()
     //complex ()
