@@ -129,7 +129,7 @@ Task "GitRelease" [] <| fun _ ->
     Git.Branches.pushTag "" remote release.NugetVersion
 
 Task "Default" ["RunTests"] DoNothing
-Task "Release" ["GitHubRelease"; "PublishNuget"] DoNothing
+Task "Release" ["GitRelease"; "GitHubRelease"; "PublishNuget"] DoNothing
 Task "CI" ["Clean"; "RunTests"; "Zip"; "NuGet"] DoNothing
 
 RunTaskOrDefault "Default"
