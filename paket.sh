@@ -1,6 +1,6 @@
 #!/bin/bash
 
-PAKET_VERSION=3.20.2
+PAKET_VERSION=3.21.4
 
 function dotnet { if test "$OS" = "Windows_NT"; then $@; else mono $@; fi }
 
