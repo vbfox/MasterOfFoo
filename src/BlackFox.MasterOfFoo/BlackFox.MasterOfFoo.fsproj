@@ -8,7 +8,7 @@
     <ProjectGuid>80e6d22c-3dec-4929-b4bf-68e3a3f28039</ProjectGuid>
     <OutputType>Library</OutputType>
     <RootNamespace>MasterOfFoo</RootNamespace>
-    <AssemblyName>MasterOfFoo</AssemblyName>
+    <AssemblyName>BlackFox.MasterOfFoo</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <TargetFSharpCoreVersion>4.3.1.0</TargetFSharpCoreVersion>
     <Name>MasterOfFoo</Name>
