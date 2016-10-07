@@ -1,6 +1,6 @@
 type project
 id BlackFox.MasterOfFoo
-title Master Of Foo
+title BlackFox.MasterOfFoo
 owners Julien Roncaglia
 authors Julien Roncaglia
 tags F# FSharp printf
