@@ -101,6 +101,13 @@ value.
 val it : (int -> int -> float -> string) = <fun:it@1>
 ````
 
+Projects using it
+-----------------
+
+* [ColoredPrintf][colorprintf]: A small library that I created to add colored parts to printf strings.
+
+*If you use it somewhere, ping me on twitter [@virtualblackfox][twitter] so I can add you.*
+
 More fun ?
 ----------
 
@@ -134,3 +141,5 @@ ColorPrintf.colorprintf "%s est %t" "La vie" (fun _ -> "belle !")
 ```
 
 [printf_fs]: https://github.com/fsharp/fsharp/blob/master/src/fsharp/FSharp.Core/printf.fs
+[twitter]: https://twitter.com/virtualblackfox
+[colorprintf]: https://github.com/vbfox/ColoredPrintf
