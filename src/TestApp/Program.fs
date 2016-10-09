@@ -91,11 +91,11 @@ type internal SqlEnv<'cmd when 'cmd :> DbCommand>(n: int, command: 'cmd) =
         ignore(queryString.Append p.ParameterName)
         command.Parameters.Add p |> ignore
 
-    override x.Finalize() =
+    override __.Finalize() =
         command.CommandText <- queryString.ToString()
         command
 
-    override this.Write(s : PrintableElement) =
+    override __.Write(s : PrintableElement) =
         let asPrintf = s.FormatAsPrintF()
         match s.ElementType with
         | PrintableElementType.FromFormatSpecifier ->
@@ -115,7 +115,7 @@ type internal SqlEnv<'cmd when 'cmd :> DbCommand>(n: int, command: 'cmd) =
         | _ ->
             ignore(queryString.Append asPrintf)
 
-    override this.WriteT(()) = ()
+    override __.WriteT(()) = ()
 
 let sqlCommandf (format : Format<'T, unit, unit, SqlCommand>) =
     MasterOfFoo.doPrintf format (fun n -> SqlEnv(n, new SqlCommand ()) :> PrintfEnv<_, _, _>)
