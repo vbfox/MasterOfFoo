@@ -3,9 +3,10 @@
 open BlackFox.MasterOfFoo
 open System
 open System.Reflection
+open System.Diagnostics.CodeAnalysis
 
 let inline boolToString v = if v then "true" else "false"
-let inline stringToSafeString v = if v = null then "" else v
+let inline stringToSafeString v = if isNull v then "" else v
 
 let inline hasFlag flags (expected : FormatFlags) = (flags &&& expected) = expected
 let inline isLeftJustify flags = hasFlag flags FormatFlags.LeftJustify
@@ -89,9 +90,7 @@ module Padding =
                     )
             else
                 // width=X, prec=*
-                box(fun v -> 
-                    basic v
-                    )
+                box(basic)
 
     let inline withPaddingFormatted (spec : FormatSpecifier) getFormat  (defaultFormat : string) (f : string ->  'T -> string) left right =
         if not (spec.IsWidthSpecified || spec.IsPrecisionSpecified) then
@@ -401,6 +400,7 @@ let basicNumberToString (ty : Type) (spec : FormatSpecifier) =
 
     else raise (ArgumentException(ty.Name + " not a basic integer type"))
 
+[<SuppressMessageAttribute("FunctionReimplementation", "ReimplementsFunction")>]
 let basicFloatToString ty spec = 
     let defaultFormat = getFormatForFloat spec.TypeChar DefaultPrecision
     match Type.GetTypeCode(ty) with
@@ -409,7 +409,7 @@ let basicFloatToString ty spec =
     | TypeCode.Decimal  -> decimalWithPadding spec (getFormatForFloat spec.TypeChar) defaultFormat (fun fmt (v : decimal) -> toFormattedString fmt v)
     | _ -> raise (ArgumentException(ty.Name + " not a basic floating point type"))
 
-let getValueConverter_Real (ty : Type) (spec : FormatSpecifier) = 
+let getValueConverterCore (ty : Type) (spec : FormatSpecifier) = 
     match spec.TypeChar with
     | 'b' ->  
         System.Diagnostics.Debug.Assert(ty === typeof<bool>, "ty === typeof<bool>")
@@ -422,7 +422,7 @@ let getValueConverter_Real (ty : Type) (spec : FormatSpecifier) =
         basicWithPadding spec (fun (c : char) -> c.ToString())
     | 'M'  ->
         System.Diagnostics.Debug.Assert(ty === typeof<decimal>, "ty === typeof<decimal>")
-        decimalWithPadding spec (fun _ -> "G") "G" (fun fmt (v : decimal) -> toFormattedString fmt v) // %M ignores precision
+        decimalWithPadding spec (fun _ -> "G") "G" toFormattedString // %M ignores precision
     | 'd' | 'i' | 'x' | 'X' | 'u' | 'o'-> 
         basicNumberToString ty spec
     | 'e' | 'E' 
@@ -430,12 +430,12 @@ let getValueConverter_Real (ty : Type) (spec : FormatSpecifier) =
     | 'g' | 'G' -> 
         basicFloatToString ty spec
     | 'A' ->
-        let mi = typeof<ObjectPrinter>.GetMethod("GenericToString", NonPublicStatics)
+        let mi = typeof<ObjectPrinter>.GetMethod("GenericToString", nonPublicStatics)
         verifyMethodInfoWasTaken mi
         let mi' = mi.MakeGenericMethod(ty)
         mi'.Invoke(null, [| box spec |])
     | 'O' -> 
-        let mi = typeof<ObjectPrinter>.GetMethod("ObjectToString", NonPublicStatics)
+        let mi = typeof<ObjectPrinter>.GetMethod("ObjectToString", nonPublicStatics)
         verifyMethodInfoWasTaken mi
         let mi' = mi.MakeGenericMethod(ty)
         mi'.Invoke(null, [| box spec |])
@@ -445,9 +445,9 @@ let getValueConverter_Real (ty : Type) (spec : FormatSpecifier) =
 open FormatSpecifierConstants
 
 type ValueConverterHolder =
-    static member getValueConverterFor<'t> (ty : Type, spec : FormatSpecifier) =
+    static member GetValueConverterFor<'t> (ty : Type, spec : FormatSpecifier) =
         let et = PrintableElementType.FromFormatSpecifier
-        let realUntyped = getValueConverter_Real ty spec
+        let realUntyped = getValueConverterCore ty spec
         if spec.IsStarWidth && spec.IsStarPrecision then
             let real = realUntyped :?> ('t -> int -> int -> string)
             box(fun (x: 't) width prec ->
@@ -470,7 +470,7 @@ type ValueConverterHolder =
                 PrintableElement(printer, box x, et, ty, spec, NotSpecifiedValue, NotSpecifiedValue))
 
 let private getValueConverterForMethod =
-    let mi = typeof<ValueConverterHolder>.GetMethod("getValueConverterFor", NonPublicStatics)
+    let mi = typeof<ValueConverterHolder>.GetMethod("GetValueConverterFor", nonPublicStatics)
     verifyMethodInfoWasTaken mi
     mi
 

@@ -403,7 +403,7 @@ type private PrintfBuilderStack() =
         System.Diagnostics.Debug.Assert(this.IsEmpty, "this.IsEmpty")
         System.Diagnostics.Debug.Assert(
             (
-                let _arg, retTy = Microsoft.FSharp.Reflection.FSharpType.GetFunctionElements(cont.GetType())
+                let _, retTy = Microsoft.FSharp.Reflection.FSharpType.GetFunctionElements(cont.GetType())
                 contTy.IsAssignableFrom retTy
             ),
             "incorrect type"
@@ -435,13 +435,13 @@ type PrintfBuilder<'S, 'Re, 'Res>() =
            
     let buildSpecialChained(spec : FormatSpecifier, argTys : Type[], prefix : PrintableElement, tail : obj, retTy) = 
         if spec.TypeChar = 'a' then
-            let mi = typeof<Specializations<'S, 'Re, 'Res>>.GetMethod("LittleAChained", NonPublicStatics)
+            let mi = typeof<Specializations<'S, 'Re, 'Res>>.GetMethod("LittleAChained", nonPublicStatics)
             verifyMethodInfoWasTaken mi
             let mi = mi.MakeGenericMethod([| argTys.[1];  retTy |])
             let args = [| box prefix; tail   |]
             mi.Invoke(null, args)
         elif spec.TypeChar = 't' then
-            let mi = typeof<Specializations<'S, 'Re, 'Res>>.GetMethod("TChained", NonPublicStatics)
+            let mi = typeof<Specializations<'S, 'Re, 'Res>>.GetMethod("TChained", nonPublicStatics)
             verifyMethodInfoWasTaken mi
             let mi = mi.MakeGenericMethod([| retTy |])
             let args = [| box prefix; tail |]
@@ -453,7 +453,7 @@ type PrintfBuilder<'S, 'Re, 'Res>() =
                 let n = if spec.IsStarWidth = spec.IsStarPrecision then 2 else 1
                 let prefix = if spec.TypeChar = '%' then "PercentStarChained" else "StarChained"
                 let name = prefix + (string n)
-                typeof<Specializations<'S, 'Re, 'Res>>.GetMethod(name, NonPublicStatics)
+                typeof<Specializations<'S, 'Re, 'Res>>.GetMethod(name, nonPublicStatics)
                 
             verifyMethodInfoWasTaken mi
                 
@@ -470,13 +470,13 @@ type PrintfBuilder<'S, 'Re, 'Res>() =
             
     let buildSpecialFinal(spec : FormatSpecifier, argTys : Type[], prefix : PrintableElement, suffix : PrintableElement) =
         if spec.TypeChar = 'a' then
-            let mi = typeof<Specializations<'S, 'Re, 'Res>>.GetMethod("LittleAFinal", NonPublicStatics)
+            let mi = typeof<Specializations<'S, 'Re, 'Res>>.GetMethod("LittleAFinal", nonPublicStatics)
             verifyMethodInfoWasTaken mi
             let mi = mi.MakeGenericMethod(argTys.[1] : Type)
             let args = [| box prefix; box suffix |]
             mi.Invoke(null, args)
         elif spec.TypeChar = 't' then
-            let mi = typeof<Specializations<'S, 'Re, 'Res>>.GetMethod("TFinal", NonPublicStatics)
+            let mi = typeof<Specializations<'S, 'Re, 'Res>>.GetMethod("TFinal", nonPublicStatics)
             verifyMethodInfoWasTaken mi
             let args = [| box prefix; box suffix |]
             mi.Invoke(null, args)
@@ -487,7 +487,7 @@ type PrintfBuilder<'S, 'Re, 'Res>() =
                 let n = if spec.IsStarWidth = spec.IsStarPrecision then 2 else 1
                 let prefix = if spec.TypeChar = '%' then "PercentStarFinal" else "StarFinal"
                 let name = prefix + (string n)
-                typeof<Specializations<'S, 'Re, 'Res>>.GetMethod(name, NonPublicStatics)
+                typeof<Specializations<'S, 'Re, 'Res>>.GetMethod(name, nonPublicStatics)
                
             verifyMethodInfoWasTaken mi
 
@@ -504,20 +504,20 @@ type PrintfBuilder<'S, 'Re, 'Res>() =
 
     let buildPlainFinal(args : obj[], argTypes : Type[]) = 
         let methodName = "Final" + (argTypes.Length.ToString())
-        let mi = typeof<Specializations<'S, 'Re, 'Res>>.GetMethod(methodName, NonPublicStatics)
+        let mi = typeof<Specializations<'S, 'Re, 'Res>>.GetMethod(methodName, nonPublicStatics)
         verifyMethodInfoWasTaken mi
         let mi' = mi.MakeGenericMethod(argTypes)
         mi'.Invoke(null, args)
     
     let buildPlainChained(args : obj[], argTypes : Type[]) = 
-        let mi = typeof<Specializations<'S, 'Re, 'Res>>.GetMethod("Chained" + ((argTypes.Length - 1).ToString()), NonPublicStatics)
+        let mi = typeof<Specializations<'S, 'Re, 'Res>>.GetMethod("Chained" + ((argTypes.Length - 1).ToString()), nonPublicStatics)
         verifyMethodInfoWasTaken mi
         let mi' = mi.MakeGenericMethod(argTypes)
         mi'.Invoke(null, args)   
 
     let builderStack = PrintfBuilderStack()
 
-    let ContinuationOnStack = -1
+    let continuationOnStack = -1
 
     let buildPlain numberOfArgs prefix = 
         let n = numberOfArgs * 2
@@ -573,20 +573,20 @@ type PrintfBuilder<'S, 'Re, 'Res>() =
         let numberOfArgs = parseFromFormatSpecifier suffix s retTy next
 
         if spec.TypeChar = 'a' || spec.TypeChar = 't' || spec.IsStarWidth || spec.IsStarPrecision then
-            if numberOfArgs = ContinuationOnStack then
+            if numberOfArgs = continuationOnStack then
 
                 let cont, contTy = builderStack.PopContinuationWithType()
                 let currentCont = buildSpecialChained(spec, argTys, prefix, cont, contTy)
                 builderStack.PushContinuationWithType(currentCont, funcTy)
 
-                ContinuationOnStack
+                continuationOnStack
             else
                 if numberOfArgs = 0 then
                     System.Diagnostics.Debug.Assert(builderStack.IsEmpty, "builderStack.IsEmpty")
 
                     let currentCont = buildSpecialFinal(spec, argTys, prefix, suffix)
                     builderStack.PushContinuationWithType(currentCont, funcTy)
-                    ContinuationOnStack
+                    continuationOnStack
                 else
                         
                         
@@ -614,9 +614,9 @@ type PrintfBuilder<'S, 'Re, 'Res>() =
                     let next = buildSpecialChained(spec, argTys, prefix, next, retTy)
                     builderStack.PushContinuationWithType(next, funcTy)
 
-                    ContinuationOnStack
+                    continuationOnStack
         else
-            if numberOfArgs = ContinuationOnStack then
+            if numberOfArgs = continuationOnStack then
                 let idx = argTys.Length - 2
                 builderStack.PushArgument suffix
                 builderStack.PushArgumentWithType((getValueConverter argTys.[idx] spec), argTys.[idx])
@@ -628,7 +628,7 @@ type PrintfBuilder<'S, 'Re, 'Res>() =
                 if numberOfArgs = MaxArgumentsInSpecialization - 1 then
                     let cont = buildPlain (numberOfArgs + 1) prefix
                     builderStack.PushContinuationWithType(cont, funcTy)
-                    ContinuationOnStack
+                    continuationOnStack
                 else 
                     numberOfArgs + 1
 
@@ -643,7 +643,7 @@ type PrintfBuilder<'S, 'Re, 'Res>() =
         else
             let n = parseFromFormatSpecifier prefix s funcTy prefixPos
                 
-            if n = ContinuationOnStack || n = 0 then
+            if n = continuationOnStack || n = 0 then
                 builderStack.PopValueUnsafe()
             else
                 buildPlain n prefix
