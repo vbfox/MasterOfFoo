@@ -2,6 +2,7 @@
     "recommendations": [
         "Ionide.Ionide-fsharp",
         "Ionide.Ionide-FAKE",
-        "Ionide.Ionide-Paket"
+        "Ionide.Ionide-Paket",
+        "EditorConfig.EditorConfig"
     ]
 }
