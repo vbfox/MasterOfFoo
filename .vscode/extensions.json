@@ -1,0 +1,7 @@
+{
+    "recommendations": [
+        "Ionide.Ionide-fsharp",
+        "Ionide.Ionide-FAKE",
+        "Ionide.Ionide-Paket"
+    ]
+}
