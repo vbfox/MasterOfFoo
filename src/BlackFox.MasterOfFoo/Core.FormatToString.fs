@@ -324,7 +324,7 @@ type ObjectPrinter =
     static member ObjectToString<'T>(spec : FormatSpecifier) = 
         basicWithPadding spec (fun (v : 'T) -> match box v with null -> "<null>" | x -> x.ToString())
         
-    static member GenericToStringCore(v : 'T) = 
+    static member GenericToStringCore(v : 'T, opts : FormatOptions, bindingFlags) = 
         // printfn %0A is considered to mean 'print width zero'
         match box v with 
         | null -> "<null>" 
@@ -334,12 +334,8 @@ type ObjectPrinter =
 
     static member GenericToString<'T>(spec : FormatSpecifier) = 
         let bindingFlags = 
-#if FX_RESHAPED_REFLECTION
-            isPlusForPositives spec.Flags // true - show non-public
-#else
             if isPlusForPositives spec.Flags then BindingFlags.Public ||| BindingFlags.NonPublic
             else BindingFlags.Public 
-#endif
 
         let useZeroWidth = isPadWithZeros spec.Flags
         let opts = 
