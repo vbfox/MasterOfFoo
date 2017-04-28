@@ -16,3 +16,5 @@ summary
     An F# library to allow using printf style strings in more places.
 description
     An F# library to allow using printf style strings in more places.
+excludeddependencies
+    FSharpLint.MSBuild
