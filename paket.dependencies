@@ -1,9 +1,11 @@
-version 3.25.1
+version 4.8.4
 
 source https://api.nuget.org/v3/index.json
+
+framework: >=net45
+
 nuget FAKE
 nuget FSharp.Core ~> 4
-nuget FSharpLint.MSBuild
 nuget NUnit
 nuget NUnit.ConsoleRunner
 github fsharp/FAKE modules/Octokit/Octokit.fsx
