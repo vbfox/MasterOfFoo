@@ -1,10 +1,11 @@
 ﻿module BlackFox.MasterOfFoo.DoPrintfTests
 
+open Expecto
 open System.Text
-open NUnit.Framework
+
 open BlackFox.MasterOfFoo
 
-type TestEnv() = 
+type TestEnv() =
     inherit PrintfEnv<unit, string, string>()
     let buf = StringBuilder()
     override __.Finalize() = buf.ToString ()
@@ -14,46 +15,58 @@ type TestEnv() =
 let testprintf (format: Printf.StringFormat<'a>) = doPrintf format (fun _ -> TestEnv())
 let coreprintf = FSharp.Core.Printf.sprintf
 
-[<Test>]
-let SimpleString () =
-    Assert.AreEqual(
-        coreprintf "Foo",
-        testprintf "Foo")
-
-[<Test>]
-let StringFormat () =
-    Assert.AreEqual(
-        coreprintf "%s" "Foo",
-        testprintf "%s" "Foo")
-
-[<Test>]
-let StringFormatWidth () =
-    Assert.AreEqual(
-        coreprintf "%1s" "Foo",
-        testprintf "%1s" "Foo")
-    Assert.AreEqual(
-        coreprintf "%5s" "Foo",
-        testprintf "%5s" "Foo")
-
-[<Test>]
-let IntFormat () =
-    Assert.AreEqual(
-        coreprintf "%i" 5,
-        testprintf "%i" 5)
-
-[<Test>]
-let IntFormatWidth () =
-    Assert.AreEqual(
-        coreprintf "%1i" 5,
-        testprintf "%1i" 5)
-    Assert.AreEqual(
-        coreprintf "%5i" 5,
-        testprintf "%5i" 5)
-
 type Discriminated = |A of string | B of int
 
-[<Test>]
-let AFormat () =
-    Assert.AreEqual(
-        coreprintf "%A %A %A %A %A" "Foo" 5 (A("Foo")) (B(42)) System.ConsoleColor.Red,
-        testprintf "%A %A %A %A %A" "Foo" 5 (A("Foo")) (B(42)) System.ConsoleColor.Red)
+let tests = [
+    test "simple string" {
+        Expect.equal
+            (coreprintf "Foo")
+            (testprintf "Foo")
+            "Foo"
+    }
+
+    test "string format" {
+        Expect.equal
+            (coreprintf "%s" "Foo")
+            (testprintf "%s" "Foo")
+            "%s"
+    }
+
+    test "string format width" {
+        Expect.equal
+            (coreprintf "%1s" "Foo")
+            (testprintf "%1s" "Foo")
+            "%1s"
+        Expect.equal
+            (coreprintf "%5s" "Foo")
+            (testprintf "%5s" "Foo")
+            "%5s"
+    }
+
+    test "int format" {
+        Expect.equal
+            (coreprintf "%i" 5)
+            (testprintf "%i" 5)
+            "%i"
+    }
+
+    test "int format width" {
+        Expect.equal
+            (coreprintf "%1i" 5)
+            (testprintf "%1i" 5)
+            "%1i"
+        Expect.equal
+            (coreprintf "%5i" 5)
+            (testprintf "%5i" 5)
+            "%5i"
+    }
+
+    test "A format" {
+        Expect.equal
+            (coreprintf "%A %A %A %A %A" "Foo" 5 (A("Foo")) (B(42)) System.ConsoleColor.Red)
+            (testprintf "%A %A %A %A %A" "Foo" 5 (A("Foo")) (B(42)) System.ConsoleColor.Red)
+            "%A %A %A %A %A"
+    }
+]
+[<Tests>]
+let test = testList "Tests" tests
