@@ -8,21 +8,21 @@ open System.Data.Common
 
 module ReimplementPrintf =
     open System
-    type StringPrintfEnv<'Result>(k, n) = 
+    type StringPrintfEnv<'Result>(k, n) =
         inherit PrintfEnv<unit, string, 'Result>(())
 
         let buf : string[] = Array.zeroCreate n
         let mutable ptr = 0
 
         override this.Finalize() : 'Result = k (String.Concat(buf))
-        override this.Write(s : PrintableElement) = 
+        override this.Write(s : PrintableElement) =
             buf.[ptr] <- s.ToString()
             ptr <- ptr + 1
-        override this.WriteT(s) = 
+        override this.WriteT(s) =
             buf.[ptr] <- s
             ptr <- ptr + 1
 
-    type StringBuilderPrintfEnv<'Result>(k, buf) = 
+    type StringBuilderPrintfEnv<'Result>(k, buf) =
         inherit PrintfEnv<Text.StringBuilder, unit, 'Result>(buf)
         override this.Finalize() : 'Result = k ()
         override this.Write(s : PrintableElement) = ignore(buf.Append(s.ToString()))
@@ -42,7 +42,7 @@ module ReimplementPrintf =
     type TextWriterFormat<'T>  = TextWriterFormat<'T,unit>
 
     [<CompiledName("PrintFormatToStringThen")>]
-    let ksprintf continuation (format : Format<'T, unit, string, 'Result>) : 'T = 
+    let ksprintf continuation (format : Format<'T, unit, string, 'Result>) : 'T =
         doPrintf format (fun n -> StringPrintfEnv(continuation, n))
 
     [<CompiledName("PrintFormatToStringThen")>]
@@ -52,17 +52,17 @@ module ReimplementPrintf =
     let kprintf f fmt = ksprintf f fmt
 
     [<CompiledName("PrintFormatToStringBuilderThen")>]
-    let kbprintf f (buf: System.Text.StringBuilder) fmt = 
+    let kbprintf f (buf: System.Text.StringBuilder) fmt =
         doPrintfFromEnv fmt (StringBuilderPrintfEnv(f, buf))
-    
+
     [<CompiledName("PrintFormatToTextWriterThen")>]
     let kfprintf f os fmt = doPrintfFromEnv fmt (TextWriterPrintfEnv(f, os))
 
     [<CompiledName("PrintFormatToStringBuilder")>]
-    let bprintf buf fmt  = kbprintf ignore buf fmt 
+    let bprintf buf fmt  = kbprintf ignore buf fmt
 
     [<CompiledName("PrintFormatToTextWriter")>]
-    let fprintf (os: System.IO.TextWriter) fmt  = kfprintf ignore os fmt 
+    let fprintf (os: System.IO.TextWriter) fmt  = kfprintf ignore os fmt
 
     [<CompiledName("PrintFormatLineToTextWriter")>]
     let fprintfn (os: System.IO.TextWriter) fmt  = kfprintf (fun _ -> os.WriteLine()) os fmt
@@ -130,7 +130,7 @@ module ColorPrintf =
         override this.Finalize() : 'Result = k()
         override this.Write(s : PrintableElement) =
             match s.ElementType with
-            | PrintableElementType.FromFormatSpecifier -> 
+            | PrintableElementType.FromFormatSpecifier ->
                 let color = Console.ForegroundColor
                 Console.ForegroundColor <- ConsoleColor.Blue
                 Console.Write(s.FormatAsPrintF())
@@ -155,7 +155,7 @@ type internal QueryStringEnv() =
     override this.Write(s : PrintableElement) =
         let asPrintf = s.FormatAsPrintF()
         match s.ElementType with
-        | PrintableElementType.FromFormatSpecifier -> 
+        | PrintableElementType.FromFormatSpecifier ->
             let escaped = System.Uri.EscapeDataString(asPrintf)
             ignore(this.State.Append escaped)
         | _ ->
@@ -166,7 +166,7 @@ type internal QueryStringEnv() =
 let queryStringf (format : Format<'T, StringBuilder, unit, string>) =
     MasterOfFoo.doPrintf format (fun _ -> QueryStringEnv() :> PrintfEnv<_, _, _>)
 
-type internal MyTestEnv<'Result>(k, state) = 
+type internal MyTestEnv<'Result>(k, state) =
     inherit PrintfEnv<StringBuilder, unit, 'Result>(state)
     override this.Finalize() : 'Result =
         printfn "Finalizing"
@@ -174,11 +174,11 @@ type internal MyTestEnv<'Result>(k, state) =
     override this.Write(s : PrintableElement) =
         printfn "Writing: %A" s
         state.Append(s.FormatAsPrintF()) |> ignore
-    override this.WriteT(()) = 
+    override this.WriteT(()) =
         printfn "WTF"
 
 let testprintf (sb: StringBuilder) (format : Format<'T, StringBuilder, unit, unit>) =
-    MasterOfFoo.doPrintf format (fun n -> 
+    MasterOfFoo.doPrintf format (fun n ->
         MyTestEnv(ignore, sb) :> PrintfEnv<_, _, _>
     )
 
@@ -206,7 +206,7 @@ let chained () =
     testprintf sb "Hello %s %s %s %s %s %s" "1" "2" "3" "4" "5" "6"
     System.Console.WriteLine("RESULT: {0}", sb.ToString())
 
-let complex () = 
+let complex () =
     printfn "------------------------------------------------"
     let sb = StringBuilder ()
     testprintf sb "Hello %s %s %s %s %s %s %06i %t" "1" "2" "3" "4" "5" "6" 5 (fun x -> x.Append("CALLED") |> ignore)

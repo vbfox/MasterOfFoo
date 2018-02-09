@@ -1,5 +1,5 @@
 // include Fake libs
-#r "../packages/FAKE/tools/FakeLib.dll"
+#r "../packages/build/FAKE/tools/FakeLib.dll"
 #load "./TaskDefinitionHelper.fsx"
 #load "./AppVeyorEx.fsx"
 
@@ -99,7 +99,7 @@ Task "Zip" ["Build"] <| fun _ ->
         |> Zip libraryBinDir zipFile
     AppVeyor.PushArtifacts [zipFile]
 
-#load "../paket-files/fsharp/FAKE/modules/Octokit/Octokit.fsx"
+#load "../paket-files/build/fsharp/FAKE/modules/Octokit/Octokit.fsx"
 
 Task "GitHubRelease" ["Zip"] <| fun _ ->
     let user =
