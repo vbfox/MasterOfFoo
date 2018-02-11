@@ -1,9 +1,11 @@
 // include Fake libs
 #r "../packages/build/FAKE/tools/FakeLib.dll"
+#r "System.Xml.Linq"
 #load "./TaskDefinitionHelper.fsx"
 #load "./AppVeyorEx.fsx"
 
 open System
+open System.Xml.Linq
 open Fake
 open Fake.ReleaseNotesHelper
 open Fake.Testing.Expecto
@@ -43,22 +45,26 @@ let release =
 
 let mutable dotnetExePath = "dotnet"
 
-let dotnetAdditionalArgs =
-    [
-        sprintf "/p:Version=%s" release.AssemblyVersion
-        sprintf "/p:PackageVersion=%s" release.NugetVersion
-        // TODO: Really escape parameters
-        sprintf "\"/p:PackageReleaseNotes=%s\"" (toLines release.Notes)
-    ]
-
 Task "InstallDotNetCore" [] (fun _ ->
     dotnetExePath <- DotNetCli.InstallDotNetSDK (DotNetCli.GetDotNetSDKVersionFromGlobalJson())
 )
 
 AppVeyorEx.updateBuild (fun info -> { info with Version = Some release.AssemblyVersion })
 
+let writeVersionProps() =
+    let doc =
+        XDocument(
+            XElement(XName.Get("Project"),
+                XElement(XName.Get("PropertyGroup"),
+                    XElement(XName.Get "Version", release.AssemblyVersion),
+                    XElement(XName.Get "PackageVersion", release.NugetVersion),
+                    XElement(XName.Get "PackageReleaseNotes", toLines release.Notes))))
+    let path = artifactsDir </> "Version.props"
+    System.IO.File.WriteAllText(path, doc.ToString())
+
 Task "Init" [] <| fun _ ->
     CreateDir artifactsDir
+    writeVersionProps ()
 
 // Targets
 Task "Clean" ["Init"] <| fun _ ->
@@ -69,7 +75,6 @@ Task "Build" ["InstallDotNetCore"; "Init"; "?Clean"] <| fun _ ->
     DotNetCli.Build
       (fun p ->
            { p with
-                AdditionalArgs = dotnetAdditionalArgs
                 WorkingDir = srcDir
                 Configuration = configuration
                 ToolPath = dotnetExePath })
@@ -130,7 +135,6 @@ Task "NuGet" ["Build"] <| fun _ ->
       (fun p ->
            { p with
                 WorkingDir = librarySrcDir
-                AdditionalArgs = dotnetAdditionalArgs
                 Configuration = configuration
                 ToolPath = dotnetExePath })
     let nupkg =

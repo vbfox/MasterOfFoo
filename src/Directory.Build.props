@@ -1,6 +1,7 @@
 <Project>
   <PropertyGroup>
-    <OutputPath>$(MSBuildThisFileDirectory)\..\artifacts\$(MSBuildProjectName)\$(Configuration)\</OutputPath>
+    <ArtifactsDir>$(MSBuildThisFileDirectory)/../artifacts/</ArtifactsDir>
+    <OutputPath>$(ArtifactsDir)/$(MSBuildProjectName)/$(Configuration)/</OutputPath>
   </PropertyGroup>
   <PropertyGroup>
     <Description>An F# library to allow using printf style strings in more places.</Description>
@@ -10,4 +11,5 @@
     <PackageTags>F#;FSharp;printf</PackageTags>
     <Authors>vbfox</Authors>
   </PropertyGroup>
+  <Import Project="$(ArtifactsDir)\Version.props" Condition="exists('$(ArtifactsDir)\Version.props')" />
 </Project>
