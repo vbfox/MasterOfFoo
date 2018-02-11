@@ -1,6 +1,6 @@
 module BlackFox.AppVeyorEx
 
-#r "../packages/FAKE/tools/FakeLib.dll"
+#r "../packages/build/FAKE/tools/FakeLib.dll"
 #load "./CmdLine.fs"
 
 open BlackFox.CommandLine

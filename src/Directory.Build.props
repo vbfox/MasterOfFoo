@@ -1,0 +1,18 @@
+<Project>
+  <PropertyGroup>
+    <ArtifactsDir>$(MSBuildThisFileDirectory)/../artifacts/</ArtifactsDir>
+    <OutputPath>$(ArtifactsDir)/$(MSBuildProjectName)/$(Configuration)/</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup>
+    <Description>An F# library to allow using printf style strings in more places.</Description>
+    <PackageProjectUrl>https://github.com/vbfox/MasterOfFoo</PackageProjectUrl>
+    <PackageLicenseUrl>https://github.com/vbfox/MasterOfFoo/blob/master/License.md</PackageLicenseUrl>
+    <RepositoryUrl>https://github.com/vbfox/MasterOfFoo</RepositoryUrl>
+    <PackageTags>F#;FSharp;printf</PackageTags>
+    <Authors>vbfox</Authors>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(ArtifactsDir)/Version.fs"  Condition="exists('$(ArtifactsDir)/Version.fs')"/>
+  </ItemGroup>
+  <Import Project="$(ArtifactsDir)/Version.props" Condition="exists('$(ArtifactsDir)/Version.props')" />
+</Project>

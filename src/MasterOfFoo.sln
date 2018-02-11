@@ -7,16 +7,16 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".paket", ".paket", "{55CDFC
 		paket.dependencies = paket.dependencies
 	EndProjectSection
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "TestApp", "src\TestApp\TestApp.fsproj", "{4C628A7D-76EC-4673-A45D-DAE6FC060784}"
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "TestApp", "TestApp\BlackFox.MasterOfFoo.TestApp.fsproj", "{4C628A7D-76EC-4673-A45D-DAE6FC060784}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E5E77D3C-F0EE-4EB3-B813-B181020563E0}"
 	ProjectSection(SolutionItems) = preProject
 		Readme.md = Readme.md
 	EndProjectSection
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "BlackFox.MasterOfFoo.Tests", "src\BlackFox.MasterOfFoo.Tests\BlackFox.MasterOfFoo.Tests.fsproj", "{B158E4B2-AF4C-4A91-BC1E-3D4E4B080802}"
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "BlackFox.MasterOfFoo.Tests", "BlackFox.MasterOfFoo.Tests\BlackFox.MasterOfFoo.Tests.fsproj", "{B158E4B2-AF4C-4A91-BC1E-3D4E4B080802}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "BlackFox.MasterOfFoo", "src\BlackFox.MasterOfFoo\BlackFox.MasterOfFoo.fsproj", "{80E6D22C-3DEC-4929-B4BF-68E3A3F28039}"
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "BlackFox.MasterOfFoo", "BlackFox.MasterOfFoo\BlackFox.MasterOfFoo.fsproj", "{80E6D22C-3DEC-4929-B4BF-68E3A3F28039}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

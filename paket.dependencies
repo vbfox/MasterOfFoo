@@ -1,11 +1,16 @@
-version 4.8.4
+version 5.134.0
 
 source https://api.nuget.org/v3/index.json
+framework: netcoreapp2.0,netstandard1.6,netstandard2.0,net45
+storage:none
 
-framework: >=net45
+nuget Expecto
+nuget FSharp.Core 4.2.3 # Also specified in the .fsproj as it DOES NOT USE PAKET
+nuget System.Data.SqlClient
 
-nuget FAKE
-nuget FSharp.Core ~> 4
-nuget NUnit
-nuget NUnit.ConsoleRunner
-github fsharp/FAKE modules/Octokit/Octokit.fsx
+group Build
+    source https://api.nuget.org/v3/index.json
+    framework: >=net45
+
+    nuget FAKE
+    github fsharp/FAKE modules/Octokit/Octokit.fsx

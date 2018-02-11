@@ -8,8 +8,16 @@
     <ProjectReference Include="../BlackFox.MasterOfFoo/BlackFox.MasterOfFoo.fsproj" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Test.fs" />
-    <Compile Include="Main.fs" />
+    <Reference Include="mscorlib" />
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Numerics" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AssemblyInfo.fs" />
+    <Compile Include="Program.fs" />
+    <None Include="App.config" />
     <None Include="paket.references" />
   </ItemGroup>
   <Import Project="..\..\.paket\Paket.Restore.targets" />
