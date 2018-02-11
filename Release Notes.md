@@ -1,3 +1,7 @@
+### New in 1.0.0
+
+* The library now targets .Net 4.5, .Net standard 1.6 and .Net standard 2.0
+
 ### New in 0.2.1
 
 * NuGet package was accidentally dependent on FSharpLint.MSBuild
