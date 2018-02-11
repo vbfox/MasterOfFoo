@@ -7,6 +7,7 @@
 open System
 open System.Xml.Linq
 open Fake
+open Fake.AssemblyInfoFile
 open Fake.ReleaseNotesHelper
 open Fake.Testing.Expecto
 open BlackFox
@@ -32,13 +33,20 @@ let gitName = "MasterOfFoo"
 /// The url for the raw files hosted
 let gitRaw = environVarOrDefault "gitRaw" ("https://raw.github.com/" + gitOwner)
 
+let inline versionPartOrZero x = if x < 0 then 0 else x
+
 let release =
     let fromFile = LoadReleaseNotes (rootDir </> "Release Notes.md")
     if buildServer = AppVeyor then
         let appVeyorBuildVersion = int appVeyorBuildVersion
         let nugetVer = sprintf "%s-appveyor%04i" fromFile.NugetVersion appVeyorBuildVersion
         let asmVer = System.Version.Parse(fromFile.AssemblyVersion)
-        let asmVer = System.Version(asmVer.Major, asmVer.Minor, asmVer.Build, appVeyorBuildVersion)
+        let asmVer =
+            System.Version(
+                versionPartOrZero asmVer.Major,
+                versionPartOrZero asmVer.Minor,
+                versionPartOrZero asmVer.Build,
+                versionPartOrZero appVeyorBuildVersion)
         ReleaseNotes.New(asmVer.ToString(), nugetVer, fromFile.Date, fromFile.Notes)
     else
         fromFile
@@ -56,8 +64,7 @@ let writeVersionProps() =
         XDocument(
             XElement(XName.Get("Project"),
                 XElement(XName.Get("PropertyGroup"),
-                    XElement(XName.Get "Version", release.AssemblyVersion),
-                    XElement(XName.Get "PackageVersion", release.NugetVersion),
+                    XElement(XName.Get "Version", release.NugetVersion),
                     XElement(XName.Get "PackageReleaseNotes", toLines release.Notes))))
     let path = artifactsDir </> "Version.props"
     System.IO.File.WriteAllText(path, doc.ToString())
@@ -65,8 +72,8 @@ let writeVersionProps() =
 Task "Init" [] <| fun _ ->
     CreateDir artifactsDir
     writeVersionProps ()
+    CreateFSharpAssemblyInfo (artifactsDir </> "Version.fs") [Attribute.Version release.AssemblyVersion]
 
-// Targets
 Task "Clean" ["Init"] <| fun _ ->
     let objDirs = projects |> Seq.map(fun p -> System.IO.Path.GetDirectoryName(p) </> "obj") |> List.ofSeq
     CleanDirs (artifactsDir :: objDirs)

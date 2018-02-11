@@ -11,5 +11,8 @@
     <PackageTags>F#;FSharp;printf</PackageTags>
     <Authors>vbfox</Authors>
   </PropertyGroup>
-  <Import Project="$(ArtifactsDir)\Version.props" Condition="exists('$(ArtifactsDir)\Version.props')" />
+  <ItemGroup>
+    <Compile Include="$(ArtifactsDir)/Version.fs"  Condition="exists('$(ArtifactsDir)/Version.fs')"/>
+  </ItemGroup>
+  <Import Project="$(ArtifactsDir)/Version.props" Condition="exists('$(ArtifactsDir)/Version.props')" />
 </Project>
