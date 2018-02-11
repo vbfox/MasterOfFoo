@@ -16,9 +16,8 @@ let from s = { BaseDirectory = s; Includes = []; Excludes = [] }
 let rootDir = System.IO.Path.GetFullPath(__SOURCE_DIRECTORY__ </> "..")
 let srcDir = rootDir </> "src"
 let artifactsDir = rootDir </> "artifacts"
-let binDir = artifactsDir </> "bin"
 let librarySrcDir = srcDir </> "BlackFox.MasterOfFoo"
-let libraryBinDir = binDir </> "BlackFox.MasterOfFoo" </> configuration
+let libraryBinDir = artifactsDir </> "BlackFox.MasterOfFoo" </> configuration
 let projects = from srcDir ++ "**/*.*proj"
 
 /// The profile where the project is posted
@@ -42,6 +41,20 @@ let release =
     else
         fromFile
 
+let mutable dotnetExePath = "dotnet"
+
+let dotnetAdditionalArgs =
+    [
+        sprintf "/p:Version=%s" release.AssemblyVersion
+        sprintf "/p:PackageVersion=%s" release.NugetVersion
+        // TODO: Really escape parameters
+        sprintf "\"/p:PackageReleaseNotes=%s\"" (toLines release.Notes)
+    ]
+
+Task "InstallDotNetCore" [] (fun _ ->
+    dotnetExePath <- DotNetCli.InstallDotNetSDK (DotNetCli.GetDotNetSDKVersionFromGlobalJson())
+)
+
 AppVeyorEx.updateBuild (fun info -> { info with Version = Some release.AssemblyVersion })
 
 Task "Init" [] <| fun _ ->
@@ -49,13 +62,18 @@ Task "Init" [] <| fun _ ->
 
 // Targets
 Task "Clean" ["Init"] <| fun _ ->
-    CleanDirs [artifactsDir]
+    let objDirs = projects |> Seq.map(fun p -> System.IO.Path.GetDirectoryName(p) </> "obj") |> List.ofSeq
+    CleanDirs (artifactsDir :: objDirs)
 
-Task "Build" ["Init"; "?Clean"] <| fun _ ->
-    MSBuild null "Build" ["Configuration", configuration] projects
-        |> ignore
+Task "Build" ["InstallDotNetCore"; "Init"; "?Clean"] <| fun _ ->
+    DotNetCli.Build
+      (fun p ->
+           { p with
+                AdditionalArgs = dotnetAdditionalArgs
+                WorkingDir = srcDir
+                Configuration = configuration })
 
-Task "RunTests" [ "Build"] <| fun _ ->
+Task "RunTests" ["Build"] <| fun _ ->
     let nunitPath = rootDir </> @"packages" </> "NUnit.ConsoleRunner" </> "tools" </> "nunit3-console.exe"
     let testAssemblies = artifactsDir </> "bin" </> "*.Tests" </> configuration </> "*.Tests.dll"
     let testResults = artifactsDir </> "TestResults.xml"
@@ -70,16 +88,20 @@ Task "RunTests" [ "Build"] <| fun _ ->
 
     AppVeyor.UploadTestResultsFile AppVeyor.NUnit3 testResults
 
+let nupkgDir = artifactsDir </> "BlackFox.MasterOfFoo" </> configuration
+
 Task "NuGet" ["Build"] <| fun _ ->
-    Paket.Pack <| fun p ->
-        { p with
-            OutputPath = artifactsDir
-            Version = release.NugetVersion
-            ReleaseNotes = toLines release.Notes
-            WorkingDir = librarySrcDir
-            BuildConfig = configuration
-            BuildPlatform = "AnyCPU"}
-    AppVeyor.PushArtifacts (from artifactsDir ++ "*.nupkg")
+    DotNetCli.Pack
+      (fun p ->
+           { p with
+                WorkingDir = librarySrcDir
+                AdditionalArgs = dotnetAdditionalArgs
+                Configuration = configuration })
+    let nupkg =
+        nupkgDir
+            </> (sprintf "BlackFox.MasterOfFoo.%s.nupkg" release.NugetVersion)
+
+    AppVeyor.PushArtifacts [nupkg]
 
 Task "PublishNuget" ["NuGet"] <| fun _ ->
     let key =
@@ -87,7 +109,7 @@ Task "PublishNuget" ["NuGet"] <| fun _ ->
         | Some(key) -> key
         | None -> getUserPassword "NuGet key: "
 
-    Paket.Push <| fun p ->  { p with WorkingDir = artifactsDir; ApiKey = key }
+    Paket.Push <| fun p ->  { p with WorkingDir = nupkgDir; ApiKey = key }
 
 let zipFile = artifactsDir </> (sprintf "BlackFox.MasterOfFoo-%s.zip" release.NugetVersion)
 

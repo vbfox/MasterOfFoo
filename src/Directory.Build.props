@@ -8,6 +8,6 @@
     <PackageLicenseUrl>https://github.com/vbfox/MasterOfFoo/blob/master/License.md</PackageLicenseUrl>
     <RepositoryUrl>https://github.com/vbfox/MasterOfFoo</RepositoryUrl>
     <PackageTags>F#;FSharp;printf</PackageTags>
-    <Authors>Julien Roncaglia</Authors>
+    <Authors>vbfox</Authors>
   </PropertyGroup>
 </Project>
