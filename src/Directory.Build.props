@@ -1,6 +1,6 @@
 <Project>
   <PropertyGroup>
-    <OutputPath>..\..\artifacts\$(MSBuildProjectName)\$(Configuration)\</OutputPath>
+    <OutputPath>$(MSBuildThisFileDirectory)\..\artifacts\$(MSBuildProjectName)\$(Configuration)\</OutputPath>
   </PropertyGroup>
   <PropertyGroup>
     <Description>An F# library to allow using printf style strings in more places.</Description>
