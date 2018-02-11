@@ -21,71 +21,71 @@ let getFormatForFloat (ch : char) (prec : int) = ch.ToString() +  prec.ToString(
 let normalizePrecision prec = min (max prec 0) 99
 
 /// Contains helpers to convert printer functions to functions that prints value with respect to specified justification
-/// There are two kinds to printers: 
+/// There are two kinds to printers:
 /// 'T -> string - converts value to string - used for strings, basic integers etc..
-/// string -> 'T -> string - converts value to string with given format string - used by numbers with floating point, typically precision is set via format string 
+/// string -> 'T -> string - converts value to string with given format string - used by numbers with floating point, typically precision is set via format string
 /// To support both categories there are two entry points:
 /// - withPadding - adapts first category
 /// - withPaddingFormatted - adapts second category
-module Padding = 
+module Padding =
     /// pad here is function that converts T to string with respect of justification
     /// basic - function that converts T to string without appying justification rules
-    /// adaptPaddedFormatted returns boxed function that has various number of arguments depending on if width\precision flags has '*' value 
-    let inline adaptPaddedFormatted (spec : FormatSpecifier) getFormat (basic : string -> 'T -> string) (pad : string -> int -> 'T -> string) = 
+    /// adaptPaddedFormatted returns boxed function that has various number of arguments depending on if width\precision flags has '*' value
+    let inline adaptPaddedFormatted (spec : FormatSpecifier) getFormat (basic : string -> 'T -> string) (pad : string -> int -> 'T -> string) =
         if spec.IsStarWidth then
             if spec.IsStarPrecision then
                 // width=*, prec=*
-                box(fun v width prec -> 
+                box(fun v width prec ->
                     let fmt = getFormat (normalizePrecision prec)
                     pad fmt width v
                     )
-            else 
+            else
                 // width=*, prec=?
                 let prec = if spec.IsPrecisionSpecified then normalizePrecision spec.Precision else DefaultPrecision
                 let fmt = getFormat prec
-                box(fun v width -> 
+                box(fun v width ->
                     pad fmt width v
                     )
         elif spec.IsStarPrecision then
             if spec.IsWidthSpecified then
                 // width=val, prec=*
-                box(fun v prec -> 
+                box(fun v prec ->
                     let fmt = getFormat prec
                     pad fmt spec.Width v
                     )
             else
                 // width=X, prec=*
-                box(fun v prec -> 
+                box(fun v prec ->
                     let fmt = getFormat prec
                     basic fmt v
-                    )                        
+                    )
         else
             let prec = if spec.IsPrecisionSpecified then normalizePrecision spec.Precision else DefaultPrecision
             let fmt = getFormat prec
             if spec.IsWidthSpecified then
                 // width=val, prec=*
-                box(fun v -> 
+                box(fun v ->
                     pad fmt spec.Width v
                     )
             else
                 // width=X, prec=*
-                box(fun v -> 
+                box(fun v ->
                     basic fmt v
                     )
 
     /// pad here is function that converts T to string with respect of justification
     /// basic - function that converts T to string without appying justification rules
-    /// adaptPadded returns boxed function that has various number of arguments depending on if width flags has '*' value 
-    let inline adaptPadded (spec : FormatSpecifier) (basic : 'T -> string) (pad : int -> 'T -> string) = 
+    /// adaptPadded returns boxed function that has various number of arguments depending on if width flags has '*' value
+    let inline adaptPadded (spec : FormatSpecifier) (basic : 'T -> string) (pad : int -> 'T -> string) =
         if spec.IsStarWidth then
                 // width=*, prec=?
-                box(fun v width -> 
+                box(fun v width ->
                     pad width v
                     )
         else
             if spec.IsWidthSpecified then
                 // width=val, prec=*
-                box(fun v -> 
+                box(fun v ->
                     pad spec.Width v
                     )
             else
@@ -113,23 +113,23 @@ module Padding =
 let inline isNumber (x: ^T) =
     not (^T: (static member IsPositiveInfinity: 'T -> bool) x) && not (^T: (static member IsNegativeInfinity: 'T -> bool) x) && not (^T: (static member IsNaN: 'T -> bool) x)
 
-let inline isInteger n = 
+let inline isInteger n =
     n % LanguagePrimitives.GenericOne = LanguagePrimitives.GenericZero
-    
-let inline isPositive n = 
+
+let inline isPositive n =
     n >= LanguagePrimitives.GenericZero
 
 /// contains functions to handle left\right justifications for non-numeric types (strings\bools)
 module Basic =
-    let inline leftJustify f padChar = 
-        fun (w : int) v -> 
+    let inline leftJustify f padChar =
+        fun (w : int) v ->
             (f v : string).PadRight(w, padChar)
-    
-    let inline rightJustify f padChar = 
-        fun (w : int) v -> 
+
+    let inline rightJustify f padChar =
+        fun (w : int) v ->
             (f v : string).PadLeft(w, padChar)
-    
-    
+
+
 /// contains functions to handle left\right and no justification case for numbers
 module GenericNumber =
     /// handles right justification when pad char = '0'
@@ -140,7 +140,7 @@ module GenericNumber =
         System.Diagnostics.Debug.Assert(prefixForPositives.Length = 0 || prefixForPositives.Length = 1)
         if isNumber then
             if isPositive then
-                prefixForPositives + (if w = 0 then str else str.PadLeft(w - prefixForPositives.Length, '0')) // save space to 
+                prefixForPositives + (if w = 0 then str else str.PadLeft(w - prefixForPositives.Length, '0')) // save space to
             else
                 if str.[0] = '-' then
                     let str = str.Substring(1)
@@ -149,13 +149,13 @@ module GenericNumber =
                     str.PadLeft(w, '0')
         else
             str.PadLeft(w, ' ')
-        
+
     /// handler right justification when pad char = ' '
     let inline rightJustifyWithSpaceAsPadChar (str : string) isNumber isPositive w (prefixForPositives : string) =
         System.Diagnostics.Debug.Assert(prefixForPositives.Length = 0 || prefixForPositives.Length = 1)
         (if isNumber && isPositive then prefixForPositives + str else str).PadLeft(w, ' ')
-        
-    /// handles left justification with formatting with 'G'\'g' - either for decimals or with 'g'\'G' is explicitly set 
+
+    /// handles left justification with formatting with 'G'\'g' - either for decimals or with 'g'\'G' is explicitly set
     let inline leftJustifyWithGFormat (str : string) isNumber isInteger isPositive w (prefixForPositives : string) padChar  =
         if isNumber then
             let str = if isPositive then prefixForPositives + str else str
@@ -173,26 +173,26 @@ module GenericNumber =
             let str = if isPositive then prefixForPositives + str else str
             str.PadRight(w, padChar)
         else
-            str.PadRight(w, ' ') // pad NaNs with ' ' 
-        
+            str.PadRight(w, ' ') // pad NaNs with ' '
+
     /// processes given string based depending on values isNumber\isPositive
-    let inline noJustificationCore (str : string) isNumber isPositive prefixForPositives = 
+    let inline noJustificationCore (str : string) isNumber isPositive prefixForPositives =
         if isNumber && isPositive then prefixForPositives + str
         else str
-        
+
     /// noJustification handler for f : 'T -> string - basic integer types
     let inline noJustification f (prefix : string) isUnsigned =
         if isUnsigned then
             fun v -> noJustificationCore (f v) true true prefix
-        else 
+        else
             fun v -> noJustificationCore (f v) true (isPositive v) prefix
 
     /// noJustification handler for f : string -> 'T -> string - floating point types
-    let inline noJustificationWithFormat f (prefix : string) = 
+    let inline noJustificationWithFormat f (prefix : string) =
         fun (fmt : string) v -> noJustificationCore (f fmt v) true (isPositive v) prefix
 
     /// leftJustify handler for f : 'T -> string - basic integer types
-    let inline leftJustify isGFormat f (prefix : string) padChar isUnsigned = 
+    let inline leftJustify isGFormat f (prefix : string) padChar isUnsigned =
         if isUnsigned then
             if isGFormat then
                 fun (w : int) v ->
@@ -207,15 +207,15 @@ module GenericNumber =
             else
                 fun (w : int) v ->
                     leftJustifyWithNonGFormat (f v) true (isPositive v) w prefix padChar
-        
-    /// leftJustify handler for f : string -> 'T -> string - floating point types                    
-    let inline leftJustifyWithFormat isGFormat f (prefix : string) padChar = 
+
+    /// leftJustify handler for f : string -> 'T -> string - floating point types
+    let inline leftJustifyWithFormat isGFormat f (prefix : string) padChar =
         if isGFormat then
             fun (fmt : string) (w : int) v ->
                 leftJustifyWithGFormat (f fmt v) true (isInteger v) (isPositive v) w prefix padChar
         else
             fun (fmt : string) (w : int) v ->
-                leftJustifyWithNonGFormat (f fmt v) true (isPositive v) w prefix padChar    
+                leftJustifyWithNonGFormat (f fmt v) true (isPositive v) w prefix padChar
 
     /// rightJustify handler for f : 'T -> string - basic integer types
     let inline rightJustify f (prefixForPositives : string) padChar isUnsigned =
@@ -237,7 +237,7 @@ module GenericNumber =
                 fun (w : int) v ->
                     rightJustifyWithSpaceAsPadChar (f v) true (isPositive v) w prefixForPositives
 
-    /// rightJustify handler for f : string -> 'T -> string - floating point types                    
+    /// rightJustify handler for f : string -> 'T -> string - floating point types
     let inline rightJustifyWithFormat f (prefixForPositives : string) padChar =
         if padChar = '0' then
             fun (fmt : string) (w : int) v ->
@@ -247,18 +247,18 @@ module GenericNumber =
             System.Diagnostics.Debug.Assert((padChar = ' '))
             fun (fmt : string) (w : int) v ->
                 rightJustifyWithSpaceAsPadChar (f fmt v) true (isPositive v) w prefixForPositives
-module Float = 
-    let inline noJustification f (prefixForPositives : string) = 
-        fun (fmt : string) v -> 
+module Float =
+    let inline noJustification f (prefixForPositives : string) =
+        fun (fmt : string) v ->
             GenericNumber.noJustificationCore (f fmt v) (isNumber v) (isPositive v) prefixForPositives
-    
-    let inline leftJustify isGFormat f (prefix : string) padChar = 
+
+    let inline leftJustify isGFormat f (prefix : string) padChar =
         if isGFormat then
             fun (fmt : string) (w : int) v ->
                 GenericNumber.leftJustifyWithGFormat (f fmt v) (isNumber v) (isInteger v) (isPositive v) w prefix padChar
         else
             fun (fmt : string) (w : int) v ->
-                GenericNumber.leftJustifyWithNonGFormat (f fmt v) (isNumber v) (isPositive v) w prefix padChar  
+                GenericNumber.leftJustifyWithNonGFormat (f fmt v) (isNumber v) (isPositive v) w prefix padChar
 
     let inline rightJustify f (prefixForPositives : string) padChar =
         if padChar = '0' then
@@ -269,24 +269,24 @@ module Float =
             fun (fmt : string) (w : int) v ->
                 GenericNumber.rightJustifyWithSpaceAsPadChar (f fmt v) (isNumber v) (isPositive v) w prefixForPositives
 
-let isDecimalFormatSpecifier (spec : FormatSpecifier) = 
+let isDecimalFormatSpecifier (spec : FormatSpecifier) =
     spec.TypeChar = 'M'
 
-let getPadAndPrefix allowZeroPadding (spec : FormatSpecifier) = 
+let getPadAndPrefix allowZeroPadding (spec : FormatSpecifier) =
     let padChar = if allowZeroPadding && isPadWithZeros spec.Flags then '0' else ' ';
-    let prefix = 
-        if isPlusForPositives spec.Flags then "+" 
+    let prefix =
+        if isPlusForPositives spec.Flags then "+"
         elif isSpaceForPositives spec.Flags then " "
         else ""
-    padChar, prefix    
+    padChar, prefix
 
-let isGFormat(spec : FormatSpecifier) = 
+let isGFormat(spec : FormatSpecifier) =
     isDecimalFormatSpecifier spec || System.Char.ToLower(spec.TypeChar) = 'g'
 
 let inline basicWithPadding (spec : FormatSpecifier) f =
     let padChar, _ = getPadAndPrefix false spec
     Padding.withPadding spec f (Basic.leftJustify f padChar) (Basic.rightJustify f padChar)
-    
+
 let inline numWithPadding (spec : FormatSpecifier) isUnsigned f  =
     let allowZeroPadding = not (isLeftJustify spec.Flags) || isDecimalFormatSpecifier spec
     let padChar, prefix = getPadAndPrefix allowZeroPadding spec
@@ -311,37 +311,37 @@ let inline numberToString c spec alt unsignedConv  =
     if c = 'd' || c = 'i' then
         numWithPadding spec false (alt >> toString : ^T -> string)
     elif c = 'u' then
-        numWithPadding spec true  (alt >> unsignedConv >> toString : ^T -> string) 
+        numWithPadding spec true  (alt >> unsignedConv >> toString : ^T -> string)
     elif c = 'x' then
         numWithPadding spec true (alt >> toFormattedString "x" : ^T -> string)
     elif c = 'X' then
         numWithPadding spec true (alt >> toFormattedString "X" : ^T -> string )
     elif c = 'o' then
         numWithPadding spec true (fun (v : ^T) -> Convert.ToString(int64(unsignedConv (alt v)), 8))
-    else raise (ArgumentException())    
+    else raise (ArgumentException())
 
-type ObjectPrinter = 
-    static member ObjectToString<'T>(spec : FormatSpecifier) = 
+type ObjectPrinter =
+    static member ObjectToString<'T>(spec : FormatSpecifier) =
         basicWithPadding spec (fun (v : 'T) -> match box v with null -> "<null>" | x -> x.ToString())
-        
-    static member GenericToStringCore(v : 'T, opts : FormatOptions, bindingFlags) = 
+
+    static member GenericToStringCore(v : 'T, opts : FormatOptions, bindingFlags) =
         // printfn %0A is considered to mean 'print width zero'
-        match box v with 
-        | null -> "<null>" 
+        match box v with
+        | null -> "<null>"
         | _ ->
             sprintf "%A" v
             //Microsoft.FSharp.Text.StructuredPrintfImpl.Display.anyToStringForPrintf opts bindingFlags v
 
-    static member GenericToString<'T>(spec : FormatSpecifier) = 
-        let bindingFlags = 
+    static member GenericToString<'T>(spec : FormatSpecifier) =
+        let bindingFlags =
             if isPlusForPositives spec.Flags then BindingFlags.Public ||| BindingFlags.NonPublic
-            else BindingFlags.Public 
+            else BindingFlags.Public
 
         let useZeroWidth = isPadWithZeros spec.Flags
-        let opts = 
+        let opts =
             let o = FormatOptions.Default
             let o =
-                if useZeroWidth then { o with PrintWidth = 0} 
+                if useZeroWidth then { o with PrintWidth = 0}
                 elif spec.IsWidthSpecified then { o with PrintWidth = spec.Width}
                 else o
             if spec.IsPrecisionSpecified then { o with PrintSize = spec.Precision}
@@ -367,28 +367,28 @@ type ObjectPrinter =
             box (fun (v : 'T) ->
                 ObjectPrinter.GenericToStringCore(v, opts, bindingFlags)
                 )
-    
+
 let basicNumberToString (ty : Type) (spec : FormatSpecifier) =
     System.Diagnostics.Debug.Assert(not spec.IsPrecisionSpecified, "not spec.IsPrecisionSpecified")
 
     let ch = spec.TypeChar
 
     match Type.GetTypeCode(ty) with
-    | TypeCode.Int32    -> numberToString ch spec identity (uint32 : int -> uint32) 
+    | TypeCode.Int32    -> numberToString ch spec identity (uint32 : int -> uint32)
     | TypeCode.Int64    -> numberToString ch spec identity (uint64 : int64 -> uint64)
-    | TypeCode.Byte     -> numberToString ch spec identity (byte : byte -> byte) 
+    | TypeCode.Byte     -> numberToString ch spec identity (byte : byte -> byte)
     | TypeCode.SByte    -> numberToString ch spec identity (byte : sbyte -> byte)
     | TypeCode.Int16    -> numberToString ch spec identity (uint16 : int16 -> uint16)
     | TypeCode.UInt16   -> numberToString ch spec identity (uint16 : uint16 -> uint16)
     | TypeCode.UInt32   -> numberToString ch spec identity (uint32 : uint32 -> uint32)
     | TypeCode.UInt64   -> numberToString ch spec identity (uint64 : uint64 -> uint64)
     | _ ->
-    if ty === typeof<nativeint> then 
-        if IntPtr.Size = 4 then 
+    if ty === typeof<nativeint> then
+        if IntPtr.Size = 4 then
             numberToString ch spec (fun (v : IntPtr) -> v.ToInt32()) uint32
         else
             numberToString ch spec (fun (v : IntPtr) -> v.ToInt64()) uint64
-    elif ty === typeof<unativeint> then 
+    elif ty === typeof<unativeint> then
         if IntPtr.Size = 4 then
             numberToString ch spec (fun (v : UIntPtr) -> v.ToUInt32()) uint32
         else
@@ -397,7 +397,7 @@ let basicNumberToString (ty : Type) (spec : FormatSpecifier) =
     else raise (ArgumentException(ty.Name + " not a basic integer type"))
 
 [<SuppressMessageAttribute("FunctionReimplementation", "ReimplementsFunction")>]
-let basicFloatToString ty spec = 
+let basicFloatToString ty spec =
     let defaultFormat = getFormatForFloat spec.TypeChar DefaultPrecision
     match Type.GetTypeCode(ty) with
     | TypeCode.Single   -> floatWithPadding spec (getFormatForFloat spec.TypeChar) defaultFormat (fun fmt (v : float32) -> toFormattedString fmt v)
@@ -405,9 +405,9 @@ let basicFloatToString ty spec =
     | TypeCode.Decimal  -> decimalWithPadding spec (getFormatForFloat spec.TypeChar) defaultFormat (fun fmt (v : decimal) -> toFormattedString fmt v)
     | _ -> raise (ArgumentException(ty.Name + " not a basic floating point type"))
 
-let getValueConverterCore (ty : Type) (spec : FormatSpecifier) = 
+let getValueConverterCore (ty : Type) (spec : FormatSpecifier) =
     match spec.TypeChar with
-    | 'b' ->  
+    | 'b' ->
         System.Diagnostics.Debug.Assert(ty === typeof<bool>, "ty === typeof<bool>")
         basicWithPadding spec boolToString
     | 's' ->
@@ -419,23 +419,23 @@ let getValueConverterCore (ty : Type) (spec : FormatSpecifier) =
     | 'M'  ->
         System.Diagnostics.Debug.Assert(ty === typeof<decimal>, "ty === typeof<decimal>")
         decimalWithPadding spec (fun _ -> "G") "G" toFormattedString // %M ignores precision
-    | 'd' | 'i' | 'x' | 'X' | 'u' | 'o'-> 
+    | 'd' | 'i' | 'x' | 'X' | 'u' | 'o'->
         basicNumberToString ty spec
-    | 'e' | 'E' 
-    | 'f' | 'F' 
-    | 'g' | 'G' -> 
+    | 'e' | 'E'
+    | 'f' | 'F'
+    | 'g' | 'G' ->
         basicFloatToString ty spec
     | 'A' ->
-        let mi = typeof<ObjectPrinter>.GetMethod("GenericToString", nonPublicStatics)
+        let mi = typeof<ObjectPrinter>.GetTypeInfo().GetMethod("GenericToString", nonPublicStatics)
         verifyMethodInfoWasTaken mi
         let mi' = mi.MakeGenericMethod(ty)
         mi'.Invoke(null, [| box spec |])
-    | 'O' -> 
-        let mi = typeof<ObjectPrinter>.GetMethod("ObjectToString", nonPublicStatics)
+    | 'O' ->
+        let mi = typeof<ObjectPrinter>.GetTypeInfo().GetMethod("ObjectToString", nonPublicStatics)
         verifyMethodInfoWasTaken mi
         let mi' = mi.MakeGenericMethod(ty)
         mi'.Invoke(null, [| box spec |])
-    | _ -> 
+    | _ ->
         raise (ArgumentException("Bad format specifier"))
 
 open FormatSpecifierConstants
@@ -466,7 +466,7 @@ type ValueConverterHolder =
                 PrintableElement(printer, box x, et, ty, spec, NotSpecifiedValue, NotSpecifiedValue))
 
 let private getValueConverterForMethod =
-    let mi = typeof<ValueConverterHolder>.GetMethod("GetValueConverterFor", nonPublicStatics)
+    let mi = typeof<ValueConverterHolder>.GetTypeInfo().GetMethod("GetValueConverterFor", nonPublicStatics)
     verifyMethodInfoWasTaken mi
     mi
 
