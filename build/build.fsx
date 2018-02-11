@@ -71,14 +71,17 @@ let writeVersionProps() =
 
 Task "Init" [] <| fun _ ->
     CreateDir artifactsDir
-    writeVersionProps ()
-    CreateFSharpAssemblyInfo (artifactsDir </> "Version.fs") [Attribute.Version release.AssemblyVersion]
+
 
 Task "Clean" ["Init"] <| fun _ ->
     let objDirs = projects |> Seq.map(fun p -> System.IO.Path.GetDirectoryName(p) </> "obj") |> List.ofSeq
     CleanDirs (artifactsDir :: objDirs)
 
-Task "Build" ["InstallDotNetCore"; "Init"; "?Clean"] <| fun _ ->
+Task "GenerateVersionInfo" ["Init";"?Clean"]<| fun _ ->
+    writeVersionProps ()
+    CreateFSharpAssemblyInfo (artifactsDir </> "Version.fs") [Attribute.Version release.AssemblyVersion]
+
+Task "Build" ["InstallDotNetCore"; "GenerateVersionInfo"; "?Clean"] <| fun _ ->
     DotNetCli.Build
       (fun p ->
            { p with
