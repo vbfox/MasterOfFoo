@@ -6,7 +6,7 @@
 open System
 open Fake
 open Fake.ReleaseNotesHelper
-open Fake.Testing.NUnit3
+open Fake.Testing.Expecto
 open BlackFox
 
 let configuration = environVarOrDefault "configuration" "Release"
@@ -73,20 +73,54 @@ Task "Build" ["InstallDotNetCore"; "Init"; "?Clean"] <| fun _ ->
                 WorkingDir = srcDir
                 Configuration = configuration })
 
+module ExpectoDotNetCli =
+    open System.Diagnostics
+
+    let Expecto (setParams : ExpectoParams -> ExpectoParams) (assemblies : string seq) =
+        let args = setParams ExpectoParams.DefaultParams
+        use __ = assemblies |> separated ", " |> traceStartTaskUsing "Expecto"
+        let runAssembly testAssembly =
+            let argsString = sprintf "\"%s\" %s" testAssembly (string args)
+            let processTimeout = TimeSpan.MaxValue // Don't set a process timeout.  The timeout is per test.
+            let workingDir =
+                if isNotNullOrEmpty args.WorkingDirectory
+                then args.WorkingDirectory else DirectoryName testAssembly
+            let exitCode =
+                let info = ProcessStartInfo("dotnet")
+                info.WorkingDirectory <- workingDir
+                info.Arguments <- argsString
+                info.UseShellExecute <- false
+                // Pass environment variables to the expecto console process in order to let it detect it's running on TeamCity
+                // (it checks TEAMCITY_PROJECT_NAME <> null specifically).
+                for name, value in environVars EnvironmentVariableTarget.Process do
+                    info.EnvironmentVariables.[string name] <- string value
+                use proc = Process.Start(info)
+                proc.WaitForExit() // Don't set a process timeout. The timeout is per test.
+                proc.ExitCode
+            testAssembly, exitCode
+        let res =
+            assemblies
+            |> Seq.map runAssembly
+            |> Seq.filter( snd >> (<>) 0)
+            |> Seq.toList
+        match res with
+        | [] -> ()
+        | failedAssemblies ->
+            failedAssemblies
+            |> List.map (fun (testAssembly,exitCode) -> sprintf "Expecto test of assembly '%s' failed. Process finished with exit code %d." testAssembly exitCode)
+            |> String.concat System.Environment.NewLine
+            |> FailedTestsException |> raise
+
 Task "RunTests" ["Build"] <| fun _ ->
     let nunitPath = rootDir </> @"packages" </> "NUnit.ConsoleRunner" </> "tools" </> "nunit3-console.exe"
     let testAssemblies = artifactsDir </> "bin" </> "*.Tests" </> configuration </> "*.Tests.dll"
     let testResults = artifactsDir </> "TestResults.xml"
 
-    !! testAssemblies
-      |> NUnit3 (fun p ->
-          {p with
-             ToolPath = nunitPath
-             TimeOut = TimeSpan.FromMinutes 20.
-             DisposeRunners = true
-             ResultSpecs = [testResults] })
-
-    AppVeyor.UploadTestResultsFile AppVeyor.NUnit3 testResults
+    [artifactsDir </> "BlackFox.MasterOfFoo.Tests" </> configuration </> "netcoreapp2.0" </> "BlackFox.MasterOfFoo.Tests.dll"]
+        |> ExpectoDotNetCli.Expecto (fun p ->
+            { p with
+                FailOnFocusedTests = true
+            })
 
 let nupkgDir = artifactsDir </> "BlackFox.MasterOfFoo" </> configuration
 
