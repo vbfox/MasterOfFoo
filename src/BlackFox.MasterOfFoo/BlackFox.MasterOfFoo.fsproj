@@ -1,9 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>netstandard1.6;netstandard2.0</TargetFrameworks>
-    <TargetFrameworks Condition="'$(OS)' == 'Windows_NT'">net45;netstandard1.6;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks Condition="'$(OS)' == 'Windows_NT'">net40;netstandard1.6;netstandard2.0</TargetFrameworks>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="ReflectionCompat.fs" />
     <Compile Include="FormatSpecification.fs" />
     <Compile Include="PrintableElement.fs" />
     <Compile Include="PrintfEnv.fs" />
@@ -14,8 +15,9 @@
     <Compile Include="Core.PrintfBuilding.fs" />
     <Compile Include="Core.PrintfCache.fs" />
     <Compile Include="MasterOfFoo.fs" />
-    <None Include="paket.references" />
 
-    <PackageReference Include="FSharp.Core" Version="4.2.3" />
+    <PackageReference Include="FSharp.Core" Version="4.2.3" Condition="'$(TargetFramework)' == 'netstandard2.0'"/>
+    <PackageReference Include="FSharp.Core" Version="4.2.1" Condition="'$(TargetFramework)' == 'netstandard1.6'"/>
+    <PackageReference Include="FSharp.Core" Version="4.0.0.1" Condition="'$(TargetFramework)' == 'net40'"/>
   </ItemGroup>
 </Project>
