@@ -1,3 +1,7 @@
+### New in 1.0.1
+
+* Target .Net 4.5 instead
+
 ### New in 1.0.0
 
 * The library now targets .Net 4.0, .Net standard 1.6 and .Net standard 2.0
