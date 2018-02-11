@@ -1,10 +1,13 @@
 <Project>
-    <PropertyGroup>
-        <Description>An F# library to allow using printf style strings in more places.</Description>
-        <PackageProjectUrl>https://github.com/vbfox/MasterOfFoo</PackageProjectUrl>
-        <PackageLicenseUrl>https://github.com/vbfox/MasterOfFoo/blob/master/License.md</PackageLicenseUrl>
-        <RepositoryUrl>https://github.com/vbfox/MasterOfFoo</RepositoryUrl>
-        <PackageTags>F#;FSharp;printf</PackageTags>
-        <Authors>Julien Roncaglia</Authors>
-    </PropertyGroup>
+  <PropertyGroup>
+    <OutputPath>..\..\artifacts\$(MSBuildProjectName)\$(Configuration)\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup>
+    <Description>An F# library to allow using printf style strings in more places.</Description>
+    <PackageProjectUrl>https://github.com/vbfox/MasterOfFoo</PackageProjectUrl>
+    <PackageLicenseUrl>https://github.com/vbfox/MasterOfFoo/blob/master/License.md</PackageLicenseUrl>
+    <RepositoryUrl>https://github.com/vbfox/MasterOfFoo</RepositoryUrl>
+    <PackageTags>F#;FSharp;printf</PackageTags>
+    <Authors>Julien Roncaglia</Authors>
+  </PropertyGroup>
 </Project>

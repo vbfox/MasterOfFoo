@@ -1,11 +1,11 @@
 version 5.134.0
 
 source https://api.nuget.org/v3/index.json
-framework: netcoreapp2.0,netstandard2.0,net45
+framework: netcoreapp2.0,netstandard1.6,netstandard2.0,net45
 storage:none
 
 nuget Expecto
-nuget FSharp.Core ~> 4
+nuget FSharp.Core 4.2.3
 nuget System.Data.SqlClient
 
 group Build
