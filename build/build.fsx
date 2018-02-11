@@ -71,7 +71,8 @@ Task "Build" ["InstallDotNetCore"; "Init"; "?Clean"] <| fun _ ->
            { p with
                 AdditionalArgs = dotnetAdditionalArgs
                 WorkingDir = srcDir
-                Configuration = configuration })
+                Configuration = configuration
+                ToolPath = dotnetExePath })
 
 module ExpectoDotNetCli =
     open System.Diagnostics
@@ -86,7 +87,7 @@ module ExpectoDotNetCli =
                 if isNotNullOrEmpty args.WorkingDirectory
                 then args.WorkingDirectory else DirectoryName testAssembly
             let exitCode =
-                let info = ProcessStartInfo("dotnet")
+                let info = ProcessStartInfo(dotnetExePath)
                 info.WorkingDirectory <- workingDir
                 info.Arguments <- argsString
                 info.UseShellExecute <- false
@@ -130,7 +131,8 @@ Task "NuGet" ["Build"] <| fun _ ->
            { p with
                 WorkingDir = librarySrcDir
                 AdditionalArgs = dotnetAdditionalArgs
-                Configuration = configuration })
+                Configuration = configuration
+                ToolPath = dotnetExePath })
     let nupkg =
         nupkgDir
             </> (sprintf "BlackFox.MasterOfFoo.%s.nupkg" release.NugetVersion)

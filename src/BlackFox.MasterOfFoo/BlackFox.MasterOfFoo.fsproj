@@ -14,9 +14,6 @@
     <Compile Include="Core.PrintfCache.fs" />
     <Compile Include="MasterOfFoo.fs" />
     <None Include="paket.references" />
-    <None Include="paket.template">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
   <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>
