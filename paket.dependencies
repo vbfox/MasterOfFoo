@@ -14,3 +14,5 @@ group Build
 
     nuget FAKE
     github fsharp/FAKE modules/Octokit/Octokit.fsx
+    github vbfox/FoxSharp src/BlackFox.FoxSharp/CommandLine.fs
+    github vbfox/FoxSharp src/BlackFox.FakeUtils/TypedTaskDefinitionHelper.fs

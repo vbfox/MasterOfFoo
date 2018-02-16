@@ -1,7 +1,7 @@
 // include Fake libs
 #r "../packages/build/FAKE/tools/FakeLib.dll"
 #r "System.Xml.Linq"
-#load "./TaskDefinitionHelper.fsx"
+#load "../paket-files/build/vbfox/FoxSharp/src/BlackFox.FakeUtils/TypedTaskDefinitionHelper.fs"
 #load "./AppVeyorEx.fsx"
 
 open System
@@ -11,6 +11,7 @@ open Fake.AssemblyInfoFile
 open Fake.ReleaseNotesHelper
 open Fake.Testing.Expecto
 open BlackFox
+open BlackFox.TypedTaskDefinitionHelper
 
 let configuration = environVarOrDefault "configuration" "Release"
 
@@ -53,9 +54,9 @@ let release =
 
 let mutable dotnetExePath = "dotnet"
 
-Task "InstallDotNetCore" [] (fun _ ->
+let installDotNetCore = task "InstallDotNetCore" [] {
     dotnetExePath <- DotNetCli.InstallDotNetSDK (DotNetCli.GetDotNetSDKVersionFromGlobalJson())
-)
+}
 
 AppVeyorEx.updateBuild (fun info -> { info with Version = Some release.AssemblyVersion })
 
@@ -69,25 +70,28 @@ let writeVersionProps() =
     let path = artifactsDir </> "Version.props"
     System.IO.File.WriteAllText(path, doc.ToString())
 
-Task "Init" [] <| fun _ ->
+let init = task "Init" [] {
     CreateDir artifactsDir
+}
 
-
-Task "Clean" ["Init"] <| fun _ ->
+let clean = task "Clean" [init] {
     let objDirs = projects |> Seq.map(fun p -> System.IO.Path.GetDirectoryName(p) </> "obj") |> List.ofSeq
     CleanDirs (artifactsDir :: objDirs)
+}
 
-Task "GenerateVersionInfo" ["Init";"?Clean"]<| fun _ ->
+let generateVersionInfo = task "GenerateVersionInfo" [init; clean.IfNeeded] {
     writeVersionProps ()
     CreateFSharpAssemblyInfo (artifactsDir </> "Version.fs") [Attribute.Version release.AssemblyVersion]
+}
 
-Task "Build" ["InstallDotNetCore"; "GenerateVersionInfo"; "?Clean"] <| fun _ ->
+let build = task "Build" [installDotNetCore; generateVersionInfo; clean.IfNeeded] {
     DotNetCli.Build
       (fun p ->
            { p with
                 WorkingDir = srcDir
                 Configuration = configuration
                 ToolPath = dotnetExePath })
+}
 
 module ExpectoDotNetCli =
     open System.Diagnostics
@@ -127,7 +131,7 @@ module ExpectoDotNetCli =
             |> String.concat System.Environment.NewLine
             |> FailedTestsException |> raise
 
-Task "RunTests" ["Build"] <| fun _ ->
+let runTests = task "RunTests" [build] {
     let nunitPath = rootDir </> @"packages" </> "NUnit.ConsoleRunner" </> "tools" </> "nunit3-console.exe"
     let testAssemblies = artifactsDir </> "bin" </> "*.Tests" </> configuration </> "*.Tests.dll"
     let testResults = artifactsDir </> "TestResults.xml"
@@ -137,10 +141,11 @@ Task "RunTests" ["Build"] <| fun _ ->
             { p with
                 FailOnFocusedTests = true
             })
+}
 
 let nupkgDir = artifactsDir </> "BlackFox.MasterOfFoo" </> configuration
 
-Task "NuGet" ["Build"] <| fun _ ->
+let nuget = task "NuGet" [build] {
     DotNetCli.Pack
       (fun p ->
            { p with
@@ -152,28 +157,31 @@ Task "NuGet" ["Build"] <| fun _ ->
             </> (sprintf "BlackFox.MasterOfFoo.%s.nupkg" release.NugetVersion)
 
     AppVeyor.PushArtifacts [nupkg]
+}
 
-Task "PublishNuget" ["NuGet"] <| fun _ ->
+let publishNuget = task "PublishNuget" [nuget] {
     let key =
         match environVarOrNone "nuget-key" with
         | Some(key) -> key
         | None -> getUserPassword "NuGet key: "
 
     Paket.Push <| fun p ->  { p with WorkingDir = nupkgDir; ApiKey = key }
+}
 
 let zipFile = artifactsDir </> (sprintf "BlackFox.MasterOfFoo-%s.zip" release.NugetVersion)
 
-Task "Zip" ["Build"] <| fun _ ->
+let zip = task "Zip" [build] {
     from libraryBinDir
         ++ "**/*.dll"
         ++ "**/*.xml"
         -- "**/FSharp.Core.*"
         |> Zip libraryBinDir zipFile
     AppVeyor.PushArtifacts [zipFile]
+}
 
 #load "../paket-files/build/fsharp/FAKE/modules/Octokit/Octokit.fsx"
 
-Task "GitHubRelease" ["Zip"] <| fun _ ->
+let gitHubRelease = task "GitHubRelease" [zip] {
     let user =
         match getBuildParam "github-user" with
         | s when not (String.IsNullOrWhiteSpace s) -> s
@@ -189,8 +197,9 @@ Task "GitHubRelease" ["Zip"] <| fun _ ->
     |> Octokit.uploadFile zipFile
     |> Octokit.releaseDraft
     |> Async.RunSynchronously
+}
 
-Task "GitRelease" [] <| fun _ ->
+let gitRelease = task "GitRelease" [] {
     let remote =
         Git.CommandHelper.getGitResult "" "remote -v"
         |> Seq.filter (fun (s: string) -> s.EndsWith("(push)"))
@@ -199,9 +208,10 @@ Task "GitRelease" [] <| fun _ ->
 
     Git.Branches.tag "" release.NugetVersion
     Git.Branches.pushTag "" remote release.NugetVersion
+}
 
-Task "Default" ["RunTests"] DoNothing
-Task "Release" ["Clean"; "GitRelease"; "GitHubRelease"; "PublishNuget"] DoNothing
-Task "CI" ["Clean"; "RunTests"; "Zip"; "NuGet"] DoNothing
+let defaultTask = EmptyTask "Default" [runTests]
+EmptyTask "Release" [clean; gitRelease; gitHubRelease; publishNuget]
+EmptyTask "CI" [clean; runTests; zip; nuget]
 
-RunTaskOrDefault "Default"
+RunTaskOrDefault defaultTask
