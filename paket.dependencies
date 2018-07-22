@@ -32,8 +32,4 @@ group build
     nuget Fake.BuildServer.AppVeyor
     nuget Fake.Api.GitHub
 
-    //nuget SourceLink.Fake ~> 1.1
-    //github fsharp/FAKE modules/Octokit/Octokit.fsx
-    //nuget ILRepack
     github vbfox/FoxSharp src/BlackFox.FoxSharp/CommandLine.fs
-    //github vbfox/FoxSharp src/BlackFox.FakeUtils/TypedTaskDefinitionHelper.fs
