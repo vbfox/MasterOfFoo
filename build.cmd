@@ -5,9 +5,4 @@ if errorlevel 1 (
   exit /b %errorlevel%
 )
 
-pushd src\BlackFox.MasterOfFoo.Build\
-dotnet run %*
-set _errorlevel=%errorlevel%
-popd
-
-exit /b %_errorlevel%
+dotnet run --project src\BlackFox.MasterOfFoo.Build\BlackFox.MasterOfFoo.Build.fsproj %*
