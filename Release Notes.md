@@ -1,3 +1,7 @@
+### New in 1.0.2
+
+* Larger FSharp.Core version choice
+
 ### New in 1.0.1
 
 * Target .Net 4.5 instead
