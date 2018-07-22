@@ -29,6 +29,7 @@ let createAndGetDefault () =
     let rootDir = System.IO.Path.GetFullPath(__SOURCE_DIRECTORY__ </> ".." </> "..")
     let srcDir = rootDir </> "src"
     let artifactsDir = rootDir </> "artifacts"
+    let nupkgDir = artifactsDir </> "BlackFox.MasterOfFoo" </> configuration
     let libraryProjectFile = srcDir </> "BlackFox.MasterOfFoo" </> "BlackFox.MasterOfFoo.fsproj"
     let libraryBinDir = artifactsDir </> "BlackFox.MasterOfFoo" </> configuration
     let solutionFile = srcDir </> "MasterOfFoo.sln"
@@ -64,8 +65,6 @@ let createAndGetDefault () =
             ReleaseNotes.ReleaseNotes.New(asmVer.ToString(), nugetVer, fromFile.Date, fromFile.Notes)
         else
             fromFile
-
-    let mutable dotnetExePath = "dotnet"
 
     AppVeyorEx.updateBuild (fun info -> { info with Version = Some release.AssemblyVersion })
 
@@ -104,17 +103,14 @@ let createAndGetDefault () =
             |> ExpectoDotNetCli.run (fun p ->
                 { p with
                     PrintVersion = false
-                    ParallelWorkers = System.Environment.ProcessorCount
                     FailOnFocusedTests = true
                 })
     }
 
-    let nupkgDir = artifactsDir </> "BlackFox.MasterOfFoo" </> configuration
-
     let nuget = task "NuGet" [build] {
         DotNet.pack
             (fun p -> { p with Configuration = fakeConfiguration })
-            libraryProjectFile 
+            libraryProjectFile
         let nupkgFile =
             nupkgDir
                 </> (sprintf "BlackFox.MasterOfFoo.%s.nupkg" release.NugetVersion)
@@ -140,7 +136,7 @@ let createAndGetDefault () =
             ++ "**/*.xml"
             -- "**/FSharp.Core.*"
             |> Zip.createZip libraryBinDir zipFile comment 9 false
-        
+
         Trace.publish ImportData.BuildArtifact zipFile
     }
 
