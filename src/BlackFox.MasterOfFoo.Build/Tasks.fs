@@ -85,12 +85,7 @@ let createAndGetDefault () =
     }
 
     let clean = task "Clean" [init] {
-        for x in projects do
-            Trace.tracefn "%s" x
-
         let objDirs = projects |> Seq.map(fun p -> System.IO.Path.GetDirectoryName(p) </> "obj") |> List.ofSeq
-        for x in objDirs do
-            Trace.tracefn "%s" x
         Shell.cleanDirs (artifactsDir :: objDirs)
     }
 
