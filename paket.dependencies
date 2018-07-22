@@ -27,7 +27,6 @@ group build
     nuget Fake.DotNet.Cli
     nuget Fake.DotNet.AssemblyInfoFile
     nuget Fake.DotNet.Testing.Expecto
-    nuget Fake.DotNet.MsBuild
     nuget Fake.DotNet.Paket
     nuget Fake.BuildServer.AppVeyor
     nuget Fake.Api.GitHub

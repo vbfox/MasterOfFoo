@@ -13,7 +13,6 @@
     Fake.DotNet.Cli
     Fake.DotNet.AssemblyInfoFile
     Fake.DotNet.Testing.Expecto 
-    Fake.DotNet.MsBuild
     Fake.DotNet.Paket
     Fake.BuildServer.AppVeyor
     Fake.Api.GitHub
