@@ -10,13 +10,6 @@
     <ProjectReference Include="../BlackFox.MasterOfFoo/BlackFox.MasterOfFoo.fsproj" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="mscorlib" />
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Numerics" />
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="AssemblyInfo.fs" />
     <Compile Include="Program.fs" />
     <None Include="App.config" />
