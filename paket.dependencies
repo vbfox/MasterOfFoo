@@ -30,6 +30,7 @@ group build
     nuget Fake.DotNet.MsBuild
     nuget Fake.DotNet.Paket
     nuget Fake.BuildServer.AppVeyor
+    nuget Fake.Api.GitHub
 
     //nuget SourceLink.Fake ~> 1.1
     //github fsharp/FAKE modules/Octokit/Octokit.fsx

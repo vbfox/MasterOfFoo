@@ -743,6 +743,9 @@ STORAGE: NONE
 RESTRICTION: == netcoreapp2.0
 NUGET
   remote: https://api.nuget.org/v3/index.json
+    Fake.Api.GitHub (5.2)
+      FSharp.Core (>= 4.3.4)
+      Octokit (>= 0.30)
     Fake.BuildServer.AppVeyor (5.2)
       Fake.Core.Environment (>= 5.2)
       Fake.Core.Process (>= 5.2)
@@ -882,6 +885,8 @@ NUGET
     NETStandard.Library (2.0.3)
       Microsoft.NETCore.Platforms (>= 1.1)
     Newtonsoft.Json (11.0.2)
+    Octokit (0.31)
+      NETStandard.Library (>= 1.6)
     runtime.native.System (4.3.1)
       Microsoft.NETCore.Platforms (>= 1.1.1)
       Microsoft.NETCore.Targets (>= 1.1.3)

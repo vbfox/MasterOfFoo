@@ -16,6 +16,7 @@
     Fake.DotNet.MsBuild
     Fake.DotNet.Paket
     Fake.BuildServer.AppVeyor
+    Fake.Api.GitHub
 
     File: CommandLine.fs
 

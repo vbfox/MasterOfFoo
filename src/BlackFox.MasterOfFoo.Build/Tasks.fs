@@ -1,7 +1,8 @@
 ﻿module BlackFox.MasterOfFoo.Build.Tasks
 
-open Fake.Core
+open Fake.Api
 open Fake.BuildServer
+open Fake.Core
 open Fake.DotNet
 open Fake.IO
 open Fake.IO.Globbing
@@ -11,9 +12,7 @@ open Fake.Tools
 
 open BlackFox
 open BlackFox.TypedTaskDefinitionHelper
-open BlackFox.CommandLine
 open System.Xml.Linq
-open Fake.Core
 
 let createAndGetDefault () =
     let configuration = Environment.environVarOrDefault "configuration" "Release"
@@ -145,25 +144,29 @@ let createAndGetDefault () =
         Trace.publish ImportData.BuildArtifact zipFile
     }
 
-    (*
     let gitHubRelease = task "GitHubRelease" [zip] {
         let user =
-            match getBuildParam "github-user" with
-            | s when not (String.IsNullOrWhiteSpace s) -> s
-            | _ -> getUserInput "GitHub Username: "
+            match Environment.environVarOrNone "github-user" with
+            | Some s -> s
+            | _ -> UserInput.getUserInput "GitHub Username: "
         let pw =
-            match getBuildParam "github-pw" with
-            | s when not (String.IsNullOrWhiteSpace s) -> s
-            | _ -> getUserPassword "GitHub Password or Token: "
+            match Environment.environVarOrNone "github-pw" with
+            | Some s -> s
+            | _ -> UserInput.getUserPassword "GitHub Password or Token: "
 
         // release on github
-        Octokit.createClient user pw
-        |> Octokit.createDraft gitOwner gitName release.NugetVersion (release.SemVer.PreRelease <> None) release.Notes
-        |> Octokit.uploadFile zipFile
-        |> Octokit.releaseDraft
+        GitHub.createClient user pw
+        |> GitHub.createRelease gitOwner gitName release.NugetVersion (fun p ->
+            { p with
+                Prerelease = release.SemVer.PreRelease <> None
+                Body = String.toLines release.Notes
+                Draft = true
+            }
+        )
+        |> GitHub.uploadFile zipFile
+        |> GitHub.publishDraft
         |> Async.RunSynchronously
     }
-    *)
 
     let gitRelease = task "GitRelease" [] {
         let remote =
@@ -176,7 +179,7 @@ let createAndGetDefault () =
         Git.Branches.pushTag "" remote release.NugetVersion
     }
 
-    let _releaseTask = EmptyTask "Release" [clean; gitRelease; (*gitHubRelease;*) publishNuget]
+    let _releaseTask = EmptyTask "Release" [clean; gitRelease; gitHubRelease; publishNuget]
     let _ciTask = EmptyTask "CI" [clean; runTests; zip; nuget]
 
     EmptyTask "Default" [runTests]
