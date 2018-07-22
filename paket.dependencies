@@ -1,4 +1,4 @@
-version 5.134.0
+version 5.174.5
 
 source https://api.nuget.org/v3/index.json
 framework: netcoreapp2.0,netstandard1.6,netstandard2.0,net45
@@ -8,11 +8,31 @@ nuget Expecto
 nuget FSharp.Core 4.2.3 # Also specified in the .fsproj as it DOES NOT USE PAKET
 nuget System.Data.SqlClient
 
-group Build
+// Build infrastructure
+group build
     source https://api.nuget.org/v3/index.json
-    framework: >=net45
+    storage: none
+    framework: netcoreapp2.0
 
-    nuget FAKE
-    github fsharp/FAKE modules/Octokit/Octokit.fsx
+    nuget FSharp.Core ~> 4
+    nuget Fake.Core.Target
+    nuget Fake.Core.Environment
+    nuget Fake.Core.Process
+    nuget Fake.Core.Trace
+    nuget Fake.Core.ReleaseNotes
+    nuget Fake.Core.UserInput
+    nuget Fake.IO.FileSystem
+    nuget Fake.IO.Zip
+    nuget Fake.Tools.Git
+    nuget Fake.DotNet.Cli
+    nuget Fake.DotNet.AssemblyInfoFile
+    nuget Fake.DotNet.Testing.Expecto
+    nuget Fake.DotNet.MsBuild
+    nuget Fake.DotNet.Paket
+    nuget Fake.BuildServer.AppVeyor
+
+    //nuget SourceLink.Fake ~> 1.1
+    //github fsharp/FAKE modules/Octokit/Octokit.fsx
+    //nuget ILRepack
     github vbfox/FoxSharp src/BlackFox.FoxSharp/CommandLine.fs
-    github vbfox/FoxSharp src/BlackFox.FakeUtils/TypedTaskDefinitionHelper.fs
+    //github vbfox/FoxSharp src/BlackFox.FakeUtils/TypedTaskDefinitionHelper.fs

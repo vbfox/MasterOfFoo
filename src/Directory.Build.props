@@ -1,6 +1,8 @@
 <Project>
   <PropertyGroup>
     <ArtifactsDir>$(MSBuildThisFileDirectory)/../artifacts/</ArtifactsDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(MSBuildProjectName)' != 'BlackFox.MasterOfFoo.Build'">
     <OutputPath>$(ArtifactsDir)/$(MSBuildProjectName)/$(Configuration)/</OutputPath>
   </PropertyGroup>
   <PropertyGroup>

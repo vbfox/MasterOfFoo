@@ -1,22 +1,20 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
-MinimumVisualStudioVersion = 10.0.40219.1
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".paket", ".paket", "{55CDFCF1-7A70-4E5D-9906-88F5A3D3C3B1}"
-	ProjectSection(SolutionItems) = preProject
-		paket.dependencies = paket.dependencies
-	EndProjectSection
-EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "TestApp", "TestApp\BlackFox.MasterOfFoo.TestApp.fsproj", "{4C628A7D-76EC-4673-A45D-DAE6FC060784}"
+# Visual Studio 15
+VisualStudioVersion = 15.0.26403.7
+MinimumVisualStudioVersion = 15.0.26403.7
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "BlackFox.MasterOfFoo.TestApp", "TestApp\BlackFox.MasterOfFoo.TestApp.fsproj", "{4C628A7D-76EC-4673-A45D-DAE6FC060784}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E5E77D3C-F0EE-4EB3-B813-B181020563E0}"
 	ProjectSection(SolutionItems) = preProject
+		..\paket.dependencies = ..\paket.dependencies
 		Readme.md = Readme.md
 	EndProjectSection
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "BlackFox.MasterOfFoo.Tests", "BlackFox.MasterOfFoo.Tests\BlackFox.MasterOfFoo.Tests.fsproj", "{B158E4B2-AF4C-4A91-BC1E-3D4E4B080802}"
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "BlackFox.MasterOfFoo.Tests", "BlackFox.MasterOfFoo.Tests\BlackFox.MasterOfFoo.Tests.fsproj", "{B158E4B2-AF4C-4A91-BC1E-3D4E4B080802}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "BlackFox.MasterOfFoo", "BlackFox.MasterOfFoo\BlackFox.MasterOfFoo.fsproj", "{80E6D22C-3DEC-4929-B4BF-68E3A3F28039}"
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "BlackFox.MasterOfFoo", "BlackFox.MasterOfFoo\BlackFox.MasterOfFoo.fsproj", "{80E6D22C-3DEC-4929-B4BF-68E3A3F28039}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "BlackFox.MasterOfFoo.Build", "BlackFox.MasterOfFoo.Build\BlackFox.MasterOfFoo.Build.fsproj", "{C1EEC1BE-433F-42C9-A2B2-B86AEB877608}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -36,8 +34,15 @@ Global
 		{80E6D22C-3DEC-4929-B4BF-68E3A3F28039}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{80E6D22C-3DEC-4929-B4BF-68E3A3F28039}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{80E6D22C-3DEC-4929-B4BF-68E3A3F28039}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C1EEC1BE-433F-42C9-A2B2-B86AEB877608}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C1EEC1BE-433F-42C9-A2B2-B86AEB877608}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C1EEC1BE-433F-42C9-A2B2-B86AEB877608}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C1EEC1BE-433F-42C9-A2B2-B86AEB877608}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D7E9F6C5-DE27-456B-BAFD-3A445D56D74A}
 	EndGlobalSection
 EndGlobal

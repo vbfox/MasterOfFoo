@@ -1,8 +1,13 @@
 @echo off
 
-paket.exe restore
+paket.exe restore -s
 if errorlevel 1 (
   exit /b %errorlevel%
 )
 
-packages\build\FAKE\tools\FAKE.exe build\build.fsx %*
+pushd src\BlackFox.MasterOfFoo.Build\
+dotnet run %*
+set _errorlevel=%errorlevel%
+popd
+
+exit /b %_errorlevel%
