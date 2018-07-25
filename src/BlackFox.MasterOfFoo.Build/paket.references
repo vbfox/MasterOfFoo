@@ -12,10 +12,8 @@
     Fake.Tools.Git
     Fake.DotNet.Cli
     Fake.DotNet.AssemblyInfoFile
-    Fake.DotNet.Testing.Expecto 
+    Fake.DotNet.Testing.Expecto
     Fake.DotNet.Paket
     Fake.BuildServer.AppVeyor
     Fake.Api.GitHub
-
-    File: CommandLine.fs
 
