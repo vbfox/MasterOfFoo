@@ -152,13 +152,12 @@ let createAndGetDefault () =
 
         // release on github
         GitHub.createClient user pw
-        |> GitHub.createRelease gitOwner gitName release.NugetVersion (fun p ->
-            { p with
-                Prerelease = release.SemVer.PreRelease <> None
-                Body = String.toLines release.Notes
-                Draft = true
-            }
-        )
+        |> GitHub.draftNewRelease
+            gitOwner
+            gitName
+            release.NugetVersion
+            (release.SemVer.PreRelease <> None)
+            (release.Notes)
         |> GitHub.uploadFile zipFile
         |> GitHub.publishDraft
         |> Async.RunSynchronously
