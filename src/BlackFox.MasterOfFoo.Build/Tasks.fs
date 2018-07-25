@@ -52,21 +52,21 @@ let createAndGetDefault () =
 
     let release =
         let fromFile = ReleaseNotes.load (rootDir </> "Release Notes.md")
-        if BuildServer.buildServer = BuildServer.AppVeyor then
-            let appVeyorBuildVersion = int AppVeyor.Environment.BuildVersion
-            let nugetVer = sprintf "%s-appveyor%04i" fromFile.NugetVersion appVeyorBuildVersion
+        if BuildServer.buildServer <> BuildServer.LocalBuild then
+            let buildVersion = int BuildServer.buildVersion
+            let nugetVer = sprintf "%s-appveyor%04i" fromFile.NugetVersion buildVersion
             let asmVer = System.Version.Parse(fromFile.AssemblyVersion)
             let asmVer =
                 System.Version(
                     versionPartOrZero asmVer.Major,
                     versionPartOrZero asmVer.Minor,
                     versionPartOrZero asmVer.Build,
-                    versionPartOrZero appVeyorBuildVersion)
+                    versionPartOrZero buildVersion)
             ReleaseNotes.ReleaseNotes.New(asmVer.ToString(), nugetVer, fromFile.Date, fromFile.Notes)
         else
             fromFile
 
-    AppVeyorEx.updateBuild (fun info -> { info with Version = Some release.AssemblyVersion })
+    Trace.setBuildNumber release.AssemblyVersion
 
     let writeVersionProps() =
         let doc =
