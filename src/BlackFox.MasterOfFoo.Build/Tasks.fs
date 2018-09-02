@@ -1,7 +1,6 @@
 ﻿module BlackFox.MasterOfFoo.Build.Tasks
 
 open Fake.Api
-open Fake.BuildServer
 open Fake.Core
 open Fake.DotNet
 open Fake.IO
@@ -23,10 +22,6 @@ let createAndGetDefault () =
         | "debug" -> DotNet.BuildConfiguration.Debug
         | _ -> DotNet.BuildConfiguration.Custom configuration
 
-    let from s =
-        { LazyGlobbingPattern.BaseDirectory = s; Includes = []; Excludes = [] }
-        :> IGlobbingPattern
-
     let rootDir = System.IO.Path.GetFullPath(__SOURCE_DIRECTORY__ </> ".." </> "..")
     let srcDir = rootDir </> "src"
     let artifactsDir = rootDir </> "artifacts"
@@ -35,7 +30,7 @@ let createAndGetDefault () =
     let libraryBinDir = artifactsDir </> "BlackFox.MasterOfFoo" </> configuration
     let solutionFile = srcDir </> "MasterOfFoo.sln"
     let projects =
-        from srcDir
+        GlobbingPattern.createFrom srcDir
         ++ "**/*.*proj"
         -- "*.Build/*"
 
@@ -132,7 +127,7 @@ let createAndGetDefault () =
 
     let zip = BuildTask.create "Zip" [build] {
         let comment = sprintf "MasterOfFoo v%s" release.NugetVersion
-        from libraryBinDir
+        GlobbingPattern.createFrom libraryBinDir
             ++ "**/*.dll"
             ++ "**/*.xml"
             -- "**/FSharp.Core.*"
