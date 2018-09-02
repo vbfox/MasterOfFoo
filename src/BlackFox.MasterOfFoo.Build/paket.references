@@ -16,5 +16,6 @@
     Fake.DotNet.Testing.Expecto
     Fake.DotNet.Paket
     Fake.BuildServer.AppVeyor
+    Fake.BuildServer.Travis
     Fake.Api.GitHub
 

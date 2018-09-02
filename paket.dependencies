@@ -31,4 +31,5 @@ group build
     nuget Fake.DotNet.Testing.Expecto
     nuget Fake.DotNet.Paket
     nuget Fake.BuildServer.AppVeyor
+    nuget Fake.BuildServer.Travis
     nuget Fake.Api.GitHub
