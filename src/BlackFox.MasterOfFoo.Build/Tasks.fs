@@ -3,8 +3,8 @@
 open Fake.Api
 open Fake.Core
 open Fake.DotNet
+open Fake.DotNet.Testing
 open Fake.IO
-open Fake.IO.Globbing
 open Fake.IO.Globbing.Operators
 open Fake.IO.FileSystemOperators
 open Fake.Tools
@@ -12,22 +12,16 @@ open Fake.Tools
 open BlackFox
 open BlackFox.Fake
 open System.Xml.Linq
-open Fake.DotNet.Testing
 
 let createAndGetDefault () =
-    let configuration = Environment.environVarOrDefault "configuration" "Release"
-    let fakeConfiguration =
-        match configuration.Trim().ToLowerInvariant() with
-        | "release" -> DotNet.BuildConfiguration.Release
-        | "debug" -> DotNet.BuildConfiguration.Debug
-        | _ -> DotNet.BuildConfiguration.Custom configuration
+    let configuration = DotNet.BuildConfiguration.fromEnvironVarOrDefault "configuration" DotNet.BuildConfiguration.Release
 
     let rootDir = System.IO.Path.GetFullPath(__SOURCE_DIRECTORY__ </> ".." </> "..")
     let srcDir = rootDir </> "src"
     let artifactsDir = rootDir </> "artifacts"
-    let nupkgDir = artifactsDir </> "BlackFox.MasterOfFoo" </> configuration
+    let nupkgDir = artifactsDir </> "BlackFox.MasterOfFoo" </> (string configuration)
     let libraryProjectFile = srcDir </> "BlackFox.MasterOfFoo" </> "BlackFox.MasterOfFoo.fsproj"
-    let libraryBinDir = artifactsDir </> "BlackFox.MasterOfFoo" </> configuration
+    let libraryBinDir = artifactsDir </> "BlackFox.MasterOfFoo" </> (string configuration)
     let solutionFile = srcDir </> "MasterOfFoo.sln"
     let projects =
         GlobbingPattern.createFrom srcDir
@@ -90,12 +84,12 @@ let createAndGetDefault () =
 
     let build = BuildTask.create "Build" [generateVersionInfo; clean.IfNeeded] {
         DotNet.build
-          (fun p -> { p with Configuration = fakeConfiguration })
+          (fun p -> { p with Configuration = configuration })
           solutionFile
     }
 
     let runTests = BuildTask.create "RunTests" [build] {
-        [artifactsDir </> "BlackFox.MasterOfFoo.Tests" </> configuration </> "netcoreapp2.0" </> "BlackFox.MasterOfFoo.Tests.dll"]
+        [artifactsDir </> "BlackFox.MasterOfFoo.Tests" </> (string configuration) </> "netcoreapp2.0" </> "BlackFox.MasterOfFoo.Tests.dll"]
             |> Expecto.run (fun p ->
                 { p with
                     PrintVersion = false
@@ -105,7 +99,7 @@ let createAndGetDefault () =
 
     let nuget = BuildTask.create "NuGet" [build] {
         DotNet.pack
-            (fun p -> { p with Configuration = fakeConfiguration })
+            (fun p -> { p with Configuration = configuration })
             libraryProjectFile
         let nupkgFile =
             nupkgDir
