@@ -8,7 +8,7 @@
   <PropertyGroup>
     <Description>An F# library to allow using printf style strings in more places.</Description>
     <PackageProjectUrl>https://github.com/vbfox/MasterOfFoo</PackageProjectUrl>
-    <PackageLicenseUrl>https://github.com/vbfox/MasterOfFoo/blob/master/License.md</PackageLicenseUrl>
+    <PackageLicenseUrl>https://github.com/vbfox/MasterOfFoo/blob/master/LICENSE</PackageLicenseUrl>
     <RepositoryUrl>https://github.com/vbfox/MasterOfFoo.git</RepositoryUrl>
     <PackageTags>F#;FSharp;printf</PackageTags>
     <Authors>vbfox</Authors>
