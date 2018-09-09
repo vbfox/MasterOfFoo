@@ -130,7 +130,18 @@ let createAndGetDefault () =
         Trace.publish ImportData.BuildArtifact zipFile
     }
 
-    let gitHubRelease = BuildTask.create "GitHubRelease" [zip] {
+    let gitRelease = BuildTask.create "GitRelease" [nuget.IfNeeded] {
+        let remote =
+            Git.CommandHelper.getGitResult "" "remote -v"
+            |> Seq.filter (fun (s: string) -> s.EndsWith("(push)"))
+            |> Seq.tryFind (fun (s: string) -> s.Contains(gitOwner + "/" + gitName))
+            |> function None -> gitHome + "/" + gitName | Some (s: string) -> s.Split().[0]
+
+        Git.Branches.tag "" release.NugetVersion
+        Git.Branches.pushTag "" remote release.NugetVersion
+    }
+
+    let gitHubRelease = BuildTask.create "GitHubRelease" [zip; gitRelease.IfNeeded] {
         let user =
             match Environment.environVarOrNone "github-user" with
             | Some s -> s
@@ -151,17 +162,6 @@ let createAndGetDefault () =
         |> GitHub.uploadFile zipFile
         |> GitHub.publishDraft
         |> Async.RunSynchronously
-    }
-
-    let gitRelease = BuildTask.create "GitRelease" [] {
-        let remote =
-            Git.CommandHelper.getGitResult "" "remote -v"
-            |> Seq.filter (fun (s: string) -> s.EndsWith("(push)"))
-            |> Seq.tryFind (fun (s: string) -> s.Contains(gitOwner + "/" + gitName))
-            |> function None -> gitHome + "/" + gitName | Some (s: string) -> s.Split().[0]
-
-        Git.Branches.tag "" release.NugetVersion
-        Git.Branches.pushTag "" remote release.NugetVersion
     }
 
     let _releaseTask = BuildTask.createEmpty "Release" [clean; gitRelease; gitHubRelease; publishNuget]
