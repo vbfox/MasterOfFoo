@@ -1,7 +1,8 @@
 ﻿MasterOfFoo
 ===========
 
-[![Join the chat at https://gitter.im/vbfox/MasterOfFoo](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/vbfox/MasterOfFoo?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+!["f" Logo](https://raw.githubusercontent.com/vbfox/MasterOfFoo/master/src/BlackFox.MasterOfFoo/Icon.png)
+
 [![AppVeyor Build status](https://ci.appveyor.com/api/projects/status/qp2g8ufg75ogv0k5/branch/master?svg=true)](https://ci.appveyor.com/project/vbfox/masteroffoo/branch/master)
 [![Travis-CI Build status](https://travis-ci.org/vbfox/MasterOfFoo.svg?branch=master)](https://travis-ci.org/vbfox/MasterOfFoo)
 [![Nuget Package](https://img.shields.io/nuget/v/BlackFox.MasterOfFoo.svg)](https://www.nuget.org/packages/BlackFox.MasterOfFoo)

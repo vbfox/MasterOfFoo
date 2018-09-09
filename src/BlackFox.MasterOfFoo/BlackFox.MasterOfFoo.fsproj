@@ -4,6 +4,7 @@
     <TargetFrameworks Condition="'$(OS)' == 'Windows_NT'">net45;netstandard2.0</TargetFrameworks>
     <DisableImplicitSystemValueTupleReference>true</DisableImplicitSystemValueTupleReference>
     <DisableImplicitFSharpCoreReference>true</DisableImplicitFSharpCoreReference>
+    <PackageIconUrl>https://raw.githubusercontent.com/vbfox/MasterOfFoo/master/src/BlackFox.MasterOfFoo/Icon.png</PackageIconUrl>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="FormatSpecification.fs" />
