@@ -97,7 +97,7 @@ let createAndGetDefault () =
                 })
     }
 
-    let nuget = BuildTask.create "NuGet" [build] {
+    let nuget = BuildTask.create "NuGet" [build;runTests.IfNeeded] {
         DotNet.pack
             (fun p -> { p with Configuration = configuration })
             libraryProjectFile
@@ -119,7 +119,7 @@ let createAndGetDefault () =
 
     let zipFile = artifactsDir </> (sprintf "BlackFox.MasterOfFoo-%s.zip" release.NugetVersion)
 
-    let zip = BuildTask.create "Zip" [build] {
+    let zip = BuildTask.create "Zip" [build;runTests.IfNeeded] {
         let comment = sprintf "MasterOfFoo v%s" release.NugetVersion
         GlobbingPattern.createFrom libraryBinDir
             ++ "**/*.dll"
