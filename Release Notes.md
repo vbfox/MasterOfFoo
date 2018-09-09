@@ -1,3 +1,7 @@
+### New in 1.0.3
+
+* Remove ValueTuple from references
+
 ### New in 1.0.2
 
 * Larger FSharp.Core version choice
