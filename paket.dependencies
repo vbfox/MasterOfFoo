@@ -5,7 +5,8 @@ framework: netcoreapp2.0,netstandard1.6,netstandard2.0,net45
 storage:none
 
 nuget Expecto
-nuget FSharp.Core 4.2.3 # Also specified in the .fsproj as it DOES NOT USE PAKET
+nuget Expecto.TestResults
+nuget FSharp.Core
 nuget System.Data.SqlClient
 
 // Build infrastructure
@@ -32,4 +33,5 @@ group build
     nuget Fake.DotNet.Paket
     nuget Fake.BuildServer.AppVeyor
     nuget Fake.BuildServer.Travis
+    nuget Fake.BuildServer.TeamFoundation
     nuget Fake.Api.GitHub
