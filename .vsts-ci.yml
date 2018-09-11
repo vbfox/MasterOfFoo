@@ -1,5 +1,5 @@
 jobs:
-- job: XXXLinux
+- job: Linux
   pool:
     vmImage: 'Ubuntu 16.04'
   steps:
@@ -11,13 +11,13 @@ jobs:
     displayName: Compile build script
   - script: ./build.sh CI
     displayName: Build
-- job: XXXWindows
+- job: Windows
   pool:
     vmImage: 'Hosted VS2017'
   steps:
   - script: dotnet help
     displayName: .NET first run experience
-  - script: paket.cmd restore
+  - script: paket.exe restore
     displayName: Restore packages
   - script: dotnet build src/BlackFox.MasterOfFoo.Build/BlackFox.MasterOfFoo.Build.fsproj
     displayName: Compile build script
