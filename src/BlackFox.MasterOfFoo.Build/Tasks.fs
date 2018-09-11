@@ -90,7 +90,7 @@ let createAndGetDefault () =
 
     let runTests = BuildTask.create "RunTests" [build] {
         let testsBinaryDir = artifactsDir </> "BlackFox.MasterOfFoo.Tests" </> (string configuration) </> "netcoreapp2.0"
-        [ testsBinaryDir </> "BlackFox.MasterOfFoo.Tests.dll"]
+        [testsBinaryDir </> "BlackFox.MasterOfFoo.Tests.dll"]
             |> Expecto.run (fun p ->
                 { p with
                     PrintVersion = false
