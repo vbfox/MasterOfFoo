@@ -35,9 +35,6 @@ let createAndGetDefault () =
     /// The name of the project on GitHub
     let gitName = "MasterOfFoo"
 
-    /// The url for the raw files hosted
-    let gitRaw = Environment.environVarOrDefault "gitRaw" ("https://raw.github.com/" + gitOwner)
-
     let inline versionPartOrZero x = if x < 0 then 0 else x
 
     let getUnionCaseName (x:'a) =
@@ -52,9 +49,6 @@ let createAndGetDefault () =
         else
             fromFile
 
-    // if BuildServer.buildServer = BuildServer.AppVeyor then
-    //    Trace.setBuildNumber release.AssemblyVersion
-    //else
     Trace.setBuildNumber release.NugetVersion
 
     let writeVersionProps() =
