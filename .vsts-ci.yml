@@ -19,5 +19,7 @@ jobs:
     displayName: .NET first run experience
   - script: paket.exe restore
     displayName: Restore packages
+  - script: dotnet build src/BlackFox.MasterOfFoo.Build/BlackFox.MasterOfFoo.Build.fsproj
+    displayName: Compile build script
   - script: build.cmd CI
     displayName: Build
