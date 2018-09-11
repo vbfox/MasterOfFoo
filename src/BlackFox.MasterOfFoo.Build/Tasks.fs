@@ -46,7 +46,7 @@ let createAndGetDefault () =
     let release =
         let fromFile = ReleaseNotes.load (rootDir </> "Release Notes.md")
         if BuildServer.buildServer <> BuildServer.LocalBuild then
-            let buildServerName = getUnionCaseName BuildServer.buildServer
+            let buildServerName = (getUnionCaseName BuildServer.buildServer).ToLowerInvariant()
             let nugetVer = sprintf "%s-%s.%s" fromFile.NugetVersion buildServerName BuildServer.buildVersion
             ReleaseNotes.ReleaseNotes.New(fromFile.AssemblyVersion, nugetVer, fromFile.Date, fromFile.Notes)
         else
