@@ -1,12 +1,13 @@
-pool:
-  vmImage: 'Ubuntu 16.04'
-
-steps:
-- script: dotnet help
-  displayName: .NET first run experience
-- script: ./paket.sh restore
-  displayName: Restore packages
-- script: dotnet build src/BlackFox.MasterOfFoo.Build/BlackFox.MasterOfFoo.Build.fsproj
-  displayName: Compile build script
-- script: ./build.sh CI
-  displayName: Build
+jobs:
+- job: XXXLinux
+  pool:
+    vmImage: 'Ubuntu 16.04'
+  steps:
+  - script: dotnet help
+    displayName: .NET first run experience
+  - script: ./paket.sh restore
+    displayName: Restore packages
+  - script: dotnet build src/BlackFox.MasterOfFoo.Build/BlackFox.MasterOfFoo.Build.fsproj
+    displayName: Compile build script
+  - script: ./build.sh CI
+    displayName: Build
