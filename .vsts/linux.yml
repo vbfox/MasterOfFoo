@@ -6,5 +6,7 @@ steps:
   displayName: .NET first run experience
 - script: ./paket.sh restore
   displayName: Restore packages
-- script: ./build.sh
+- script: dotnet build src/BlackFox.MasterOfFoo.Build/BlackFox.MasterOfFoo.Build.fsproj
+  displayName: Compile build script
+- script: ./build.sh CI
   displayName: Build
