@@ -2,5 +2,9 @@ pool:
   vmImage: 'Ubuntu 16.04'
 
 steps:
-- script: |
-    ./build.sh
+- script: dotnet help
+  displayName: .NET first run experience
+- script: ./paket.sh restore
+  displayName: Restore packages
+- script: ./build.sh
+  displayName: Build
