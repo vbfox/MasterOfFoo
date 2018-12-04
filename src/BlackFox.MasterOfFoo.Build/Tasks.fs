@@ -35,8 +35,6 @@ let createAndGetDefault () =
     /// The name of the project on GitHub
     let gitName = "MasterOfFoo"
 
-    let inline versionPartOrZero x = if x < 0 then 0 else x
-
     let getUnionCaseName (x:'a) =
         match Microsoft.FSharp.Reflection.FSharpValue.GetUnionFields(x, typeof<'a>) with | case, _ -> case.Name
 
