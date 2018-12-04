@@ -1,4 +1,9 @@
-## New in 1.0.4
+### New in 1.0.5
+
+* Specify the package license using SPDX
+* Build with 2.1.500 SDK
+
+### New in 1.0.4
 
 * Include pdb files in package (With SourceLink)
 * Include XmlDoc in package
