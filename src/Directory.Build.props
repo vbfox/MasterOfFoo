@@ -13,6 +13,10 @@
     <PackageTags>F#;FSharp;printf</PackageTags>
     <Authors>vbfox</Authors>
   </PropertyGroup>
+  <PropertyGroup>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <NoWarn>FS2003</NoWarn>
+  </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(ArtifactsDir)/Version.fs"  Condition="exists('$(ArtifactsDir)/Version.fs')"/>
   </ItemGroup>
