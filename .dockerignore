@@ -1,0 +1,13 @@
+artifacts/
+paket-files/
+.vscode/
+
+**/.vs/
+**/bin/
+**/obj/
+**/*.afdesign
+
+# Docker
+.dockerignore
+*.Dockerfile
+Dockerfile
