@@ -1,3 +1,5 @@
 ﻿FSharp.Core
+Microsoft.NET.Test.Sdk
 Expecto
 Expecto.TestResults
+YoloDev.Expecto.TestSdk

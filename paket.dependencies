@@ -1,12 +1,14 @@
-version 5.176.6
+version 5.257.0
 
 source https://api.nuget.org/v3/index.json
-framework: netcoreapp2.0,netstandard1.6,netstandard2.0,net45
+framework: net5.0,netstandard1.6,netstandard2.0,net45
 storage:none
 
+nuget Microsoft.NET.Test.Sdk
 nuget Expecto
 nuget Expecto.TestResults
-nuget FSharp.Core
+nuget YoloDev.Expecto.TestSdk
+nuget FSharp.Core ~> 4.0
 nuget System.Data.SqlClient
 
 // Build infrastructure
@@ -15,7 +17,7 @@ group build
     storage: none
     framework: netcoreapp2.0
 
-    nuget FSharp.Core ~> 4
+    nuget FSharp.Core ~> 4.0
     nuget BlackFox.Fake.BuildTask
 
     nuget Fake.Core.Target
