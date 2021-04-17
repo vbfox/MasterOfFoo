@@ -222,7 +222,7 @@ let main argv =
             5
             "Test"
             System.DateTimeOffset.Now
-    ColorPrintf.colorprintf "%s est %t" "La vie" (fun _ -> "belle !")
+    ColorPrintf.colorprintf "%s est %t" "La vie" (fun _ -> "belle !\n")
     // simple ()
     //percentStar ()
     //chained ()
