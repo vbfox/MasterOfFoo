@@ -30,7 +30,5 @@ group build
     nuget Fake.DotNet.AssemblyInfoFile
     nuget Fake.DotNet.Testing.Expecto
     nuget Fake.DotNet.Paket
-    nuget Fake.BuildServer.AppVeyor
-    nuget Fake.BuildServer.Travis
-    nuget Fake.BuildServer.TeamFoundation
+    nuget Fake.BuildServer.GitHubActions
     nuget Fake.Api.GitHub
