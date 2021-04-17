@@ -31,8 +31,8 @@ jobs:
       PAKET_SKIP_RESTORE_TARGETS: true
     steps:
     - uses: actions/checkout@v2
-    - name: Restore packages
-      run: ./paket.cmd restore
+    #- name: Restore packages
+    #  run: ./paket.cmd restore
     #- name: Compile build script
     #  run: dotnet build src/BlackFox.FoxSharp.Build/BlackFox.FoxSharp.Build.fsproj
     - name: Build
