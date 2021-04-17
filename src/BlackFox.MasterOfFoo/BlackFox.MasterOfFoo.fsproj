@@ -4,10 +4,13 @@
     <TargetFrameworks Condition="'$(OS)' == 'Windows_NT'">net45;netstandard2.0</TargetFrameworks>
     <DisableImplicitSystemValueTupleReference>true</DisableImplicitSystemValueTupleReference>
     <DisableImplicitFSharpCoreReference>true</DisableImplicitFSharpCoreReference>
-    <PackageIconUrl>https://raw.githubusercontent.com/vbfox/MasterOfFoo/master/src/BlackFox.MasterOfFoo/Icon.png</PackageIconUrl>
+    <PackageIcon>Icon.png</PackageIcon>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
   </PropertyGroup>
+  <ItemGroup>
+    <None Include="Icon.png" Pack="true" PackagePath=""/>
+  </ItemGroup>
   <ItemGroup>
     <Compile Include="FormatSpecification.fs" />
     <Compile Include="PrintableElement.fs" />
