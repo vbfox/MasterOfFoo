@@ -1,3 +1,8 @@
+### New in 1.0.6
+
+* Make dependency ranges less strict (For `FSharp.Core` 6.x)
+* Build with 5.0.201 SDK
+
 ### New in 1.0.5
 
 * Specify the package license using SPDX
