@@ -13,6 +13,8 @@ open BlackFox
 open BlackFox.Fake
 open System.Xml.Linq
 
+let testProjectName = "BlackFox.MasterOfFoo.Tests"
+
 let createAndGetDefault () =
     let configuration = DotNet.BuildConfiguration.fromEnvironVarOrDefault "configuration" DotNet.BuildConfiguration.Release
 
@@ -80,14 +82,23 @@ let createAndGetDefault () =
     }
 
     let runTests = BuildTask.create "RunTests" [build] {
-        let testsBinaryDir = artifactsDir </> "BlackFox.MasterOfFoo.Tests" </> (string configuration) </> "netcoreapp2.0"
-        [testsBinaryDir </> "BlackFox.MasterOfFoo.Tests.dll"]
-            |> Expecto.run (fun p ->
-                { p with
-                    PrintVersion = false
-                    FailOnFocusedTests = true
-                })
-        Trace.publish (ImportData.Nunit NunitDataVersion.Nunit) (testsBinaryDir </> "TestResults.xml")
+        let baseTestDir = artifactsDir </> testProjectName </> (string configuration)
+        let testConfs = ["netcoreapp2.0", ".dll"; "net5.0", ".dll"]
+
+        testConfs
+        |> List.map (fun (fw, ext) -> baseTestDir </> fw </> (testProjectName + ext))
+        |> Expecto.run (fun p ->
+            { p with
+                PrintVersion = false
+                FailOnFocusedTests = true
+            })
+
+        for (fw, _) in testConfs do
+            let dir = baseTestDir </> fw
+            let outFile = sprintf "TestResults_%s.xml" (fw.Replace('.', '_'))
+            File.delete (dir </> outFile)
+            (dir </> "TestResults.xml") |> Shell.rename (dir </> outFile)
+            Trace.publish (ImportData.Nunit NunitDataVersion.Nunit) (dir </> outFile)
     }
 
     let nuget = BuildTask.create "NuGet" [build;runTests.IfNeeded] {
