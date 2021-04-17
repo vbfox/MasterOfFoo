@@ -1,11 +1,10 @@
 version 5.176.6
 
 source https://api.nuget.org/v3/index.json
-framework: netcoreapp2.0,netstandard1.6,netstandard2.0,net45
+framework: net5.0,netcoreapp2.0,netstandard1.6,netstandard2.0,net45
 storage:none
 
 nuget Expecto
-nuget Expecto.TestResults
 nuget FSharp.Core
 nuget System.Data.SqlClient
 
@@ -13,7 +12,7 @@ nuget System.Data.SqlClient
 group build
     source https://api.nuget.org/v3/index.json
     storage: none
-    framework: netcoreapp2.0
+    framework: net5.0
 
     nuget FSharp.Core ~> 4
     nuget BlackFox.Fake.BuildTask
@@ -31,7 +30,5 @@ group build
     nuget Fake.DotNet.AssemblyInfoFile
     nuget Fake.DotNet.Testing.Expecto
     nuget Fake.DotNet.Paket
-    nuget Fake.BuildServer.AppVeyor
-    nuget Fake.BuildServer.Travis
-    nuget Fake.BuildServer.TeamFoundation
+    nuget Fake.BuildServer.GitHubActions
     nuget Fake.Api.GitHub
