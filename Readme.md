@@ -3,9 +3,8 @@
 
 !["f" Logo](https://raw.githubusercontent.com/vbfox/MasterOfFoo/master/src/BlackFox.MasterOfFoo/Icon.png)
 
-[![AppVeyor Build status](https://ci.appveyor.com/api/projects/status/qp2g8ufg75ogv0k5/branch/master?svg=true)](https://ci.appveyor.com/project/vbfox/masteroffoo/branch/master)
-[![Travis-CI Build status](https://travis-ci.org/vbfox/MasterOfFoo.svg?branch=master)](https://travis-ci.org/vbfox/MasterOfFoo)
-[![VSTS Status](https://vbfox.visualstudio.com/MasterOfFoo/_apis/build/status/MasterOfFoo%20CI?branchName=master)](https://vbfox.visualstudio.com/MasterOfFoo/_build/latest?definitionId=6&branchName=master)
+
+[![Github Actions Status](https://github.com/vbfox/MasterOfFoo/actions/workflows/main.yml/badge.svg)](https://github.com/vbfox/MasterOfFoo/actions/workflows/main.yml)
 [![Nuget Package](https://img.shields.io/nuget/v/BlackFox.MasterOfFoo.svg)](https://www.nuget.org/packages/BlackFox.MasterOfFoo)
 
 A library to allow using `printf` style strings in more places.
