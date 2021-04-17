@@ -18,8 +18,8 @@ jobs:
     - uses: actions/checkout@v2
     - name: Restore packages
       run: ./paket.sh restore
-    #- name: Compile build script
-    #  run: dotnet build src/BlackFox.FoxSharp.Build/BlackFox.FoxSharp.Build.fsproj
+    - name: Compile build script
+      run: dotnet build src/BlackFox.MasterOfFoo.Build/BlackFox.MasterOfFoo.Build.fsproj
     - name: Build
       run: ./build.sh CI
   windows:
@@ -31,9 +31,9 @@ jobs:
       PAKET_SKIP_RESTORE_TARGETS: true
     steps:
     - uses: actions/checkout@v2
-    #- name: Restore packages
-    #  run: ./paket.cmd restore
-    #- name: Compile build script
-    #  run: dotnet build src/BlackFox.FoxSharp.Build/BlackFox.FoxSharp.Build.fsproj
+    - name: Restore packages
+      run: ./paket.cmd restore
+    - name: Compile build script
+      run: dotnet build src/BlackFox.MasterOfFoo.Build/BlackFox.MasterOfFoo.Build.fsproj
     - name: Build
       run: ./build.cmd CI
