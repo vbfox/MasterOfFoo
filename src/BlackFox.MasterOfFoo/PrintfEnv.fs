@@ -53,8 +53,10 @@ type Step =
 type PrintfEnv<'State, 'Residue, 'Result>(state: 'State) =
     member _.State = state
 
+    /// Create the final result for this printer
     abstract Finish: unit -> 'Result
 
+    /// Write an element from the format string (Raw text or format specifier) to the printer
     abstract Write: PrintableElement -> unit
 
     /// Write the result of a '%t' format.  If this is a string it is written. If it is a 'unit' value

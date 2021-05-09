@@ -14,7 +14,7 @@ module ReimplementPrintf =
         let buf : string[] = Array.zeroCreate n
         let mutable ptr = 0
 
-        override this.Finalize() : 'Result = k (String.Concat(buf))
+        override this.Finish() : 'Result = k (String.Concat(buf))
         override this.Write(s : PrintableElement) =
             buf.[ptr] <- s.ToString()
             ptr <- ptr + 1
@@ -24,13 +24,13 @@ module ReimplementPrintf =
 
     type StringBuilderPrintfEnv<'Result>(k, buf) =
         inherit PrintfEnv<Text.StringBuilder, unit, 'Result>(buf)
-        override this.Finalize() : 'Result = k ()
+        override this.Finish() : 'Result = k ()
         override this.Write(s : PrintableElement) = ignore(buf.Append(s.ToString()))
         override this.WriteT(()) = ()
 
     type TextWriterPrintfEnv<'Result>(k, tw : IO.TextWriter) =
         inherit PrintfEnv<IO.TextWriter, unit, 'Result>(tw)
-        override this.Finalize() : 'Result = k()
+        override this.Finish() : 'Result = k()
         override this.Write(s : PrintableElement) = tw.Write (s.ToString())
         override this.WriteT(()) = ()
 
@@ -91,7 +91,7 @@ type internal SqlEnv<'cmd when 'cmd :> DbCommand>(n: int, command: 'cmd) =
         ignore(queryString.Append p.ParameterName)
         command.Parameters.Add p |> ignore
 
-    override __.Finalize() =
+    override __.Finish() =
         command.CommandText <- queryString.ToString()
         command
 
@@ -127,7 +127,7 @@ module ColorPrintf =
 
     type private Colorize<'Result>(k) =
         inherit PrintfEnv<unit, string, 'Result>()
-        override this.Finalize() : 'Result = k()
+        override this.Finish() : 'Result = k()
         override this.Write(s : PrintableElement) =
             match s.ElementType with
             | PrintableElementType.FromFormatSpecifier ->
@@ -150,7 +150,7 @@ module ColorPrintf =
 type internal QueryStringEnv() =
     inherit PrintfEnv<StringBuilder, unit, string>(StringBuilder())
 
-    override this.Finalize() = this.State.ToString()
+    override this.Finish() = this.State.ToString()
 
     override this.Write(s : PrintableElement) =
         let asPrintf = s.FormatAsPrintF()
@@ -168,7 +168,7 @@ let queryStringf (format : Format<'T, StringBuilder, unit, string>) =
 
 type internal MyTestEnv<'Result>(k, state) =
     inherit PrintfEnv<StringBuilder, unit, 'Result>(state)
-    override this.Finalize() : 'Result =
+    override this.Finish() : 'Result =
         printfn "Finalizing"
         k ()
     override this.Write(s : PrintableElement) =
@@ -223,6 +223,12 @@ let main argv =
             "Test"
             System.DateTimeOffset.Now
     ColorPrintf.colorprintf "%s est %t" "La vie" (fun _ -> "belle !\n")
+
+    let name = "Phillip"
+    let age = 30
+    let tf = (fun _ -> "belle !\n")
+
+    ColorPrintf.colorprintf $"Name: {name} %s{name}, Age: {age}, tf: %t{tf}, %A{age}"
     // simple ()
     //percentStar ()
     //chained ()

@@ -19,28 +19,6 @@ open LanguagePrimitives.IntrinsicOperators
 open BlackFox.MasterOfFoo
 open BlackFox.MasterOfFoo.FormatFlagsHelpers
 
-type PrintfFormat<'Printer, 'State, 'Residue, 'Result>(value:string, captures: obj[], captureTys: Type[]) =
-
-    new (value) = new PrintfFormat<'Printer, 'State, 'Residue, 'Result>(value, null, null)
-
-    member _.Value = value
-
-    member _.Captures = captures
-
-    member _.CaptureTypes = captureTys
-
-    override _.ToString() = value
-
-type PrintfFormat<'Printer, 'State, 'Residue, 'Result, 'Tuple>(value:string, captures, captureTys: Type[]) =
-
-    inherit PrintfFormat<'Printer, 'State, 'Residue, 'Result>(value, captures, captureTys)
-
-    new (value) = new PrintfFormat<'Printer, 'State, 'Residue, 'Result, 'Tuple>(value, null, null)
-
-type Format<'Printer, 'State, 'Residue, 'Result> = PrintfFormat<'Printer, 'State, 'Residue, 'Result>
-
-type Format<'Printer, 'State, 'Residue, 'Result, 'Tuple> = PrintfFormat<'Printer, 'State, 'Residue, 'Result, 'Tuple>
-
 [<AutoOpen>]
 module internal PrintfImpl =
 
@@ -801,53 +779,33 @@ module internal PrintfImpl =
     type PrintableValueConverter private (f: obj) =
         member x.FuncObj = f
 
-        static member inline Make<'t> (f: 't -> PrintableElement) = PrintableValueConverter(box f)
-        static member inline Make<'t> (f: 't -> int -> PrintableElement) = PrintableValueConverter(box f)
-        static member inline Make<'t> (f: 't -> int-> int -> PrintableElement) = PrintableValueConverter(box f)
-
-    type ValueConverterHolder =
-        static member GetValueConverterFor<'t> (ty : Type, spec : FormatSpecifier): PrintableValueConverter =
-            let et = PrintableElementType.FromFormatSpecifier
-            let realUntyped = getValueConverterCore ty spec
-            if spec.IsStarWidth && spec.IsStarPrecision then
-                let real = realUntyped.FuncObj :?> ('t -> int -> int -> string)
-                PrintableValueConverter.Make(fun (x: 't) width prec ->
-                    let printer = fun () -> real x width prec
-                    PrintableElement(printer, box x, et, ty, spec, width, prec))
-            else if spec.IsStarWidth || spec.IsStarPrecision then
-                let real = realUntyped.FuncObj :?> ('t -> int -> string)
-                if spec.IsStarWidth then
-                    PrintableValueConverter.Make(fun (x: 't) width ->
-                        let printer = fun () -> real x width
-                        PrintableElement(printer, box x, et, ty, spec, width, NotSpecifiedValue))
-                else
-                    PrintableValueConverter.Make(fun (x: 't) prec ->
-                        let printer = fun () -> real x prec
-                        PrintableElement(printer, box x, et, ty, spec, NotSpecifiedValue, prec))
-            else
-                let real = realUntyped.FuncObj :?> ('t -> string)
-                PrintableValueConverter.Make(fun (x: 't) ->
-                    let printer = fun () -> real x
-                    PrintableElement(printer, box x, et, ty, spec, NotSpecifiedValue, NotSpecifiedValue))
-
-    let nonPublicStatics = BindingFlags.Public ||| BindingFlags.NonPublic ||| BindingFlags.Static
-
-    let inline verifyMethodInfoWasTaken (_mi : System.Reflection.MemberInfo) =
-    #if DEBUG
-        if isNull _mi then
-            ignore (System.Diagnostics.Debugger.Break())
-    #else
-        ()
-    #endif
-
-    let private getValueConverterForMethod =
-        let mi = typeof<ValueConverterHolder>.GetTypeInfo().GetMethod("GetValueConverterFor", nonPublicStatics)
-        verifyMethodInfoWasTaken mi
-        mi
+        static member inline Make<'t> (f: obj -> PrintableElement) = PrintableValueConverter(box f)
+        static member inline Make<'t> (f: obj -> int -> PrintableElement) = PrintableValueConverter(box f)
+        static member inline Make<'t> (f: obj -> int-> int -> PrintableElement) = PrintableValueConverter(box f)
 
     let getValueConverter (ty : Type) (spec : FormatSpecifier) : PrintableValueConverter =
-        let mi' = getValueConverterForMethod.MakeGenericMethod(ty)
-        mi'.Invoke(null, [| ty; box spec |]) :?> PrintableValueConverter
+        let et = PrintableElementType.FromFormatSpecifier
+        let realUntyped = getValueConverterCore ty spec
+        if spec.IsStarWidth && spec.IsStarPrecision then
+            let real = realUntyped.FuncObj :?> (obj -> int -> int -> string)
+            PrintableValueConverter.Make(fun (x: obj) width prec ->
+                let printer = fun () -> real x width prec
+                PrintableElement(printer, x, et, ty, spec, width, prec))
+        else if spec.IsStarWidth || spec.IsStarPrecision then
+            let real = realUntyped.FuncObj :?> (obj -> int -> string)
+            if spec.IsStarWidth then
+                PrintableValueConverter.Make(fun (x: obj) width ->
+                    let printer = fun () -> real x width
+                    PrintableElement(printer, x, et, ty, spec, width, NotSpecifiedValue))
+            else
+                PrintableValueConverter.Make(fun (x: obj) prec ->
+                    let printer = fun () -> real x prec
+                    PrintableElement(printer, x, et, ty, spec, NotSpecifiedValue, prec))
+        else
+            let real = realUntyped.FuncObj :?> (obj -> string)
+            PrintableValueConverter.Make(fun (x: obj) ->
+                let printer = fun () -> real x
+                PrintableElement(printer, x, et, ty, spec, NotSpecifiedValue, NotSpecifiedValue))
 
     let extractCurriedArguments (ty: Type) n =
         System.Diagnostics.Debug.Assert(n = 1 || n = 2 || n = 3, "n = 1 || n = 2 || n = 3")
@@ -942,10 +900,17 @@ module internal PrintfImpl =
                 | null when spec.TypeChar = 'A' ->
                     let convFunc arg argTy =
                         let mi = mi_GenericToString.MakeGenericMethod [| argTy |]
-                        // XXX this won't work... at all
-                        let f = mi.Invoke(null, [| box spec |]) :?> PrintableValueConverter
-                        let f2 = f.FuncObj :?> (obj -> PrintableElement)
-                        f2 arg
+                        let f = mi.Invoke(null, [| box spec |]) :?> ValueConverter
+                        let f2 = f.FuncObj :?> (obj -> string)
+
+                        let printer = fun () -> f2 arg
+                        PrintableElement(
+                            printer,
+                            arg,
+                            PrintableElementType.FromFormatSpecifier,
+                            argTy,
+                            spec,
+                            NotSpecifiedValue, NotSpecifiedValue)
 
                     StepWithTypedArg (prefix, convFunc)
 
