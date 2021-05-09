@@ -4,7 +4,7 @@ open System
 
 [<NoComparison; NoEquality>]
 /// Represents one step in the execution of a format string
-type Step =
+type internal Step =
     | StepWithArg of prefix: PrintableElement * conv: (obj -> PrintableElement)
     | StepWithTypedArg of prefix: PrintableElement * conv: (obj -> Type -> PrintableElement)
     | StepString of prefix: PrintableElement

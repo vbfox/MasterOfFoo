@@ -8,7 +8,7 @@ open System.Globalization
 
 /// These are a typical set of options used to control structured formatting.
 [<NoEquality; NoComparison>]
-type FormatOptions =
+type internal FormatOptions =
     { FloatingPointFormat: string
       AttributeProcessor: (string -> (string * string) list -> bool -> unit)
       FormatProvider: IFormatProvider
@@ -34,6 +34,6 @@ type FormatOptions =
           ShowIEnumerable = true
         }
 
-module Display =
-    let internal anyToStringForPrintf (_options: FormatOptions) (_bindingFlags:BindingFlags) (value, _typValue: Type): string =
+module internal Display =
+    let anyToStringForPrintf (_options: FormatOptions) (_bindingFlags:BindingFlags) (value, _typValue: Type): string =
         sprintf "%A" value
