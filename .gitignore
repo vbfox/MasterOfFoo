@@ -245,3 +245,5 @@ paket-files/
 launchSettings.json
 .ionide/
 .idea/
+
+TestResults.xml
