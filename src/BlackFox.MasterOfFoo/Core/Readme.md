@@ -10,3 +10,8 @@ Core is the part of MasterOfFoo that is extracted from the F# Compiler.
 * Move `FormatSpecifier` and `FormatFlags` to `FormatSpecification.fs`
 * Replace `PrintfEnv` signature with `abstract Write : PrintableElement -> unit` & fix thigns
 * `findNextFormatSpecifier` returns `PrintableElement`
+* The cornerstone is that ValueConverter should now return a function generating PrintableElement instances
+  instead of strings.
+
+There are quite a few things to fix but the original `printf.fs` and `sformat.fs` are commited to serve as guide by
+diffing the current code and new versions before upgrade.
