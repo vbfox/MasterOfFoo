@@ -280,7 +280,7 @@ module internal PrintfImpl =
                     env.WriteSkipEmpty prefix1
                     env.Write(conv1 (box arg1))
                     env.WriteSkipEmpty prefix2
-                    env.Finish())
+                    env.Finalize())
             )
 
         // Special case for format strings containing two simple formats like '%d %s' etc, i.e.
@@ -298,7 +298,7 @@ module internal PrintfImpl =
                     env.WriteSkipEmpty prefix2
                     env.Write(conv2 (box arg2))
                     env.WriteSkipEmpty prefix3
-                    env.Finish())
+                    env.Finalize())
             )
 
     let inline (===) a b = Object.ReferenceEquals(a, b)
@@ -1017,8 +1017,8 @@ module internal PrintfImpl =
             | [| StepString prefix |] ->
                 PrintfFuncFactory<_, 'State, 'Residue, 'Result>(fun _args initial ->
                     let env = initial()
-                    env.Write prefix
-                    env.Finish()
+                    env.WriteSkipEmpty prefix
+                    env.Finalize()
                 ) |> box
 
             // If there is one simple format specifier then we can create an even better factory function

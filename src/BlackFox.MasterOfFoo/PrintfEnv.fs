@@ -54,7 +54,7 @@ type PrintfEnv<'State, 'Residue, 'Result>(state: 'State) =
     member _.State = state
 
     /// Create the final result for this printer
-    abstract Finish: unit -> 'Result
+    abstract Finalize: unit -> 'Result
 
     /// Write an element from the format string (Raw text or format specifier) to the printer
     abstract Write: PrintableElement -> unit
@@ -134,4 +134,4 @@ type PrintfEnv<'State, 'Residue, 'Result>(state: 'State) =
                 argIndex <- argIndex + 2
                 env.Write(PrintableElement("%", PrintableElementType.MadeByEngine))
 
-        env.Finish()
+        env.Finalize()

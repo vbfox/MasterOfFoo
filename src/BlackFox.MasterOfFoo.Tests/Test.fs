@@ -8,7 +8,7 @@ open BlackFox.MasterOfFoo
 type TestEnv() =
     inherit PrintfEnv<unit, string, string>()
     let buf = StringBuilder()
-    override __.Finish() = buf.ToString ()
+    override __.Finalize() = buf.ToString ()
     override __.Write(s : PrintableElement) = ignore(buf.Append(s.FormatAsPrintF()))
     override __.WriteT(s : string) = ignore(buf.Append(s))
 
