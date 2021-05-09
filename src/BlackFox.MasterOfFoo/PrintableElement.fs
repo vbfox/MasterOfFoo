@@ -73,7 +73,7 @@ type PrintableElement
         | PrintableElementType.FromFormatSpecifier -> printer ()
         | _ -> value :?> string
 
-    member x.IsNullOrEmpty with get() =
+    member internal x.IsNullOrEmpty with get() =
         match type' with
         | PrintableElementType.FromFormatSpecifier -> false
         | _ -> String.IsNullOrEmpty(value :?> string)
