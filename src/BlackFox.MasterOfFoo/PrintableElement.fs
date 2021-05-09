@@ -5,7 +5,7 @@ open FormatSpecifierConstants
 
 /// The type of an element passed to a PrintfEnv.
 type PrintableElementType =
-    /// A string created by the engine, only used in a few edge cases and only "%" is generated
+    /// A string created by the engine, only used in a few edge cases
     | MadeByEngine = 0uy
     /// A string coming directly from the format string
     | Direct = 1uy
@@ -36,27 +36,27 @@ type PrintableElement
 
     /// The type of element (From a format specifier or directly from the string)
     member x.ElementType with get() = type'
-    
+
     /// The value passed as parameter, of type ValueType
     member x.Value with get() = value
-    
+
     /// The type of the value
     member x.ValueType
         with get() =
             match type' with
             | PrintableElementType.FromFormatSpecifier -> valueType
-            | _ -> typeof<string>    
-    
+            | _ -> typeof<string>
+
     /// The format specification for format specifiers
     member x.Specifier with get() = if Object.ReferenceEquals(spec, null) then None else Some(spec)
-    
+
     /// The width if specified via another parameter as in "%*i"
     member x.StarWidth with get() = match starWidth with NotSpecifiedValue -> None | x -> Some(x)
-    
+
     /// The precision if specified via another parameter as in "%.*f"
     member x.StarPrecision with get() = match starPrecision with NotSpecifiedValue -> None | x -> Some(x)
 
-    override x.ToString () = 
+    override x.ToString () =
         sprintf
             "value: %A, type: %A, valueType: %s, spec: %s, starWidth: %s, starPrecision: %s, AsPrintF: %s"
             value
@@ -72,3 +72,8 @@ type PrintableElement
         match type' with
         | PrintableElementType.FromFormatSpecifier -> printer ()
         | _ -> value :?> string
+
+    member x.IsNullOrEmpty with get() =
+        match type' with
+        | PrintableElementType.FromFormatSpecifier -> false
+        | _ -> String.IsNullOrEmpty(value :?> string)
