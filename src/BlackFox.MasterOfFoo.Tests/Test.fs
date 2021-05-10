@@ -106,5 +106,6 @@ let tests = [
             "%A %A %A %A %A"
     }
 ]
+
 [<Tests>]
 let test = testList "Tests" tests
