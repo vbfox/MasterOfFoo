@@ -16,6 +16,5 @@
         "**/packages": true,
         "**/paket-files": true,
         "**/artifacts": true
-    },
-    "FSharp.inlayHints.parameterNames": false
+    }
 }
