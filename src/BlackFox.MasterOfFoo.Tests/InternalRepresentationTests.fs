@@ -393,7 +393,7 @@ Finalize
             (testprintf $"{value}")
             """
 Init
-Write value: "Foo", type: FromFormatSpecifier, valueType: System.Object, spec: 'P', Precision=-, Width=-, Flags=None, starWidth: , starPrecision: , AsPrintF: Foo;
+Write value: "Foo", type: FromFormatSpecifier, valueType: System.Object, spec: 'P', Precision=-, Width=-, Flags=None, dotnetFormat: '', starWidth: , starPrecision: , AsPrintF: Foo;
 Finalize
 """
     }
@@ -403,7 +403,7 @@ Finalize
             (testprintf $"""{"embedded string literal"}""")
             """
 Init
-Write value: "embedded string literal", type: FromFormatSpecifier, valueType: System.Object, spec: 'P', Precision=-, Width=-, Flags=None, starWidth: , starPrecision: , AsPrintF: embedded string literal;
+Write value: "embedded string literal", type: FromFormatSpecifier, valueType: System.Object, spec: 'P', Precision=-, Width=-, Flags=None, dotnetFormat: '', starWidth: , starPrecision: , AsPrintF: embedded string literal;
 Finalize
 """
     }
@@ -425,7 +425,7 @@ Finalize
             (testprintf $"{value}")
             """
 Init
-Write value: 42, type: FromFormatSpecifier, valueType: System.Object, spec: 'P', Precision=-, Width=-, Flags=None, starWidth: , starPrecision: , AsPrintF: 42;
+Write value: 42, type: FromFormatSpecifier, valueType: System.Object, spec: 'P', Precision=-, Width=-, Flags=None, dotnetFormat: '', starWidth: , starPrecision: , AsPrintF: 42;
 Finalize
 """
     }
@@ -445,7 +445,7 @@ Finalize
             (testprintf $"{System.Math.PI:N3}")
             """
 Init
-Write value: 3.141592654, type: FromFormatSpecifier, valueType: System.Object, spec: 'P', Precision=-, Width=-, Flags=None, starWidth: , starPrecision: , AsPrintF: 3.142;
+Write value: 3.141592654, type: FromFormatSpecifier, valueType: System.Object, spec: 'P', Precision=-, Width=-, Flags=None, dotnetFormat: 'N3', starWidth: , starPrecision: , AsPrintF: 3.142;
 Finalize
 """
     }
