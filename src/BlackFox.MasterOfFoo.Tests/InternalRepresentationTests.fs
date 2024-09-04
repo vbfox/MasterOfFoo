@@ -13,14 +13,14 @@ type MyToStringSaysHi() =
 type TestEnv() =
     inherit PrintfEnv<unit, string, string>()
     let buf = StringBuilder().AppendLine("Init")
-    override __.Finalize() =
+    override _.Finalize() =
         buf.AppendLine("Finalize") |> ignore
         buf.ToString ()
-    override __.Write(s : PrintableElement) =
+    override _.Write(s : PrintableElement) =
         buf.Append("Write ") |> ignore
         buf.Append(sprintf "%A" s) |> ignore
         buf.AppendLine(";") |> ignore
-    override __.WriteT(s : string) =
+    override _.WriteT(s : string) =
         buf.Append("WriteT ") |> ignore
         buf.AppendLine(s) |> ignore
 
