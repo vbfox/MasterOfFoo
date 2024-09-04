@@ -33,8 +33,11 @@ let cleanTypeParameters (s: string) =
 let testprintf (format: Printf.StringFormat<'a>) =
     doPrintf format (fun _ -> TestEnv())
 
+let cleanText (s: string) =
+    s.Trim().Replace("\r\n", "\n")
+
 let testEqual (actual: string) (expected:string) =
-    Expect.equal (actual.Trim() |> cleanTypeParameters) (expected.Trim()) ""
+    Expect.equal (actual |> cleanText |> cleanTypeParameters) (expected |> cleanText) ""
 
 let tests = [
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -371,15 +374,78 @@ Finalize
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Interpolation XXX Experimental
+    // Interpolation
 
-    test "string hole only (interpolated)" {
+    test "interpolated-explicit string hole only" {
         let value = "Foo"
         testEqual
             (testprintf $"%s{value}")
             """
 Init
 Write value: "Foo", type: FromFormatSpecifier, valueType: System.Object, spec: 's', Precision=-, Width=-, Flags=None, starWidth: , starPrecision: , AsPrintF: Foo;
+Finalize
+"""
+    }
+
+    test "interpolated-implicit string hole only" {
+        let value = "Foo"
+        testEqual
+            (testprintf $"{value}")
+            """
+Init
+Write value: "Foo", type: FromFormatSpecifier, valueType: System.Object, spec: 'P', Precision=-, Width=-, Flags=None, starWidth: , starPrecision: , AsPrintF: Foo;
+Finalize
+"""
+    }
+
+    test "interpolated-embeded string hole only" {
+        testEqual
+            (testprintf $"""{"embedded string literal"}""")
+            """
+Init
+Write value: "embedded string literal", type: FromFormatSpecifier, valueType: System.Object, spec: 'P', Precision=-, Width=-, Flags=None, starWidth: , starPrecision: , AsPrintF: embedded string literal;
+Finalize
+"""
+    }
+
+    test "interpolated-explicit int hole only" {
+        let value = 42
+        testEqual
+            (testprintf $"%i{value}")
+            """
+Init
+Write value: 42, type: FromFormatSpecifier, valueType: System.Object, spec: 'i', Precision=-, Width=-, Flags=None, starWidth: , starPrecision: , AsPrintF: 42;
+Finalize
+"""
+    }
+
+    test "interpolated-implicit int hole only" {
+        let value = 42
+        testEqual
+            (testprintf $"{value}")
+            """
+Init
+Write value: 42, type: FromFormatSpecifier, valueType: System.Object, spec: 'P', Precision=-, Width=-, Flags=None, starWidth: , starPrecision: , AsPrintF: 42;
+Finalize
+"""
+    }
+
+    test "interpolated-explicit float hole F# format only" {
+        testEqual
+            (testprintf $"%0.3f{System.Math.PI}")
+            """
+Init
+Write value: 3.141592654, type: FromFormatSpecifier, valueType: System.Object, spec: 'f', Precision=3, Width=-, Flags=PadWithZeros, starWidth: , starPrecision: , AsPrintF: 3.142;
+Finalize
+"""
+    }
+
+    test "interpolated-implicit float hole dotnet format only" {
+        testEqual
+            (testprintf $"{System.Math.PI:N3}")
+            """
+Init
+Write value: 3.141592654, type: FromFormatSpecifier, valueType: System.Object, spec: 'P', Precision=-, Width=-, Flags=None, starWidth: , starPrecision: , AsPrintF: 3.142;
 Finalize
 """
     }
