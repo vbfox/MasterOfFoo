@@ -1,5 +1,4 @@
-﻿MasterOfFoo
-===========
+﻿# MasterOfFoo
 
 !["f" Logo](https://raw.githubusercontent.com/vbfox/MasterOfFoo/master/src/BlackFox.MasterOfFoo/Icon.png)
 
@@ -13,8 +12,7 @@ The code is essentially an extracted version of [`printf.fs`][printf_fs] where t
 what to do with the final blocks that compose the string (printf put them on the console, sprintf in a buffer, ...)
 but also what to do with the parameters passed for each format specifier.
 
-Sample usage
-------------
+## Sample usage
 
 ```fsharp
 module MyModule =
@@ -33,8 +31,7 @@ module MyModule =
 MyModule.mysprintf "Hello %s." "World"
 ```
 
-Mini-Doc
---------
+## Mini-Doc
 
 ### PrintableElement
 
@@ -70,8 +67,7 @@ Members:
 * `doPrintfFromEnv`: Take a format and a `PrintfEnv` to create a printf-like function
 * `doPrintf`: Same as `doPrintfFromEnv` but allow to know the number of elements when the `PrintfEnv` is created.
 
-FAQ
----
+## FAQ
 
 ### What does it allow exactly that can't be done with the original set of functions ?
 
@@ -102,8 +98,18 @@ value.
 val it : (int -> int -> float -> string) = <fun:it@1>
 ````
 
-Projects using it
------------------
+### How are interpolated strings represented ?
+
+The details of string interpolation internals are specified in [F# RFC FS-1001 - String Interpolation][fs-1001].
+
+They appear as follow in this library:
+* Type-checked "printf-style" fills behave exactly as they do in `sprintf` and friends.
+* Unchecked ".NET-style" fills appear with a `Specifier.TypeChar` of 'P' and the .NET format string
+  in `Specifier.InteropHoleDotNetFormat`.
+
+[fs-1001]: https://github.com/fsharp/fslang-design/blob/aca88da13cdb95f4f337d4f7d44cbf9d343704ae/FSharp-5.0/FS-1001-StringInterpolation.md#f-rfc-fs-1001---string-interpolation
+
+## Projects using it
 
 * [ColoredPrintf][colorprintf]: A small library that I created to add colored parts to printf strings.
 
