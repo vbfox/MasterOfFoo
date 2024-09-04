@@ -17,4 +17,3 @@
     Fake.DotNet.Paket
     Fake.BuildServer.GitHubActions
     Fake.Api.GitHub
-
