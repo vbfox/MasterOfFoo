@@ -18,7 +18,9 @@ jobs:
     - uses: actions/checkout@v4
     - uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: '2'
+        dotnet-version: |
+          2
+          5
     - name: Restore packages
       run: ./paket.sh restore
     - name: Compile build script
@@ -36,7 +38,9 @@ jobs:
     - uses: actions/checkout@v4
     - uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: '2'
+        dotnet-version: |
+          2
+          5
     - name: Restore packages
       run: ./paket.cmd restore
     - name: Compile build script
