@@ -143,6 +143,16 @@ Finalize
 """
     }
 
+    test "int hole only %B" {
+        testEqual
+            (testprintf "%B" 42)
+            """
+Init
+Write value: 42, type: FromFormatSpecifier, valueType: System.Int32, spec: 'B', Precision=-, Width=-, Flags=None, starWidth: , starPrecision: , AsPrintF: 101010;
+Finalize
+"""
+    }
+
     test "float64 hole only %f" {
         testEqual
             (testprintf "%f" 42.42)
