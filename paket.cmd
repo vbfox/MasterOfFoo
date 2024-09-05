@@ -1,2 +1,3 @@
-@dotnet tool restore
+@dotnet tool restore --verbosity quiet
+
 dotnet paket %*

@@ -7,7 +7,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E5E77D3C-F0EE-4EB3-B813-B181020563E0}"
 	ProjectSection(SolutionItems) = preProject
 		..\paket.dependencies = ..\paket.dependencies
-		Readme.md = Readme.md
+		..\Readme.md = ..\Readme.md
 	EndProjectSection
 EndProject
 Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "BlackFox.MasterOfFoo.Tests", "BlackFox.MasterOfFoo.Tests\BlackFox.MasterOfFoo.Tests.fsproj", "{B158E4B2-AF4C-4A91-BC1E-3D4E4B080802}"

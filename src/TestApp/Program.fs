@@ -1,7 +1,4 @@
-﻿// Learn more about F# at http://fsharp.org
-// See the 'F# Tutorial' project for more help.
-
-open System.Text
+﻿open System.Text
 open BlackFox.MasterOfFoo
 open System.Data.SqlClient
 open System.Data.Common
@@ -122,8 +119,6 @@ let sqlCommandf (format : Format<'T, unit, unit, SqlCommand>) =
 
 module ColorPrintf =
     open System
-    open System.Text
-    open BlackFox.MasterOfFoo
 
     type private Colorize<'Result>(k) =
         inherit PrintfEnv<unit, string, 'Result>()
@@ -182,16 +177,27 @@ let testprintf (sb: StringBuilder) (format : Format<'T, StringBuilder, unit, uni
         MyTestEnv(ignore, sb) :> PrintfEnv<_, _, _>
     )
 
-let simple () =
-    printfn "------------------------------------------------"
+let title s =
+    printfn $"%s{s}"
+    printfn $"%s{System.String('-', s.Length)}"
+
+let endOfBlock () =
+    printfn ""
+    printfn ""
+
+let debugSimple () =
+    title "Simple"
+
     let sb = StringBuilder ()
     testprintf sb "Hello %0-10i hello %s %A" 1000 "World" "World"
     sb.Clear() |> ignore
     testprintf sb "Hello %-010i hello %s" 1000 "World"
     System.Console.WriteLine("RESULT: {0}", sb.ToString())
 
-let percentStar () =
-    printfn "------------------------------------------------"
+    endOfBlock ()
+
+let debugPercentStar () =
+    title "Percent Star"
     let sb = StringBuilder ()
     testprintf sb "Hello '%*i'" 5 42
     sb.Clear() |> ignore
@@ -200,21 +206,55 @@ let percentStar () =
     testprintf sb "Hello '%*.*f'" 5 3 42.12345
     System.Console.WriteLine("RESULT: {0}", sb.ToString())
 
-let chained () =
-    printfn "------------------------------------------------"
+    endOfBlock ()
+
+let debugChained () =
+    title "Chained"
     let sb = StringBuilder ()
     testprintf sb "Hello %s %s %s %s %s %s" "1" "2" "3" "4" "5" "6"
     System.Console.WriteLine("RESULT: {0}", sb.ToString())
 
-let complex () =
-    printfn "------------------------------------------------"
+    endOfBlock ()
+
+let debugComplex () =
+    title "Complex"
     let sb = StringBuilder ()
     testprintf sb "Hello %s %s %s %s %s %s %06i %t" "1" "2" "3" "4" "5" "6" 5 (fun x -> x.Append("CALLED") |> ignore)
     System.Console.WriteLine("RESULT: {0}", sb.ToString())
 
-[<EntryPoint>]
-let main argv =
-    //printfn "%s" (queryStringf "hello/uri+with space/x?foo=%s&bar=%s&work=%i" "#baz" "++Hello world && problem for arg √" 1)
+    endOfBlock ()
+
+let demoQueryString () =
+    title "Query String"
+
+    let foo = "#baz"
+    let bar = "++Hello world && problem for arg √"
+    let work = 1
+    let result = queryStringf $"hello/uri+with space/x?foo=%s{foo}&bar=%s{bar}&work=%i{work}"
+    printfn $"%s{result}"
+
+    endOfBlock()
+
+let demoColorPrintf () =
+    title "Color Printf"
+
+    ColorPrintf.colorprintf "%s est %t" "La vie" (fun _ -> "belle !\n")
+
+    endOfBlock()
+
+let demoColorPrintfInterpolated () =
+    title "Color Printf Interpolated"
+
+    let name = "Phillip"
+    let age = 30
+    let tf = (fun _ -> "Hello TF")
+
+    ColorPrintf.colorprintf $"Name: {name} %s{name}, Age: {age}, tf: %t{tf}, %A{age}\n"
+
+    endOfBlock()
+
+let demoSqlCommand () =
+    title "SQL Command"
 
     let cmd: SqlCommand =
         sqlCommandf
@@ -222,10 +262,23 @@ let main argv =
             5
             "Test"
             System.DateTimeOffset.Now
-    ColorPrintf.colorprintf "%s est %t" "La vie" (fun _ -> "belle !\n")
-    // simple ()
-    //percentStar ()
-    //chained ()
-    //complex ()
-    ignore(System.Console.ReadLine ())
-    0 // return an integer exit code
+
+    printfn "Command: %s " cmd.CommandText
+    for p in cmd.Parameters do
+        printfn " - %s = %O" p.ParameterName p.Value
+
+    endOfBlock()
+
+[<EntryPoint>]
+let main argv =
+    if argv.Length > 0 && argv.[0].ToLowerInvariant() = "debug" then
+        debugSimple ()
+        debugPercentStar ()
+        debugChained ()
+        debugComplex ()
+    else
+        demoQueryString ()
+        demoColorPrintf ()
+        demoColorPrintfInterpolated ()
+        demoSqlCommand ()
+    0

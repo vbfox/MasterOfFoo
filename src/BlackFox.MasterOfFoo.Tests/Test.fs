@@ -17,11 +17,28 @@ let coreprintf = FSharp.Core.Printf.sprintf
 
 type Discriminated = |A of string | B of int
 
+let testStr = "Foo"
+let testInt = 42
+
+type MyFormatable() =
+    interface System.IFormattable with
+        member __.ToString(format: string, _formatProvider: System.IFormatProvider) =
+            $"MyFormatable(%s{format})"
+
+    override _.ToString() = "MyFormatable"
+
 let tests = [
     test "simple string" {
         Expect.equal
             (coreprintf "Foo")
             (testprintf "Foo")
+            "Foo"
+    }
+
+    test "simple string interpolation" {
+        Expect.equal
+            (coreprintf $"Foo")
+            (testprintf $"Foo")
             "Foo"
     }
 
@@ -43,10 +60,45 @@ let tests = [
             "%5s"
     }
 
+    test "string untyped interpolation" {
+        Expect.equal
+            (coreprintf $"""{"Foo"}""")
+            (testprintf $"""{"Foo"}""")
+            "%s"
+    }
+
+    test "string typed interpolation" {
+        Expect.equal
+            (coreprintf $"""%s{"Foo"}""")
+            (testprintf $"""%s{"Foo"}""")
+            "%s"
+    }
+
     test "int format" {
         Expect.equal
             (coreprintf "%i" 5)
             (testprintf "%i" 5)
+            "%i"
+    }
+
+    test "int untyped interpolation" {
+        Expect.equal
+            (coreprintf $"{5}")
+            (testprintf $"{5}")
+            "{5}"
+    }
+
+    test "int untyped interpolation .NET format" {
+        Expect.equal
+            (coreprintf $"{System.Math.PI:N3}")
+            (testprintf $"{System.Math.PI:N3}")
+            "{System.Math.PI:N3}"
+    }
+
+    test "int typed interpolation" {
+        Expect.equal
+            (coreprintf $"%i{5}")
+            (testprintf $"%i{5}")
             "%i"
     }
 
@@ -67,6 +119,29 @@ let tests = [
             (testprintf "%A %A %A %A %A" "Foo" 5 (A("Foo")) (B(42)) System.ConsoleColor.Red)
             "%A %A %A %A %A"
     }
+
+    test "custom untyped interpolation" {
+        Expect.equal
+            (coreprintf $"{MyFormatable()}")
+            (testprintf $"{MyFormatable()}")
+            "{MyFormatable()}"
+    }
+
+    test "custom untyped interpolation .NET format" {
+        Expect.equal
+            (coreprintf $"{MyFormatable():HelloWorld}")
+            (testprintf $"{MyFormatable():HelloWorld}")
+            "{MyFormatable():HelloWorld}"
+    }
+
+    test "custom untyped interpolation .NET format unusual characters" {
+        // Using double backticks to escape the format string if it contains spaces for example
+        Expect.equal
+            (coreprintf $"{MyFormatable():``Hello World``}")
+            (testprintf $"{MyFormatable():``Hello World``}")
+            "{MyFormatable():``Hello World``}"
+    }
 ]
+
 [<Tests>]
 let test = testList "Tests" tests

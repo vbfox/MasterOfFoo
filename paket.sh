@@ -1,4 +1,4 @@
 #!/bin/bash
 
-dotnet tool restore
+dotnet tool restore --verbosity minimal
 dotnet paket $@

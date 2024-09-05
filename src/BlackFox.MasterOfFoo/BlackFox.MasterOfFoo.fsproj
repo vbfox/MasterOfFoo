@@ -1,31 +1,29 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0</TargetFrameworks>
-    <TargetFrameworks Condition="'$(OS)' == 'Windows_NT'">net45;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;net5.0</TargetFrameworks>
+    <TargetFrameworks Condition="'$(OS)' == 'Windows_NT'">net461;netstandard2.0;net5.0</TargetFrameworks>
     <DisableImplicitSystemValueTupleReference>true</DisableImplicitSystemValueTupleReference>
     <DisableImplicitFSharpCoreReference>true</DisableImplicitFSharpCoreReference>
     <PackageIcon>Icon.png</PackageIcon>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
+    <PackageReadmeFile>Readme.md</PackageReadmeFile>
   </PropertyGroup>
   <ItemGroup>
     <None Include="Icon.png" Pack="true" PackagePath=""/>
+    <None Include="../../Readme.md" Pack="true" PackagePath="\"/>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="FormatSpecification.fs" />
     <Compile Include="PrintableElement.fs" />
     <Compile Include="PrintfEnv.fs" />
-    <Compile Include="Core.Helpers.fs" />
-    <Compile Include="Core.FormatOptions.fs" />
-    <Compile Include="Core.FormatString.fs" />
-    <Compile Include="Core.FormatToString.fs" />
-    <Compile Include="Core.PrintfBuilding.fs" />
-    <Compile Include="Core.PrintfCache.fs" />
+    <Compile Include="sformat.fs" />
+    <Compile Include="printf.fs" />
     <Compile Include="MasterOfFoo.fs" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="FSharp.Core" Version="4.0.0.1" Condition="'$(TargetFramework)' == 'net45'" />
-    <PackageReference Include="FSharp.Core" Version="4.2.3" Condition="'$(TargetFramework)' == 'netstandard2.0'" />
+    <PackageReference Include="FSharp.Core" Version="4.5.0" Condition="'$(TargetFramework)' == 'net461'" />
+    <PackageReference Include="FSharp.Core" Version="4.5.0" Condition="'$(TargetFramework)' == 'netstandard2.0'" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All"/>
   </ItemGroup>
 </Project>
