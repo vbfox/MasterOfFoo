@@ -135,3 +135,10 @@ type PrintfEnv<'State, 'Residue, 'Result>(state: 'State) =
                 env.Write(PrintableElement("%", PrintableElementType.MadeByEngine))
 
         env.Finalize()
+
+    /// This is the new name of Finalize in the new version of FSharp.Core
+    ///
+    /// We can't rename our method without breaking customers code but changing the name everywhere in printf.fs is
+    /// also a pain. So as an alternative this internal version, made only to ease porting was introduced.
+    member internal env.Finish () =
+        env.Finalize()
