@@ -1,3 +1,9 @@
+### New in 2.0.0-alpha.1
+
+* Build with 8.0.201 SDK
+* The new set of supported platforms is .NET Framework 4.5, .NET Standard 2.0 and .NET 5.0
+* Add support for interpolated strings
+
 ### New in 1.0.6
 
 * Make dependency ranges less strict (For `FSharp.Core` 6.x)
