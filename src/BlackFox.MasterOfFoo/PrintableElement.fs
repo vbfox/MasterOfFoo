@@ -35,28 +35,28 @@ type PrintableElement
             NotSpecifiedValue)
 
     /// The type of element (From a format specifier or directly from the string)
-    member x.ElementType with get() = type'
+    member _.ElementType with get() = type'
 
     /// The value passed as parameter, of type ValueType
-    member x.Value with get() = value
+    member _.Value with get() = value
 
     /// The type of the value
-    member x.ValueType
+    member _.ValueType
         with get() =
             match type' with
             | PrintableElementType.FromFormatSpecifier -> valueType
             | _ -> typeof<string>
 
     /// The format specification for format specifiers
-    member x.Specifier with get() = if Object.ReferenceEquals(spec, null) then None else Some(spec)
+    member _.Specifier with get() = if Object.ReferenceEquals(spec, null) then None else Some(spec)
 
     // The .Net format string for format specifiers
 
     /// The width if specified via another parameter as in "%*i"
-    member x.StarWidth with get() = match starWidth with NotSpecifiedValue -> None | x -> Some(x)
+    member _.StarWidth with get() = match starWidth with NotSpecifiedValue -> None | x -> Some(x)
 
     /// The precision if specified via another parameter as in "%.*f"
-    member x.StarPrecision with get() = match starPrecision with NotSpecifiedValue -> None | x -> Some(x)
+    member _.StarPrecision with get() = match starPrecision with NotSpecifiedValue -> None | x -> Some(x)
 
     override x.ToString () =
         // The .Net format is handled differently as it's stored in the Specifier but not present
@@ -85,12 +85,12 @@ type PrintableElement
             (x.FormatAsPrintF())
 
     /// Get the string representation that printf would have normally generated
-    member x.FormatAsPrintF() =
+    member _.FormatAsPrintF() =
         match type' with
         | PrintableElementType.FromFormatSpecifier -> printer ()
         | _ -> value :?> string
 
-    member internal x.IsNullOrEmpty with get() =
+    member internal _.IsNullOrEmpty with get() =
         match type' with
         | PrintableElementType.FromFormatSpecifier -> false
         | _ -> String.IsNullOrEmpty(value :?> string)

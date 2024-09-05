@@ -20,6 +20,13 @@ type Discriminated = |A of string | B of int
 let testStr = "Foo"
 let testInt = 42
 
+type MyFormatable() =
+    interface System.IFormattable with
+        member __.ToString(format: string, _formatProvider: System.IFormatProvider) =
+            $"MyFormatable(%s{format})"
+
+    override _.ToString() = "MyFormatable"
+
 let tests = [
     test "simple string" {
         Expect.equal
@@ -78,7 +85,14 @@ let tests = [
         Expect.equal
             (coreprintf $"{5}")
             (testprintf $"{5}")
-            "%i"
+            "{5}"
+    }
+
+    test "int untyped interpolation .NET format" {
+        Expect.equal
+            (coreprintf $"{System.Math.PI:N3}")
+            (testprintf $"{System.Math.PI:N3}")
+            "{System.Math.PI:N3}"
     }
 
     test "int typed interpolation" {
@@ -104,6 +118,20 @@ let tests = [
             (coreprintf "%A %A %A %A %A" "Foo" 5 (A("Foo")) (B(42)) System.ConsoleColor.Red)
             (testprintf "%A %A %A %A %A" "Foo" 5 (A("Foo")) (B(42)) System.ConsoleColor.Red)
             "%A %A %A %A %A"
+    }
+
+    test "custom untyped interpolation" {
+        Expect.equal
+            (coreprintf $"{MyFormatable()}")
+            (testprintf $"{MyFormatable()}")
+            "{MyFormatable()}"
+    }
+
+    test "custom untyped interpolation .NET format" {
+        Expect.equal
+            (coreprintf $"{MyFormatable():HelloWorld}")
+            (testprintf $"{MyFormatable():HelloWorld}")
+            "{MyFormatable:HelloWorld}"
     }
 ]
 
