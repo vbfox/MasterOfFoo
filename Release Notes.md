@@ -1,3 +1,7 @@
+### New in 2.0.0-alpha.2
+
+* Include the readme in the NuGet package
+
 ### New in 2.0.0-alpha.1
 
 * Build with 8.0.201 SDK
