@@ -131,7 +131,15 @@ let tests = [
         Expect.equal
             (coreprintf $"{MyFormatable():HelloWorld}")
             (testprintf $"{MyFormatable():HelloWorld}")
-            "{MyFormatable:HelloWorld}"
+            "{MyFormatable():HelloWorld}"
+    }
+
+    test "custom untyped interpolation .NET format unusual characters" {
+        // Using double backticks to escape the format string if it contains spaces for example
+        Expect.equal
+            (coreprintf $"{MyFormatable():``Hello World``}")
+            (testprintf $"{MyFormatable():``Hello World``}")
+            "{MyFormatable():``Hello World``}"
     }
 ]
 

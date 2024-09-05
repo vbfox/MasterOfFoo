@@ -6,6 +6,13 @@ open System.Text
 open BlackFox.MasterOfFoo
 open System.Text.RegularExpressions
 
+type MyFormatable() =
+    interface System.IFormattable with
+        member __.ToString(format: string, _formatProvider: System.IFormatProvider) =
+            $"MyFormatable(%s{format})"
+
+    override _.ToString() = "MyFormatable"
+
 type MyToStringSaysHi() =
     override _.ToString() =
         "Hi"
@@ -222,6 +229,26 @@ Finalize
             """
 Init
 Write value: Hi, type: FromFormatSpecifier, valueType: BlackFox.MasterOfFoo.Tests.InternalRepresentationTests+MyToStringSaysHi, spec: 'O', Precision=-, Width=-, Flags=None, starWidth: , starPrecision: , AsPrintF: Hi;
+Finalize
+"""
+    }
+
+    test "IFormattable hole only" {
+        testEqual
+            (testprintf $"{MyFormatable():HelloWorld}")
+            """
+Init
+Write value: MyFormatable, type: FromFormatSpecifier, valueType: System.Object, spec: 'P', Precision=-, Width=-, Flags=None, dotnetFormat: 'HelloWorld', starWidth: , starPrecision: , AsPrintF: MyFormatable(HelloWorld);
+Finalize
+"""
+    }
+
+    test "IFormattable + unusual characters hole only" {
+        testEqual
+            (testprintf $"{MyFormatable():``Hello World``}")
+            """
+Init
+Write value: MyFormatable, type: FromFormatSpecifier, valueType: System.Object, spec: 'P', Precision=-, Width=-, Flags=None, dotnetFormat: 'Hello World', starWidth: , starPrecision: , AsPrintF: MyFormatable(Hello World);
 Finalize
 """
     }
