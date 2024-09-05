@@ -113,7 +113,7 @@ They appear as follow in this library:
 
 * [ColoredPrintf][colorprintf]: A small library that I created to add colored parts to printf strings.
 
-*If you use it somewhere, ping me on twitter [@virtualblackfox][twitter] so I can add you.*
+*If you use it somewhere, ping me on the fediverse [@vbfox@hachyderm.io][fedi] so I can add you.*
 
 More fun ?
 ----------
@@ -148,5 +148,5 @@ ColorPrintf.colorprintf "%s est %t" "La vie" (fun _ -> "belle !")
 ```
 
 [printf_fs]: https://github.com/fsharp/fsharp/blob/master/src/fsharp/FSharp.Core/printf.fs
-[twitter]: https://twitter.com/virtualblackfox
+[fedi]: https://hachyderm.io/@vbfox
 [colorprintf]: https://github.com/vbfox/ColoredPrintf
