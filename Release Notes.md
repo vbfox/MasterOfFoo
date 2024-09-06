@@ -1,3 +1,7 @@
+### New in 2.1.0
+
+* Synchronize with the latest FSharp.Core version and support the `%B` format specifier
+
 ### New in 2.0.0
 
 * Include the readme in the NuGet package

@@ -104,7 +104,7 @@ The details of string interpolation internals are specified in [F# RFC FS-1001 -
 
 They appear as follow in this library:
 * Type-checked "printf-style" fills behave exactly as they do in `sprintf` and friends.
-* Unchecked ".NET-style" fills appear with a `Specifier.TypeChar` of 'P' and the .NET format string
+* Unchecked ".NET-style" fills appear with a `Specifier.TypeChar` of `'P'` and the .NET format string
   in `Specifier.InteropHoleDotNetFormat`.
 
 [fs-1001]: https://github.com/fsharp/fslang-design/blob/aca88da13cdb95f4f337d4f7d44cbf9d343704ae/FSharp-5.0/FS-1001-StringInterpolation.md#f-rfc-fs-1001---string-interpolation

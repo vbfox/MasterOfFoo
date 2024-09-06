@@ -74,11 +74,18 @@ let tests = [
             "%s"
     }
 
-    test "int format" {
+    test "int format %i" {
         Expect.equal
             (coreprintf "%i" 5)
             (testprintf "%i" 5)
             "%i"
+    }
+
+    test "int format %B" {
+        Expect.equal
+            (coreprintf "%B" 5)
+            (testprintf "%B" 5)
+            "%B"
     }
 
     test "int untyped interpolation" {
