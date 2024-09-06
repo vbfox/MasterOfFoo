@@ -147,6 +147,6 @@ module ColorPrintf =
 ColorPrintf.colorprintf "%s est %t" "La vie" (fun _ -> "belle !")
 ```
 
-[printf_fs]: https://github.com/fsharp/fsharp/blob/master/src/fsharp/FSharp.Core/printf.fs
+[printf_fs]: https://github.com/dotnet/fsharp/blob/main/src/FSharp.Core/printf.fs
 [fedi]: https://hachyderm.io/@vbfox
 [colorprintf]: https://github.com/vbfox/ColoredPrintf
