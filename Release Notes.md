@@ -1,4 +1,4 @@
-### New in 2.1.0-alpha.1
+### New in 2.1.0
 
 * Synchronize with the latest FSharp.Core version and support the `%B` format specifier
 
