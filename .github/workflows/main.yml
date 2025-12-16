@@ -8,15 +8,15 @@ on:
 
 jobs:
   linux:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     env:
       DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
       DOTNET_CLI_TELEMETRY_OPTOUT: 1
       DOTNET_NOLOGO: 1
       PAKET_SKIP_RESTORE_TARGETS: true
     steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-dotnet@v4
+    - uses: actions/checkout@v6
+    - uses: actions/setup-dotnet@v5
       with:
         dotnet-version: |
           2
@@ -27,6 +27,13 @@ jobs:
       run: dotnet build src/BlackFox.MasterOfFoo.Build/BlackFox.MasterOfFoo.Build.fsproj
     - name: Build
       run: ./build.sh CI
+    - name: Publish artifacts
+      uses: actions/upload-artifact@v6
+      with:
+        path: artifacts/BlackFox.MasterOfFoo/Release/*.nupkg
+        if-no-files-found: error
+        compression-level: 0
+
   windows:
     runs-on: windows-latest
     env:
@@ -35,8 +42,8 @@ jobs:
       DOTNET_NOLOGO: 1
       PAKET_SKIP_RESTORE_TARGETS: true
     steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-dotnet@v4
+    - uses: actions/checkout@v6
+    - uses: actions/setup-dotnet@v5
       with:
         dotnet-version: |
           2
