@@ -112,8 +112,11 @@ They appear as follow in this library:
 ## Projects using it
 
 * [ColoredPrintf][colorprintf]: A small library that I created to add colored parts to printf strings.
+* [FSharp.Logf][Logf]: printf-style functions for `Microsoft.Extensions.Logging.ILogger`.
 
 *If you use it somewhere, ping me on the fediverse [@vbfox@hachyderm.io][fedi] so I can add you.*
+
+[Logf]: https://github.com/jwosty/FSharp.Logf
 
 More fun ?
 ----------
