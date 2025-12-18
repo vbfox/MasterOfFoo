@@ -1,3 +1,8 @@
+### New in 2.1.1
+
+* Fix FSharp.Core dependency not being specified in the NuGet package for `net5.0` target but the dll being built
+  against 8.0.0 anyway.
+
 ### New in 2.1.0
 
 * Synchronize with the latest FSharp.Core version and support the `%B` format specifier
