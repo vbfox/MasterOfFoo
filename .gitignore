@@ -247,3 +247,6 @@ launchSettings.json
 .idea/
 
 TestResults.xml
+
+# MSBuild binary logs
+*.binlog
