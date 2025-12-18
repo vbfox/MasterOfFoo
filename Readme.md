@@ -8,7 +8,7 @@
 
 A library to allow using `printf` style strings in more places.
 
-The code is essentially an extracted version of [`printf.fs`][printf_fs] where the environement can not only decide
+The code is essentially an extracted version of [`printf.fs`][printf_fs] where the environment can not only decide
 what to do with the final blocks that compose the string (printf put them on the console, sprintf in a buffer, ...)
 but also what to do with the parameters passed for each format specifier.
 
