@@ -21,6 +21,7 @@ jobs:
         dotnet-version: |
           2
           5
+          10.0.x
     - name: Restore packages
       run: ./paket.sh restore
     - name: Compile build script
@@ -48,6 +49,7 @@ jobs:
         dotnet-version: |
           2
           5
+          10.0.x
     - name: Restore packages
       run: ./paket.cmd restore
     - name: Compile build script
