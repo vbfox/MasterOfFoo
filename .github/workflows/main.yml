@@ -21,6 +21,7 @@ jobs:
         dotnet-version: |
           2
           5
+          8.0.x
           10.0.x
     - name: Restore packages
       run: ./paket.sh restore
@@ -49,6 +50,7 @@ jobs:
         dotnet-version: |
           2
           5
+          8.0.x
           10.0.x
     - name: Restore packages
       run: ./paket.cmd restore

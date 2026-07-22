@@ -1,5 +1,5 @@
 source https://api.nuget.org/v3/index.json
-framework: net10.0,net5.0,netcoreapp2.0,netstandard2.0,net461
+framework: net10.0,net8.0,net5.0,netcoreapp2.0,netstandard2.0,net461
 storage:none
 
 nuget Expecto ~> 9
