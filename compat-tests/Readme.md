@@ -42,20 +42,7 @@ cannot consume the package at all, failing with `The namespace or module
 'BlackFox' is not defined` even though NuGet resolves the assembly and passes it
 to the compiler.
 
-F# stores its own metadata — types, modules, inlined code — in a manifest
-resource beside the IL, and since F# 8 the compiler compresses it by default,
-naming the resource `FSharpSignatureCompressedData`. Older compilers only look
-for the uncompressed `FSharpSignatureData`, find nothing, and conclude the
-assembly contains no F# metadata. The flag emits the uncompressed resource,
-which every compiler since F# 4.5 understands.
-
-This is a property of the compiler that builds the package, not of the
-FSharp.Core version pinned by the consumer, so it cannot be worked around from
-the consumer's side. It costs about 29 KB of assembly size (84 KB to 113 KB).
-
-Shipping several DLLs would not have helped: NuGet picks a DLL by the consumer's
-target framework, not by their compiler version, and every target framework in
-one build is compiled by the same `fsc` anyway.
+This costs about 30 KB of assembly size.
 
 ## Running
 
