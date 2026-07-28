@@ -4,7 +4,7 @@ Checks that the packaged library behaves like `sprintf` across .NET SDK and
 FSharp.Core versions. Unlike the Expecto suite, which uses a project reference
 and whatever FSharp.Core the repository resolves, these tests consume the built
 `.nupkg` from inside a container whose SDK and FSharp.Core versions are pinned,
-so a run reflects what a real consumer's toolchain produces.
+so a run reflects what a real toolchain produces.
 
 ## How it works
 
@@ -14,11 +14,11 @@ combination — and prints the result, marking any difference with `MISMATCH`. S
 FSharp.Core itself is the oracle, and `Golden/*.txt` pins the output so that
 silent drift also shows up.
 
-| Variant | Adds | Needs |
-|---|---|---|
-| `Floor45` | every specifier, flag, width/precision and star form | FSharp.Core 4.5.0 |
-| `Interpolation50` | string interpolation, typed and `.NET`-style holes | F# 5.0, FSharp.Core 5.0 |
-| `Binary60` | the `%B` binary specifier | F# 6.0, FSharp.Core 6.0 |
+| Variant           | Adds                                                 | Needs                   |
+|-------------------|------------------------------------------------------|-------------------------|
+| `Floor45`         | every specifier, flag, width/precision and star form | FSharp.Core 4.5.0       |
+| `Interpolation50` | string interpolation, typed and `.NET`-style holes   | F# 5.0, FSharp.Core 5.0 |
+| `Binary60`        | the `%B` binary specifier                            | F# 6.0, FSharp.Core 6.0 |
 
 Each variant includes the previous ones, so running `Binary60` covers everything.
 

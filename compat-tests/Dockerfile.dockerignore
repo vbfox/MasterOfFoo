@@ -1,0 +1,17 @@
+# Ignore file for Dockerfile. Docker prefers an ignore file named after its
+# Dockerfile and sitting beside it over a .dockerignore at the context root.
+#
+# Patterns stay relative to the context root, which is the repository root
+# because the image needs both compat-tests/ and the packed nupkg under
+# artifacts/. Everything else is excluded so the context stays small (step-down
+# allow-list: a child can only be re-included if none of its parent directories
+# are excluded).
+*
+!compat-tests
+!artifacts
+artifacts/*
+!artifacts/BlackFox.MasterOfFoo
+artifacts/BlackFox.MasterOfFoo/*
+!artifacts/BlackFox.MasterOfFoo/Release
+artifacts/BlackFox.MasterOfFoo/Release/*
+!artifacts/BlackFox.MasterOfFoo/Release/*.nupkg
