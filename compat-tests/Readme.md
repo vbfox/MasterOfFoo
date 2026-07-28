@@ -33,24 +33,29 @@ The combinations live in
 orchestration in
 [`DockerCompat.fs`](../src/BlackFox.MasterOfFoo.Build/DockerCompat.fs).
 
-## Known result: SDK 3.1, 5.0 and 6.0 cannot consume the package
+## Why the library is built with `--compressmetadata-`
 
-Those rows currently fail to compile with `The namespace or module 'BlackFox' is
-not defined`, even though NuGet resolves and passes the assembly to the
-compiler. The package is built with the .NET 10 SDK, whose F# compiler embeds
-its metadata only as `FSharpSignatureCompressedData` — a form introduced in F#
-8. Older compilers look for the uncompressed `FSharpSignatureData` resource,
-find nothing, and so see no F# metadata in the assembly at all.
+Every row of the matrix passes, but only because
+[BlackFox.MasterOfFoo.fsproj](../src/BlackFox.MasterOfFoo/BlackFox.MasterOfFoo.fsproj)
+passes `--compressmetadata-` to the compiler. Without it, SDK 3.1, 5.0 and 6.0
+cannot consume the package at all, failing with `The namespace or module
+'BlackFox' is not defined` even though NuGet resolves the assembly and passes it
+to the compiler.
 
-This is a property of the compiler that builds the package, not of the pinned
-FSharp.Core version, and it sets the real floor for consumers at SDK 8.0
-regardless of the `FSharp.Core >= 4.5.0` dependency the package declares. The
-rows are kept as tolerated failures so the boundary stays measured rather than
-assumed: if the package ever gets built by an older compiler, they should start
-passing on their own.
+F# stores its own metadata — types, modules, inlined code — in a manifest
+resource beside the IL, and since F# 8 the compiler compresses it by default,
+naming the resource `FSharpSignatureCompressedData`. Older compilers only look
+for the uncompressed `FSharpSignatureData`, find nothing, and conclude the
+assembly contains no F# metadata. The flag emits the uncompressed resource,
+which every compiler since F# 4.5 understands.
 
-`modern-sdk-old-core` passing shows the FSharp.Core floor itself is fine — a
-current SDK held down to FSharp.Core 4.5.0 works.
+This is a property of the compiler that builds the package, not of the
+FSharp.Core version pinned by the consumer, so it cannot be worked around from
+the consumer's side. It costs about 29 KB of assembly size (84 KB to 113 KB).
+
+Shipping several DLLs would not have helped: NuGet picks a DLL by the consumer's
+target framework, not by their compiler version, and every target framework in
+one build is compiled by the same `fsc` anyway.
 
 ## Running
 
@@ -59,8 +64,10 @@ current SDK held down to FSharp.Core 4.5.0 works.
 ```
 
 This packs the library first, then walks the matrix and writes
-`artifacts/CompatReport.md`. Only combinations marked `IsMandatory` fail the
-build; the rest are reported so that known gaps stay visible without blocking.
+`artifacts/CompatReport.md`. Every combination currently passes and is marked
+`IsMandatory`, so any of them breaking fails the build. A combination that is
+known not to work yet can be set to `IsMandatory = false` to be reported
+without blocking.
 
 To try a single combination by hand, after `./build.sh NuGet`:
 
@@ -74,8 +81,8 @@ docker run --rm --platform linux/amd64 masteroffoo-compat:current Binary60
 
 ## Updating the golden files
 
-One golden file per variant is shared by every combination: FSharp.Core 8.0.403
-and 10.1.302 produce byte-identical output today, including for `%A`. If a
+One golden file per variant is shared by every combination: FSharp.Core 4.5.0
+through 10.1.302 produce byte-identical output today, including for `%A`. If a
 future FSharp.Core changes how it renders something, that shows up as an
 `output differs` failure and the files may need to be split per version.
 

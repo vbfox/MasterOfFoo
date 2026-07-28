@@ -24,8 +24,9 @@ type CompatCombo =
         /// mechanical (3.1 -> netcoreapp3.1, 5.0 -> net5.0).
         TargetFramework: string
         Variants: string list
-        /// Only mandatory combinations can fail the build. The others are
-        /// reported so regressions stay visible while they get fixed.
+        /// Only mandatory combinations can fail the build. Combinations that are
+        /// known not to work yet are reported instead, so they stay visible
+        /// without blocking.
         IsMandatory: bool
     }
 
@@ -33,10 +34,9 @@ type CompatCombo =
 /// shipped alongside it, so a row reflects a real consumer's toolchain rather
 /// than an arbitrary mix.
 ///
-/// The SDK 3.1, 5.0 and 6.0 rows currently fail: a package built by the .NET 10
-/// SDK carries its F# metadata only in the compressed form F# 8 introduced, so
-/// compilers older than that see no F# metadata in the assembly. See
-/// compat-tests/Readme.md.
+/// Every row is mandatory: they all pass, so any of them breaking is a
+/// regression. Reaching back to SDK 3.1 depends on the library being built with
+/// --compressmetadata-; see compat-tests/Readme.md.
 let matrix =
     [
         // Oldest FSharp.Core the package claims to support.
@@ -46,7 +46,7 @@ let matrix =
             FSharpCoreVersion = "4.5.0"
             TargetFramework = "netcoreapp3.1"
             Variants = [ Variants.floor45 ]
-            IsMandatory = false
+            IsMandatory = true
         }
         // Where string interpolation became available.
         {
@@ -55,7 +55,7 @@ let matrix =
             FSharpCoreVersion = "5.0.2"
             TargetFramework = "net5.0"
             Variants = [ Variants.floor45; Variants.interpolation50 ]
-            IsMandatory = false
+            IsMandatory = true
         }
         // Where %B became available.
         {
@@ -64,7 +64,7 @@ let matrix =
             FSharpCoreVersion = "6.0.7"
             TargetFramework = "net6.0"
             Variants = [ Variants.floor45; Variants.interpolation50; Variants.binary60 ]
-            IsMandatory = false
+            IsMandatory = true
         }
         {
             Label = "lts-8.0"
@@ -72,7 +72,7 @@ let matrix =
             FSharpCoreVersion = "8.0.403"
             TargetFramework = "net8.0"
             Variants = [ Variants.floor45; Variants.interpolation50; Variants.binary60 ]
-            IsMandatory = false
+            IsMandatory = true
         }
         // The inverse of the period-matched rows: a current toolchain held down
         // to the package's FSharp.Core floor, which is what happens when an old
@@ -83,7 +83,7 @@ let matrix =
             FSharpCoreVersion = "4.5.0"
             TargetFramework = "net10.0"
             Variants = [ Variants.floor45 ]
-            IsMandatory = false
+            IsMandatory = true
         }
         // What the repository itself builds and tests against.
         {

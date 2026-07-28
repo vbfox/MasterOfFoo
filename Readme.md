@@ -31,6 +31,15 @@ module MyModule =
 MyModule.mysprintf "Hello %s." "World"
 ```
 
+## Compatibility
+
+The package targets `netstandard2.0` and `net5.0` and needs FSharp.Core 4.5.0 or
+newer. It is verified against .NET SDK 3.1 through 10.0, paired with FSharp.Core
+4.5.0 through 10.1, by the suite in [compat-tests](compat-tests/Readme.md).
+
+Features gated by the F# version behave as they do in `sprintf`: string
+interpolation needs FSharp.Core 5.0, and `%B` needs FSharp.Core 6.0.
+
 ## Mini-Doc
 
 ### PrintableElement
