@@ -3,13 +3,22 @@ module BlackFox.MasterOfFoo.Build.CompatMatrix
 /// The program variants in compat-tests/Programs, each a superset of the
 /// previous one. Which ones a combination can run depends on how old its
 /// compiler and FSharp.Core are.
-module Variants =
+type Variant =
     /// Everything FSharp.Core 4.5.0 already supported.
-    let floor45 = "Floor45"
+    | Floor45
     /// Adds string interpolation (F# 5.0, FSharp.Core 5.0, RFC FS-1001).
-    let interpolation50 = "Interpolation50"
+    | Interpolation50
     /// Adds the %B binary specifier (F# 6.0, FSharp.Core 6.0, RFC FS-1100).
-    let binary60 = "Binary60"
+    | Binary60
+
+module Variant =
+    /// Names the Program.<name>.fs and Golden/<name>.txt files, and is the
+    /// argument compat-tests/entrypoint.sh expects.
+    let name variant =
+        match variant with
+        | Floor45 -> "Floor45"
+        | Interpolation50 -> "Interpolation50"
+        | Binary60 -> "Binary60"
 
 type CompatCombo =
     {
@@ -23,7 +32,7 @@ type CompatCombo =
         /// Hardcoded rather than derived: the mapping from an SDK tag is not
         /// mechanical (3.1 -> netcoreapp3.1, 5.0 -> net5.0).
         TargetFramework: string
-        Variants: string list
+        Variants: Variant list
     }
 
 /// Most rows are period-matched, pairing an SDK with the FSharp.Core that
@@ -41,7 +50,7 @@ let matrix =
             DotnetSdkTag = "3.1"
             FSharpCoreVersion = "4.5.0"
             TargetFramework = "netcoreapp3.1"
-            Variants = [ Variants.floor45 ]
+            Variants = [ Floor45 ]
         }
         // Where string interpolation became available.
         {
@@ -49,7 +58,7 @@ let matrix =
             DotnetSdkTag = "5.0"
             FSharpCoreVersion = "5.0.2"
             TargetFramework = "net5.0"
-            Variants = [ Variants.floor45; Variants.interpolation50 ]
+            Variants = [ Floor45; Interpolation50 ]
         }
         // Where %B became available.
         {
@@ -57,14 +66,14 @@ let matrix =
             DotnetSdkTag = "6.0"
             FSharpCoreVersion = "6.0.7"
             TargetFramework = "net6.0"
-            Variants = [ Variants.floor45; Variants.interpolation50; Variants.binary60 ]
+            Variants = [ Floor45; Interpolation50; Binary60 ]
         }
         {
             Label = "lts-8.0"
             DotnetSdkTag = "8.0"
             FSharpCoreVersion = "8.0.403"
             TargetFramework = "net8.0"
-            Variants = [ Variants.floor45; Variants.interpolation50; Variants.binary60 ]
+            Variants = [ Floor45; Interpolation50; Binary60 ]
         }
         // The inverse of the period-matched rows: a current toolchain held down
         // to the package's FSharp.Core floor, which is what happens when an old
@@ -74,7 +83,7 @@ let matrix =
             DotnetSdkTag = "10.0"
             FSharpCoreVersion = "4.5.0"
             TargetFramework = "net10.0"
-            Variants = [ Variants.floor45 ]
+            Variants = [ Floor45 ]
         }
         // What the repository itself builds and tests against.
         {
@@ -82,6 +91,6 @@ let matrix =
             DotnetSdkTag = "10.0"
             FSharpCoreVersion = "10.1.302"
             TargetFramework = "net10.0"
-            Variants = [ Variants.floor45; Variants.interpolation50; Variants.binary60 ]
+            Variants = [ Floor45; Interpolation50; Binary60 ]
         }
     ]

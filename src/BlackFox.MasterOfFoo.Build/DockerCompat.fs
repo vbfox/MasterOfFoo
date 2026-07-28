@@ -26,7 +26,7 @@ type Outcome =
 type VariantResult =
     {
         Combo: CompatCombo
-        Variant: string
+        Variant: Variant
         Outcome: Outcome
     }
 
@@ -87,8 +87,9 @@ let private buildImage (rootDir: string) (nupkgDir: string) (packageVersion: str
     else
         Error(lastLines 25 (result.Result.Output + result.Result.Error))
 
-let private runVariant (rootDir: string) (goldenDir: string) (combo: CompatCombo) (variant: string) =
-    let result = run rootDir "docker" [ "run"; "--rm"; "--platform"; platform; imageTag combo; variant ]
+let private runVariant (rootDir: string) (goldenDir: string) (combo: CompatCombo) (variant: Variant) =
+    let name = Variant.name variant
+    let result = run rootDir "docker" [ "run"; "--rm"; "--platform"; platform; imageTag combo; name ]
 
     if result.ExitCode <> 0 then
         // The container builds the program before running it, so a failure is
@@ -97,7 +98,7 @@ let private runVariant (rootDir: string) (goldenDir: string) (combo: CompatCombo
         let reason = if output.Contains "error FS" then "compile failed" else "run failed"
         Fail(reason, lastLines 25 output)
     else
-        let goldenFile = goldenDir </> (variant + ".txt")
+        let goldenFile = goldenDir </> (name + ".txt")
 
         if not (File.Exists goldenFile) then
             Fail("no golden file", goldenFile)
@@ -142,7 +143,7 @@ let private writeReport (reportFile: string) (results: VariantResult list) =
                 r.Combo.DotnetSdkTag
                 r.Combo.FSharpCoreVersion
                 r.Combo.TargetFramework
-                r.Variant
+                (Variant.name r.Variant)
                 status
         )
 
@@ -157,7 +158,7 @@ let private writeReport (reportFile: string) (results: VariantResult list) =
             | Pass -> ()
             | Fail(reason, details) ->
                 lines.Add ""
-                lines.Add(sprintf "### %s / %s — %s" r.Combo.Label r.Variant reason)
+                lines.Add(sprintf "### %s / %s — %s" r.Combo.Label (Variant.name r.Variant) reason)
                 lines.Add ""
                 lines.Add "```"
                 lines.Add details
@@ -189,8 +190,9 @@ let runMatrix (rootDir: string) (nupkgDir: string) (packageVersion: string) (rep
                         let outcome = runVariant rootDir goldenDir combo variant
 
                         match outcome with
-                        | Pass -> Trace.tracefn "  %s / %s: pass" combo.Label variant
-                        | Fail(reason, _) -> Trace.traceImportantfn "  %s / %s: FAIL (%s)" combo.Label variant reason
+                        | Pass -> Trace.tracefn "  %s / %s: pass" combo.Label (Variant.name variant)
+                        | Fail(reason, _) ->
+                            Trace.traceImportantfn "  %s / %s: FAIL (%s)" combo.Label (Variant.name variant) reason
 
                         {
                             Combo = combo
@@ -210,7 +212,7 @@ let runMatrix (rootDir: string) (nupkgDir: string) (packageVersion: string) (rep
             | Pass -> "pass"
             | Fail(reason, _) -> "FAIL - " + reason
 
-        Trace.tracefn "  %-22s %-16s %s" r.Combo.Label r.Variant status
+        Trace.tracefn "  %-22s %-16s %s" r.Combo.Label (Variant.name r.Variant) status
 
     Trace.tracefn ""
     Trace.tracefn "Report written to %s" reportFile
@@ -219,6 +221,6 @@ let runMatrix (rootDir: string) (nupkgDir: string) (packageVersion: string) (rep
 
     if not failures.IsEmpty then
         for r in failures do
-            Trace.traceErrorfn "Combination failed: %s / %s" r.Combo.Label r.Variant
+            Trace.traceErrorfn "Combination failed: %s / %s" r.Combo.Label (Variant.name r.Variant)
 
         failwithf "%d compatibility check(s) failed; see %s for details" failures.Length reportFile
