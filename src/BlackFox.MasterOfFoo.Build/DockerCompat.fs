@@ -133,8 +133,7 @@ let private writeReport (reportFile: string) (results: VariantResult list) =
         let status =
             match r.Outcome with
             | Pass -> "pass"
-            | Fail(reason, _) when r.Combo.IsMandatory -> "**FAIL (mandatory): " + reason + "**"
-            | Fail(reason, _) -> "fail (tolerated): " + reason
+            | Fail(reason, _) -> "**FAIL: " + reason + "**"
 
         lines.Add(
             sprintf
@@ -209,23 +208,17 @@ let runMatrix (rootDir: string) (nupkgDir: string) (packageVersion: string) (rep
         let status =
             match r.Outcome with
             | Pass -> "pass"
-            | Fail(reason, _) when r.Combo.IsMandatory -> "FAIL (mandatory) - " + reason
-            | Fail(reason, _) -> "fail (tolerated) - " + reason
+            | Fail(reason, _) -> "FAIL - " + reason
 
         Trace.tracefn "  %-22s %-16s %s" r.Combo.Label r.Variant status
 
     Trace.tracefn ""
     Trace.tracefn "Report written to %s" reportFile
 
-    let tolerated = results |> List.filter (fun r -> r.Failed && not r.Combo.IsMandatory)
+    let failures = results |> List.filter (fun r -> r.Failed)
 
-    if not tolerated.IsEmpty then
-        Trace.traceImportantfn "%d tolerated failure(s); see %s for details" tolerated.Length reportFile
+    if not failures.IsEmpty then
+        for r in failures do
+            Trace.traceErrorfn "Combination failed: %s / %s" r.Combo.Label r.Variant
 
-    let mandatoryFailures = results |> List.filter (fun r -> r.Failed && r.Combo.IsMandatory)
-
-    if not mandatoryFailures.IsEmpty then
-        for r in mandatoryFailures do
-            Trace.traceErrorfn "Mandatory combination failed: %s / %s" r.Combo.Label r.Variant
-
-        failwithf "%d mandatory compatibility check(s) failed" mandatoryFailures.Length
+        failwithf "%d compatibility check(s) failed; see %s for details" failures.Length reportFile

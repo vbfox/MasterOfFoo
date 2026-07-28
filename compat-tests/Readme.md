@@ -64,10 +64,8 @@ one build is compiled by the same `fsc` anyway.
 ```
 
 This packs the library first, then walks the matrix and writes
-`artifacts/CompatReport.md`. Every combination currently passes and is marked
-`IsMandatory`, so any of them breaking fails the build. A combination that is
-known not to work yet can be set to `IsMandatory = false` to be reported
-without blocking.
+`artifacts/CompatReport.md`. Every combination is expected to pass, so any
+failure fails the build.
 
 To try a single combination by hand, after `./build.sh NuGet`:
 
@@ -86,8 +84,8 @@ through 10.1.302 produce byte-identical output today, including for `%A`. If a
 future FSharp.Core changes how it renders something, that shows up as an
 `output differs` failure and the files may need to be split per version.
 
-Regenerate them from the mandatory combination only, and review the diff — a
-change here means the library's output changed:
+Regenerate them from the `current-repo` combination only, and review the diff —
+a change here means the library's output changed:
 
 ```bash
 for v in Floor45 Interpolation50 Binary60; do docker run --rm --platform linux/amd64 masteroffoo-compat:current "$v" > "compat-tests/Golden/$v.txt"; done
