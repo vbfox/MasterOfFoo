@@ -36,6 +36,34 @@ jobs:
         if-no-files-found: error
         compression-level: 0
 
+  docker-compat:
+    runs-on: ubuntu-22.04
+    env:
+      DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+      DOTNET_CLI_TELEMETRY_OPTOUT: 1
+      DOTNET_NOLOGO: 1
+      PAKET_SKIP_RESTORE_TARGETS: true
+    steps:
+    - uses: actions/checkout@v6
+    - uses: actions/setup-dotnet@v5
+      with:
+        # Only needed to pack the library and run the build script; the SDK
+        # versions under test come from the Docker images.
+        dotnet-version: 10.0.x
+    - name: Restore packages
+      run: ./paket.sh restore
+    - name: Compile build script
+      run: dotnet build src/BlackFox.MasterOfFoo.Build/BlackFox.MasterOfFoo.Build.fsproj
+    - name: Compatibility matrix
+      run: ./build.sh DockerCompat
+    - name: Publish report
+      uses: actions/upload-artifact@v6
+      if: always()
+      with:
+        name: compat-report
+        path: artifacts/CompatReport.md
+        if-no-files-found: warn
+
   windows:
     runs-on: windows-latest
     env:

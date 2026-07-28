@@ -1,0 +1,49 @@
+-- Floor45 --
+text | Hello
+literal percent | 100%
+s | Foo
+b | true
+c | x
+i | 42
+d negative | -42
+u | 42
+x | ff
+X | FF
+o | 52
+i int64 | 9000000000
+f | 42.420000
+F | 42.420000
+e | 4.242000e+001
+E | 4.242000E+001
+g | 42.42
+G | 42.42
+f float32 | 42.000000
+M | 123456789.123456789
+O | Hi
+A string | "Foo"
+A int | 5
+A union | A "Foo"
+A union int | B 42
+A option | Some true
+A list | [1; 2; 3]
+A enum | Red
+plus | +42
+space |  42
+zero pad | 00042
+left justify int | 42   
+left justify string | Foo  
+width 5 string |   Foo
+width 1 string | Foo
+width 5 int |    42
+precision | 42.123
+width precision |     42.123
+left width precision | 42.123    
+star width string |   Foo
+star width left | Foo  
+star width int |    42
+star precision | 42.123
+star width and precision |     42.123
+t | T
+a | 42
+mixed | aSb42c 3.14d
+chained | 1 2 3 4 5 6

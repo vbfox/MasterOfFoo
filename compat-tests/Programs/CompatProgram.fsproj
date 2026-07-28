@@ -1,0 +1,42 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!--
+    One project serving every (SDK, FSharp.Core, TFM) combination of the compat
+    matrix. Everything is driven by properties passed on the command line by
+    compat-tests/entrypoint.sh; the defaults only exist so the project can be
+    loaded or restored without them.
+
+    TargetFramework is set from a custom property rather than being overridden
+    directly as a global MSBuild property, which upsets restore.
+  -->
+  <PropertyGroup>
+    <ProgramVariant Condition="'$(ProgramVariant)' == ''">Floor45</ProgramVariant>
+    <CompatTargetFramework Condition="'$(CompatTargetFramework)' == ''">net8.0</CompatTargetFramework>
+    <CompatFSharpCoreVersion Condition="'$(CompatFSharpCoreVersion)' == ''">8.0.101</CompatFSharpCoreVersion>
+    <CompatMasterOfFooVersion Condition="'$(CompatMasterOfFooVersion)' == ''">1.0.0</CompatMasterOfFooVersion>
+  </PropertyGroup>
+  <PropertyGroup>
+    <TargetFramework>$(CompatTargetFramework)</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <IsPackable>false</IsPackable>
+    <AssemblyName>CompatProgram</AssemblyName>
+    <RootNamespace>CompatProgram</RootNamespace>
+    <!-- Without this the SDK adds its own bundled FSharp.Core on top of the
+         pinned one, which is exactly the variable under test. -->
+    <DisableImplicitFSharpCoreReference>true</DisableImplicitFSharpCoreReference>
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Common.fs" />
+    <Compile Include="Cases.Floor45.fs" />
+    <Compile Include="Cases.Interpolation50.fs" Condition="'$(ProgramVariant)' == 'Interpolation50' or '$(ProgramVariant)' == 'Binary60'" />
+    <Compile Include="Cases.Binary60.fs" Condition="'$(ProgramVariant)' == 'Binary60'" />
+    <Compile Include="Program.$(ProgramVariant).fs" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- Exact version pins: a range would let NuGet satisfy the package's own
+         "FSharp.Core >= 4.5.0" dependency with something newer than the version
+         this row is meant to exercise. -->
+    <PackageReference Include="FSharp.Core" Version="[$(CompatFSharpCoreVersion)]" />
+    <PackageReference Include="BlackFox.MasterOfFoo" Version="[$(CompatMasterOfFooVersion)]" />
+  </ItemGroup>
+</Project>

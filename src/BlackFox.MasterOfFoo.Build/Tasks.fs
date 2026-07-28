@@ -111,6 +111,14 @@ let createAndGetDefault () =
         Trace.publish ImportData.BuildArtifact nupkgFile
     }
 
+    // Kept out of the CI task: it needs Docker and builds an image per
+    // combination, so it runs from its own workflow job or on demand.
+    let _dockerCompat = BuildTask.create "DockerCompat" [nuget] {
+        let nupkgDir = sprintf "artifacts/BlackFox.MasterOfFoo/%s" (string configuration)
+        let reportFile = artifactsDir </> "CompatReport.md"
+        DockerCompat.runMatrix rootDir nupkgDir release.NugetVersion reportFile CompatMatrix.matrix
+    }
+
     let publishNuget = BuildTask.create "PublishNuget" [nuget] {
         let key =
             match Environment.environVarOrNone "nuget-key" with
