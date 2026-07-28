@@ -56,13 +56,6 @@ jobs:
       run: dotnet build src/BlackFox.MasterOfFoo.Build/BlackFox.MasterOfFoo.Build.fsproj
     - name: Compatibility matrix
       run: ./build.sh DockerCompat
-    - name: Publish report
-      uses: actions/upload-artifact@v6
-      if: always()
-      with:
-        name: compat-report
-        path: artifacts/CompatReport.md
-        if-no-files-found: warn
 
   windows:
     runs-on: windows-latest

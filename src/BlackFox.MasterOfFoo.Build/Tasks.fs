@@ -115,8 +115,7 @@ let createAndGetDefault () =
     // combination, so it runs from its own workflow job or on demand.
     let _dockerCompat = BuildTask.create "DockerCompat" [nuget] {
         let nupkgDir = sprintf "artifacts/BlackFox.MasterOfFoo/%s" (string configuration)
-        let reportFile = artifactsDir </> "CompatReport.md"
-        DockerCompat.runMatrix rootDir nupkgDir release.NugetVersion reportFile CompatMatrix.matrix
+        DockerCompat.runMatrix rootDir nupkgDir release.NugetVersion CompatMatrix.matrix
     }
 
     let publishNuget = BuildTask.create "PublishNuget" [nuget] {

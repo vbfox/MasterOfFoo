@@ -123,53 +123,9 @@ let private runVariant (rootDir: string) (goldenDir: string) (combo: CompatCombo
 
                 Fail("output differs", diff)
 
-let private writeReport (reportFile: string) (results: VariantResult list) =
-    let lines = ResizeArray<string>()
-    lines.Add "# Compatibility matrix report"
-    lines.Add ""
-    lines.Add "| Combination | SDK | FSharp.Core | TFM | Variant | Result |"
-    lines.Add "|---|---|---|---|---|---|"
-
-    for r in results do
-        let status =
-            match r.Outcome with
-            | Pass -> "pass"
-            | Fail(reason, _) -> "**FAIL: " + reason + "**"
-
-        lines.Add(
-            sprintf
-                "| %s | %s | %s | %s | %s | %s |"
-                r.Combo.Label
-                r.Combo.DotnetSdkTag
-                r.Combo.FSharpCoreVersion
-                r.Combo.TargetFramework
-                (Variant.name r.Variant)
-                status
-        )
-
-    let failures = results |> List.filter (fun r -> r.Failed)
-
-    if not failures.IsEmpty then
-        lines.Add ""
-        lines.Add "## Failure details"
-
-        for r in failures do
-            match r.Outcome with
-            | Pass -> ()
-            | Fail(reason, details) ->
-                lines.Add ""
-                lines.Add(sprintf "### %s / %s — %s" r.Combo.Label (Variant.name r.Variant) reason)
-                lines.Add ""
-                lines.Add "```"
-                lines.Add details
-                lines.Add "```"
-
-    Directory.CreateDirectory(Path.GetDirectoryName reportFile) |> ignore
-    File.WriteAllText(reportFile, String.concat "\n" lines + "\n")
-
 /// `nupkgDir` is relative to `rootDir`: it is passed into the Docker build,
 /// where paths are resolved against the build context.
-let runMatrix (rootDir: string) (nupkgDir: string) (packageVersion: string) (reportFile: string) (matrix: CompatCombo list) =
+let runMatrix (rootDir: string) (nupkgDir: string) (packageVersion: string) (matrix: CompatCombo list) =
     let goldenDir = rootDir </> "compat-tests" </> "Golden"
 
     let results =
@@ -201,8 +157,6 @@ let runMatrix (rootDir: string) (nupkgDir: string) (packageVersion: string) (rep
                         }
         ]
 
-    writeReport reportFile results
-
     Trace.tracefn ""
     Trace.tracefn "Compatibility matrix summary"
 
@@ -212,15 +166,25 @@ let runMatrix (rootDir: string) (nupkgDir: string) (packageVersion: string) (rep
             | Pass -> "pass"
             | Fail(reason, _) -> "FAIL - " + reason
 
-        Trace.tracefn "  %-22s %-16s %s" r.Combo.Label (Variant.name r.Variant) status
-
-    Trace.tracefn ""
-    Trace.tracefn "Report written to %s" reportFile
+        Trace.tracefn
+            "  %-22s %-16s %-9s %-16s %s"
+            r.Combo.Label
+            (Variant.name r.Variant)
+            ("SDK " + r.Combo.DotnetSdkTag)
+            ("FSC " + r.Combo.FSharpCoreVersion)
+            status
 
     let failures = results |> List.filter (fun r -> r.Failed)
 
     if not failures.IsEmpty then
+        // The captured output is the only record of why a combination broke, so
+        // it has to reach stdout for anyone reading a CI log.
         for r in failures do
-            Trace.traceErrorfn "Combination failed: %s / %s" r.Combo.Label (Variant.name r.Variant)
+            match r.Outcome with
+            | Pass -> ()
+            | Fail(reason, details) ->
+                Trace.traceErrorfn ""
+                Trace.traceErrorfn "%s / %s failed: %s" r.Combo.Label (Variant.name r.Variant) reason
+                Trace.traceErrorfn "%s" details
 
-        failwithf "%d compatibility check(s) failed; see %s for details" failures.Length reportFile
+        failwithf "%d compatibility check(s) failed" failures.Length

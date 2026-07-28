@@ -50,9 +50,9 @@ This costs about 30 KB of assembly size.
 ./build.sh DockerCompat
 ```
 
-This packs the library first, then walks the matrix and writes
-`artifacts/CompatReport.md`. Every combination is expected to pass, so any
-failure fails the build.
+This packs the library first, then walks the matrix and prints a summary. Every
+combination is expected to pass, so any failure fails the build, printing the
+captured compiler output or the differing lines.
 
 To try a single combination by hand, after `./build.sh NuGet`:
 
