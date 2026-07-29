@@ -36,12 +36,7 @@ type CompatCombo =
     }
 
 /// Most rows are period-matched, pairing an SDK with the FSharp.Core that
-/// shipped alongside it, so a row reflects a real consumer's toolchain rather
-/// than an arbitrary mix.
-///
-/// Every row passes, so any failure is a regression and fails the build.
-/// Reaching back to SDK 3.1 depends on the library being built with
-/// --compressmetadata-; see compat-tests/Readme.md.
+/// shipped alongside it.
 let matrix =
     [
         // Oldest FSharp.Core the package claims to support.

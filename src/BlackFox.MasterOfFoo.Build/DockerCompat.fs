@@ -11,9 +11,7 @@ open Fake.IO.FileSystemOperators
 
 open BlackFox.MasterOfFoo.Build.CompatMatrix
 
-/// Old SDK images (3.1, 5.0, 6.0) only exist for amd64, so everything is pinned
-/// to it to keep local runs and CI identical. On an arm64 host this means
-/// emulation.
+/// Old SDK images (3.1, 5.0, 6.0) only exist for amd64
 let private platform = "linux/amd64"
 
 let private imageTag (combo: CompatCombo) = "masteroffoo-compat:" + combo.Label
@@ -123,6 +121,32 @@ let private runVariant (rootDir: string) (goldenDir: string) (combo: CompatCombo
 
                 Fail("output differs", diff)
 
+let private printResultMatrix (results: VariantResult list) =
+    Trace.tracefn "Compatibility matrix summary"
+
+    for r in results do
+        let status =
+            match r.Outcome with
+            | Pass -> "pass"
+            | Fail(reason, _) -> "FAIL - " + reason
+
+        Trace.tracefn
+            "  %-22s %-16s %-9s %-16s %s"
+            r.Combo.Label
+            (Variant.name r.Variant)
+            ("SDK " + r.Combo.DotnetSdkTag)
+            ("FSC " + r.Combo.FSharpCoreVersion)
+            status
+
+let private printFailureDetails (results: VariantResult list) =
+    for r in results do
+        match r.Outcome with
+        | Pass -> ()
+        | Fail(reason, details) ->
+            Trace.traceErrorfn ""
+            Trace.traceErrorfn "%s / %s failed: %s" r.Combo.Label (Variant.name r.Variant) reason
+            Trace.traceErrorfn "%s" details
+
 /// `nupkgDir` is relative to `rootDir`: it is passed into the Docker build,
 /// where paths are resolved against the build context.
 let runMatrix (rootDir: string) (nupkgDir: string) (packageVersion: string) (matrix: CompatCombo list) =
@@ -158,33 +182,11 @@ let runMatrix (rootDir: string) (nupkgDir: string) (packageVersion: string) (mat
         ]
 
     Trace.tracefn ""
-    Trace.tracefn "Compatibility matrix summary"
+    printResultMatrix results
 
-    for r in results do
-        let status =
-            match r.Outcome with
-            | Pass -> "pass"
-            | Fail(reason, _) -> "FAIL - " + reason
+    Trace.tracefn ""
+    printFailureDetails results
 
-        Trace.tracefn
-            "  %-22s %-16s %-9s %-16s %s"
-            r.Combo.Label
-            (Variant.name r.Variant)
-            ("SDK " + r.Combo.DotnetSdkTag)
-            ("FSC " + r.Combo.FSharpCoreVersion)
-            status
-
-    let failures = results |> List.filter (fun r -> r.Failed)
-
-    if not failures.IsEmpty then
-        // The captured output is the only record of why a combination broke, so
-        // it has to reach stdout for anyone reading a CI log.
-        for r in failures do
-            match r.Outcome with
-            | Pass -> ()
-            | Fail(reason, details) ->
-                Trace.traceErrorfn ""
-                Trace.traceErrorfn "%s / %s failed: %s" r.Combo.Label (Variant.name r.Variant) reason
-                Trace.traceErrorfn "%s" details
-
-        failwithf "%d compatibility check(s) failed" failures.Length
+    let failureCount = results |> List.sumBy (fun r -> if r.Failed then 1 else 0)
+    if failureCount > 0 then
+        failwithf "%d compatibility check(s) failed" failureCount
