@@ -15,8 +15,8 @@ jobs:
       DOTNET_NOLOGO: 1
       PAKET_SKIP_RESTORE_TARGETS: true
     steps:
-    - uses: actions/checkout@v6
-    - uses: actions/setup-dotnet@v5
+    - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+    - uses: actions/setup-dotnet@26b0ec14cb23fa6904739307f278c14f94c95bf1 # v5.4.0
       with:
         dotnet-version: |
           2
@@ -30,7 +30,7 @@ jobs:
     - name: Build
       run: ./build.sh CI
     - name: Publish artifacts
-      uses: actions/upload-artifact@v6
+      uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
       with:
         path: artifacts/BlackFox.MasterOfFoo/Release/*.nupkg
         if-no-files-found: error
@@ -44,8 +44,8 @@ jobs:
       DOTNET_NOLOGO: 1
       PAKET_SKIP_RESTORE_TARGETS: true
     steps:
-    - uses: actions/checkout@v6
-    - uses: actions/setup-dotnet@v5
+    - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+    - uses: actions/setup-dotnet@26b0ec14cb23fa6904739307f278c14f94c95bf1 # v5.4.0
       with:
         dotnet-version: |
           2
