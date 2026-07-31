@@ -14,6 +14,7 @@ group build
 
     nuget FSharp.Core ~> 5
     nuget BlackFox.Fake.BuildTask
+    nuget BlackFox.CommandLine
 
     nuget Octokit 0.48 // Fake.Api.GitHub 5.20.4 references 0.48+ but 0.50 has some incompatible Api changes
     nuget Fake.Core.Target
