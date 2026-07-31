@@ -111,10 +111,15 @@ let createAndGetDefault () =
         Trace.publish ImportData.BuildArtifact nupkgFile
     }
 
+    let _dockerCompat = BuildTask.create "DockerCompat" [nuget] {
+        let nupkgDir = sprintf "artifacts/BlackFox.MasterOfFoo/%s" (string configuration)
+        DockerCompat.runMatrix rootDir nupkgDir release.NugetVersion CompatMatrix.matrix
+    }
+
     let publishNuget = BuildTask.create "PublishNuget" [nuget] {
         let key =
             match Environment.environVarOrNone "nuget-key" with
-            | Some(key) -> key
+            | Some key -> key
             | None -> UserInput.getUserPassword "NuGet key: "
 
         Paket.pushFiles
@@ -138,7 +143,7 @@ let createAndGetDefault () =
     let gitRelease = BuildTask.create "GitRelease" [nuget.IfNeeded] {
         let remote =
             Git.CommandHelper.getGitResult "" "remote -v"
-            |> Seq.filter (fun (s: string) -> s.EndsWith("(push)"))
+            |> Seq.filter (fun (s: string) -> s.EndsWith "(push)")
             |> Seq.tryFind (fun (s: string) -> s.Contains(gitOwner + "/" + gitName))
             |> function None -> gitHome + "/" + gitName | Some (s: string) -> s.Split().[0]
 
@@ -163,7 +168,7 @@ let createAndGetDefault () =
             gitName
             release.NugetVersion
             (release.SemVer.PreRelease <> None)
-            (release.Notes)
+            release.Notes
         |> GitHub.uploadFile zipFile
         |> GitHub.publishDraft
         |> Async.RunSynchronously

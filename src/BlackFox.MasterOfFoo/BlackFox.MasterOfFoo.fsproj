@@ -8,6 +8,9 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
     <PackageReadmeFile>Readme.md</PackageReadmeFile>
+    <!-- Emit the uncompressed FSharpSignatureData resource, which is what
+         compilers older than F# 8 look for to find an assembly's F# metadata. -->
+    <OtherFlags>$(OtherFlags) --compressmetadata-</OtherFlags>
   </PropertyGroup>
   <ItemGroup>
     <None Include="Icon.png" Pack="true" PackagePath=""/>
