@@ -24,9 +24,6 @@ COPY ${NUPKG_DIR}/*.nupkg /nupkgs/
 COPY compat-tests/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
-# The package graph depends on the TFM and the two pinned versions but not on
-# the program variant, so restoring here makes every later `docker run` a fast,
-# offline no-op restore.
 RUN cd /compat/Programs && dotnet restore \
     -p:CompatTargetFramework="$COMPAT_TFM" \
     -p:CompatFSharpCoreVersion="$FSHARP_CORE_VERSION" \

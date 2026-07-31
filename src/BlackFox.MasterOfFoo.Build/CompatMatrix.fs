@@ -22,24 +22,26 @@ module Variant =
 
 type CompatCombo =
     {
-        /// Also used as the Docker image tag, so keep it tag-safe.
+        /// Name of the combo, the docker label is derived from it
         Label: string
+
         /// Tag of the mcr.microsoft.com/dotnet/sdk image, which decides the
         /// F# compiler version as well as the runtime.
         DotnetSdkTag: string
+
         /// Pinned exactly, independently of what the SDK bundles.
         FSharpCoreVersion: string
-        /// Hardcoded rather than derived: the mapping from an SDK tag is not
-        /// mechanical (3.1 -> netcoreapp3.1, 5.0 -> net5.0).
+
+        /// Target framework (should be the same as the one specified by the .NET SDK but using the syntax of
+        /// project files (3.1 -> netcoreapp3.1, 5.0 -> net5.0).
         TargetFramework: string
         Variants: Variant list
     }
 
-/// Most rows are period-matched, pairing an SDK with the FSharp.Core that
-/// shipped alongside it.
+/// Pair SDKs and FSharp.Core.
+/// Mostly the versions that shipped together
 let matrix =
     [
-        // Oldest FSharp.Core the package claims to support.
         {
             Label = "floor-3.1"
             DotnetSdkTag = "3.1"
@@ -47,16 +49,16 @@ let matrix =
             TargetFramework = "netcoreapp3.1"
             Variants = [ Floor45 ]
         }
-        // Where string interpolation became available.
         {
+            // String interpolation became available.
             Label = "interp-5.0"
             DotnetSdkTag = "5.0"
             FSharpCoreVersion = "5.0.2"
             TargetFramework = "net5.0"
             Variants = [ Floor45; Interpolation50 ]
         }
-        // Where %B became available.
         {
+            // %B became available.
             Label = "binary-6.0"
             DotnetSdkTag = "6.0"
             FSharpCoreVersion = "6.0.7"
@@ -70,18 +72,16 @@ let matrix =
             TargetFramework = "net8.0"
             Variants = [ Floor45; Interpolation50; Binary60 ]
         }
-        // The inverse of the period-matched rows: a current toolchain held down
-        // to the package's FSharp.Core floor, which is what happens when an old
-        // pin arrives through a transitive dependency.
         {
+            // A current toolchain held down to the package's FSharp.Core floor
             Label = "modern-sdk-old-core"
             DotnetSdkTag = "10.0"
             FSharpCoreVersion = "4.5.0"
             TargetFramework = "net10.0"
             Variants = [ Floor45 ]
         }
-        // What the repository itself builds and tests against.
         {
+            // The current SDK/FSharp.Core used in the repository
             Label = "current-repo"
             DotnetSdkTag = "10.0"
             FSharpCoreVersion = "10.1.302"
