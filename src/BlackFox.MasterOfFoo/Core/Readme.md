@@ -4,7 +4,7 @@ Core is the part of MasterOfFoo that is extracted from the F# Compiler.
 
 # Extraction Process
 
-* Copy `printf.fs` from the compiler and fix namespace
+* Copy [`printf.fs`][printf_fs] from the compiler and fix namespace
 * Copy `FormatOptions` into `sformat.fs` and all new functions necessary. Keep `anyToStringForPrintf`.
 * Extract `PrintfEnv` into `PrintEnv.fs`
 * Move `FormatSpecifier` and `FormatFlags` to `FormatSpecification.fs`
@@ -15,3 +15,5 @@ Core is the part of MasterOfFoo that is extracted from the F# Compiler.
 
 There are quite a few things to fix but the original `printf.fs` and `sformat.fs` are commited to serve as guide by
 diffing the current code and new versions before upgrade.
+
+[printf_fs]: https://github.com/dotnet/fsharp/blob/main/src/FSharp.Core/printf.fs
