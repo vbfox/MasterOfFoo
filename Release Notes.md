@@ -1,3 +1,8 @@
+### New in 2.1.2
+
+* Fix compatibility with old .NET SDK versions that don't support compressed metadata
+* Add a test Matrix to CI to ensure compatibility
+
 ### New in 2.1.1
 
 * Fix FSharp.Core dependency not being specified in the NuGet package for `net5.0` target but the dll being built
