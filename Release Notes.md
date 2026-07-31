@@ -2,6 +2,9 @@
 
 * Fix compatibility with old .NET SDK versions that don't support compressed metadata
 * Add a test Matrix to CI to ensure compatibility
+* Port the fix "Ensure culture-independent parsing of .NET-style interpolated string holes."
+  ([Issue #19367](https://github.com/dotnet/fsharp/issues/19367),
+  [PR #19370](https://github.com/dotnet/fsharp/pull/19370))
 
 ### New in 2.1.1
 
