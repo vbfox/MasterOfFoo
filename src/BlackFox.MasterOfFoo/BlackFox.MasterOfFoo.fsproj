@@ -17,11 +17,11 @@
     <None Include="../../Readme.md" Pack="true" PackagePath="\"/>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="FormatSpecification.fs" />
+    <Compile Include="Core/FormatSpecification.fs" />
     <Compile Include="PrintableElement.fs" />
-    <Compile Include="PrintfEnv.fs" />
-    <Compile Include="sformat.fs" />
-    <Compile Include="printf.fs" />
+    <Compile Include="Core/PrintfEnv.fs" />
+    <Compile Include="Core/sformat.fs" />
+    <Compile Include="Core/printf.fs" />
     <Compile Include="MasterOfFoo.fs" />
   </ItemGroup>
   <ItemGroup>
