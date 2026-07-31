@@ -122,13 +122,6 @@ type IEnvironment =
     abstract MaxColumns: int
     abstract MaxRows: int
 
-#if NO_CHECKNULLS
-[<AutoOpen>]
-module NullShim =
-    // Shim to match nullness checking library support in preview
-    let inline (|Null|NonNull|) (x: 'T) : Choice<unit,'T> = match x with null -> Null | v -> NonNull v
-#endif
-
 [<AutoOpen>]
 module TaggedText =
     let mkTag tag text = TaggedText(tag, text)
@@ -156,6 +149,8 @@ module TaggedText =
     let rightBracket = tagPunctuation "]"
     let leftBrace = tagPunctuation "{"
     let rightBrace = tagPunctuation "}"
+    let leftBraceBar = tagPunctuation "{|"
+    let rightBraceBar = tagPunctuation "|}"
     let equals = tagOperator "="
 
 #if COMPILER
@@ -223,8 +218,6 @@ module TaggedText =
     // common tagged literals
     let lineBreak = tagLineBreak "\n"
     let space = tagSpace " "
-    let leftBraceBar = tagPunctuation "{|"
-    let rightBraceBar = tagPunctuation "|}"
     let arrow = tagPunctuation "->"
     let dot = tagPunctuation "."
     let leftAngle = tagPunctuation "<"
@@ -494,11 +487,18 @@ module ReflectUtils =
         | Value
         | Reference
 
+    // Enum (not a union) to minimize trimmed code size.
+    [<RequireQualifiedAccess>]
+    type RecordKind =
+        | Nominal = 0
+        | AnonReference = 1
+        | AnonStruct = 2
+
     [<NoEquality; NoComparison>]
     type ValueInfo =
         | TupleValue of TupleType * (obj * Type)[]
         | FunctionClosureValue of Type
-        | RecordValue of (string * obj * Type)[]
+        | RecordValue of kind: RecordKind * (string * obj * Type)[]
         | UnionCaseValue of string * (string * (obj * Type))[]
         | ExceptionValue of Type * (string * (obj * Type))[]
         | NullValue
@@ -562,7 +562,17 @@ module ReflectUtils =
                 elif FSharpType.IsRecord(reprty, bindingFlags) then
                     let props = FSharpType.GetRecordFields(reprty, bindingFlags)
 
+                    let kind =
+                        if reprty.Name.StartsWith("<>f__AnonymousType", StringComparison.Ordinal) then
+                            if reprty.IsValueType then
+                                RecordKind.AnonStruct
+                            else
+                                RecordKind.AnonReference
+                        else
+                            RecordKind.Nominal
+
                     RecordValue(
+                        kind,
                         props
                         |> Array.map (fun prop -> prop.Name, prop.GetValue(obj, null), prop.PropertyType)
                     )
@@ -575,6 +585,7 @@ module ReflectUtils =
 
         let GetValueInfo bindingFlags (x: 'a, ty: Type) (* x could be null *) =
             let obj = (box x)
+
             match obj with
             | Null ->
                 let isNullaryUnion =
@@ -594,8 +605,7 @@ module ReflectUtils =
                     UnitValue
                 else
                     NullValue
-            | NonNull obj ->
-                GetValueInfoOfObject bindingFlags obj
+            | NonNull obj -> GetValueInfoOfObject bindingFlags obj
 
 module Display =
     open ReflectUtils
@@ -868,13 +878,18 @@ module Display =
 
     let unitL = wordL (tagPunctuation "()")
 
-    let makeRecordL nameXs =
+    let makeRecordL kind nameXs =
         let itemL (name, xL) = (wordL name ^^ wordL equals) -- xL
 
         let braceL xs =
-            (wordL leftBrace) ^^ xs ^^ (wordL rightBrace)
+            match kind with
+            | RecordKind.AnonReference
+            | RecordKind.AnonStruct -> (wordL leftBraceBar) ^^ xs ^^ (wordL rightBraceBar)
+            | _ -> (wordL leftBrace) ^^ xs ^^ (wordL rightBrace)
 
-        nameXs |> List.map itemL |> aboveListL |> braceL
+        let itemLayouts = nameXs |> List.map itemL
+
+        braceL (aboveListL itemLayouts)
 
     let makePropertiesL nameXs =
         let itemL (name, v) =
@@ -1012,8 +1027,9 @@ module Display =
         // Recursive descent
         let rec nestedObjL depthLim prec (x: obj, ty: Type) = objL ShowAll depthLim prec (x, ty)
 
-        and objL showMode depthLim prec (x: obj, ty: Type) =
+        and objL showMode depthLim prec (x: objnull, ty: Type) =
             let info = Value.GetValueInfo bindingFlags (x, ty)
+
             try
                 if depthLim <= 0 || exceededPrintSize () then
                     wordL (tagPunctuation "...")
@@ -1034,9 +1050,11 @@ module Display =
                                     Some(wordL (tagText (x.ToString())))
                                 else
                                     // Try the StructuredFormatDisplayAttribute extensibility attribute
-                                    match ty.GetCustomAttributes (typeof<StructuredFormatDisplayAttribute>, true) with
-                                    | Null | [| |] -> None
-                                    | NonNull res -> structuredFormatObjectL showMode ty depthLim (res[0] :?> StructuredFormatDisplayAttribute) x
+                                    match ty.GetCustomAttributes(typeof<StructuredFormatDisplayAttribute>, true) with
+                                    | Null
+                                    | [||] -> None
+                                    | NonNull res ->
+                                        structuredFormatObjectL showMode ty depthLim (res[0] :?> StructuredFormatDisplayAttribute) x
 
 #if COMPILER
                             // This is the PrintIntercepts extensibility point currently revealed by fsi.exe's AddPrinter
@@ -1069,6 +1087,7 @@ module Display =
         // Format an object that has a layout specified by StructuredFormatAttribute
         and structuredFormatObjectL showMode ty depthLim (attr: StructuredFormatDisplayAttribute) (obj: obj) =
             let txt = attr.Value
+
             if isNull (box txt) || txt.Length <= 1 then
                 None
             else
@@ -1203,12 +1222,16 @@ module Display =
             | TupleType.Value -> structL ^^ fields
             | TupleType.Reference -> fields
 
-        and recordValueL depthLim items =
+        and recordValueL depthLim kind items =
             let itemL (name, x, ty) =
                 countNodes 1
                 tagRecordField name, nestedObjL depthLim Precedence.BracketIfTuple (x, ty)
 
-            makeRecordL (List.map itemL items)
+            let body = makeRecordL kind (List.map itemL items)
+
+            match kind with
+            | RecordKind.AnonStruct -> structL -- body
+            | _ -> body
 
         and listValueL depthLim constr recd =
             match constr with
@@ -1337,9 +1360,6 @@ module Display =
 
                 if
                     word = "map"
-                    && (match v with
-                        | null -> false
-                        | _ -> true)
                     && tyv.IsGenericType
                     && tyv.GetGenericTypeDefinition() = typedefof<KeyValuePair<int, int>>
                 then
@@ -1477,7 +1497,7 @@ module Display =
             match repr with
             | TupleValue(tupleType, vals) -> tupleValueL depthLim prec vals tupleType
 
-            | RecordValue items -> recordValueL depthLim (Array.toList items)
+            | RecordValue(kind, items) -> recordValueL depthLim kind (Array.toList items)
 
             | UnionCaseValue(constr, recd) when // x is List<T>. Note: "null" is never a valid list value.
                 (not (isNull x)) && isListType (x.GetType())
