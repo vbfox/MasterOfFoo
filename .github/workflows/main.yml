@@ -45,7 +45,7 @@ jobs:
       PAKET_SKIP_RESTORE_TARGETS: true
     steps:
     - uses: actions/checkout@v7
-    - uses: actions/setup-dotnet@v5
+    - uses: actions/setup-dotnet@v6
       with:
         # Only needed to pack the library and run the build script; the SDK
         # versions under test come from the Docker images.
