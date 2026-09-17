@@ -12,11 +12,16 @@ group build
     storage: none
     framework: net10.0
 
-    nuget FSharp.Core ~> 5
+    nuget FSharp.Core
     nuget BlackFox.Fake.BuildTask
     nuget BlackFox.CommandLine
 
-    nuget Octokit 0.48 // Fake.Api.GitHub 5.20.4 references 0.48+ but 0.50 has some incompatible Api changes
+    // 18.x only ships net11.0 and net472 libs, so on net10.0 nothing is copied to the output and
+    // FAKE's binlog parsing fails to load Microsoft.Build.Framework. 17.14 ships net9.0.
+    nuget Microsoft.Build.Framework ~> 17.14
+    nuget Microsoft.Build.Utilities.Core ~> 17.14
+    nuget Microsoft.NET.StringTools ~> 17.14
+
     nuget Fake.Core.Target
     nuget Fake.Core.Environment
     nuget Fake.Core.Process
