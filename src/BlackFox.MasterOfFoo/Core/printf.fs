@@ -791,7 +791,7 @@ module internal PrintfImpl =
     /// This type is equivalent to the `ValueConverter` type from the F# source code but with `PrintableElement` as
     /// the final result instead of `string`.
     [<Struct; NoEquality; NoComparison>]
-    type PrintableValueConverter private (f: obj) =
+    type PrintableValueConverter internal (f: obj) =
         member x.FuncObj = f
 
         static member inline Make<'t> (f: obj -> PrintableElement) = PrintableValueConverter(box f)
